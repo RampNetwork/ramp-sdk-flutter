@@ -31,7 +31,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Ramp:
-    :commit: 7c3b122efb857fdbb335c6d004a7f13577ec2f65
+    :commit: 43e48655051058819f58d0610be13339f0ca05b6
     :git: https://github.com/RampNetwork/ramp-sdk-ios
 
 SPEC CHECKSUMS:

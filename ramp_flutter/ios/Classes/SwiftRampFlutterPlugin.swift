@@ -47,8 +47,9 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
             else { result(FlutterError()) ; return }
             guard let configuration = Configuration(flutterMethodCallArguments: call.arguments)
             else { result(FlutterError()) ; return }
-            guard let ramp = try? RampViewController(configuration: configuration)
-            else { result(FlutterError()) ; return }
+            let ramp: RampViewController
+            do { ramp = try RampViewController(configuration: configuration) }
+            catch { result(FlutterError()) ; return }
             ramp.delegate = self
             viewController.present(ramp, animated: true)
             result(nil)
@@ -71,11 +72,6 @@ extension SwiftRampFlutterPlugin: RampDelegate {
     public func rampDidClose(_ rampViewController: RampViewController) {
         print("iOS closed")
         channel.invokeMethod(FlutterCallbackMethod.onRampClosed.rawValue, arguments: nil)
-    }
-    
-    public func ramp(_ rampViewController: RampViewController, didRaiseError error: Error) {
-        print("iOS error", error)
-        channel.invokeMethod(FlutterCallbackMethod.onRampFailed.rawValue, arguments: error)
     }
 }
 
@@ -106,7 +102,7 @@ private extension RampPurchase {
     func toDictionary() -> [String: Any?] {
         return [
             "id": id,
-            "endTime": endTime.description, // convert to string
+            "endTime": endTime,
             "asset": [
                 "address": asset.address,
                 "decimals": asset.decimals,
@@ -122,11 +118,11 @@ private extension RampPurchase {
             "baseRampFee": baseRampFee,
             "networkFee": networkFee,
             "appliedFee": appliedFee,
-            "paymentMethodType": paymentMethodType.rawValue,
+            "paymentMethodType": paymentMethodType,
             "finalTxHash": finalTxHash,
-            "createdAt": createdAt.description, // convert to date
-            "updatedAt": updatedAt.description, // convert to date
-            "status": status.rawValue,
+            "createdAt": createdAt,
+            "updatedAt": updatedAt,
+            "status": status,
             "escrowAddress": escrowAddress,
             "escrowDetailsHash": escrowDetailsHash,
         ]
