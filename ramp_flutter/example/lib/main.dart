@@ -27,12 +27,16 @@ class _MyAppState extends State<MyApp> {
           child: TextButton(
             onPressed: () {
               Configuration configuration = Configuration();
-              configuration.userEmailAddress = "test@test.pl";
+              configuration.url = "https://ri-widget-staging.firebaseapp.com/";
+              configuration.userEmailAddress =
+                  "mateusz.mail.kontaktowy@gmail.com";
+              configuration.userAddress =
+                  "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7";
               RampFlutter.showRamp(
                 configuration,
-                (purchase) => null,
-                () => null,
-                () => null,
+                _onPurchaseCreated,
+                _onRampClosed,
+                _onRampFailed,
               );
             },
             child: const Text("GO GO GO!"),
@@ -40,5 +44,17 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  void _onPurchaseCreated(Purchase purchase) {
+    print(purchase);
+  }
+
+  void _onRampClosed() {
+    print("_onRampClosed");
+  }
+
+  void _onRampFailed() {
+    print("_onRampFailed");
   }
 }

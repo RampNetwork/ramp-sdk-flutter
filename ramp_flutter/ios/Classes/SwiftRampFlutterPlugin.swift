@@ -49,6 +49,7 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
             else { result(FlutterError()) ; return }
             guard let ramp = try? RampViewController(configuration: configuration)
             else { result(FlutterError()) ; return }
+            ramp.delegate = self
             viewController.present(ramp, animated: true)
             result(nil)
         }
@@ -57,18 +58,23 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
 
 extension SwiftRampFlutterPlugin: RampDelegate {
     public func ramp(_ rampViewController: RampViewController, didCreatePurchase purchase: RampPurchase) {
-        channel.invokeMethod(FlutterCallbackMethod.onPurchaseCreated.rawValue, arguments: purchase)
+        print("iOS created", purchase)
+        channel.invokeMethod(FlutterCallbackMethod.onPurchaseCreated.rawValue,
+                             arguments: purchase.toDictionary())
     }
     
     public func rampPurchaseDidFail(_ rampViewController: RampViewController) {
+        print("iOS failed")
         channel.invokeMethod(FlutterCallbackMethod.onRampFailed.rawValue, arguments: nil)
     }
     
     public func rampDidClose(_ rampViewController: RampViewController) {
+        print("iOS closed")
         channel.invokeMethod(FlutterCallbackMethod.onRampClosed.rawValue, arguments: nil)
     }
     
     public func ramp(_ rampViewController: RampViewController, didRaiseError error: Error) {
+        print("iOS error", error)
         channel.invokeMethod(FlutterCallbackMethod.onRampFailed.rawValue, arguments: error)
     }
 }
@@ -93,5 +99,36 @@ private extension Configuration {
         self.containerNode = arguments["containerNode"] as? String
         self.hostApiKey = arguments["hostApiKey"] as? String
         self.deepLinkScheme = arguments["deepLinkScheme"] as? String
+    }
+}
+
+private extension RampPurchase {
+    func toDictionary() -> [String: Any?] {
+        return [
+            "id": id,
+            "endTime": endTime.description, // convert to string
+            "asset": [
+                "address": asset.address,
+                "decimals": asset.decimals,
+                "name": asset.name,
+                "symbol": asset.symbol,
+                "type": asset.type,
+            ] as [String: Any?],
+            "receiverAddress": receiverAddress,
+            "cryptoAmount": cryptoAmount,
+            "fiatCurrency": fiatCurrency,
+            "fiatValue": fiatValue,
+            "assetExchangeRate": assetExchangeRate,
+            "baseRampFee": baseRampFee,
+            "networkFee": networkFee,
+            "appliedFee": appliedFee,
+            "paymentMethodType": paymentMethodType.rawValue,
+            "finalTxHash": finalTxHash,
+            "createdAt": createdAt.description, // convert to date
+            "updatedAt": updatedAt.description, // convert to date
+            "status": status.rawValue,
+            "escrowAddress": escrowAddress,
+            "escrowDetailsHash": escrowDetailsHash,
+        ]
     }
 }

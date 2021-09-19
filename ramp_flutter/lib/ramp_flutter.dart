@@ -14,13 +14,14 @@ class RampFlutter {
     _channel.setMethodCallHandler((call) {
       switch (call.method) {
         case "onPurchaseCreated":
-          print("on purchase created");
+          Purchase purchase = Purchase.fromArguments(call.arguments);
+          onPurchaseCreated(purchase);
           break;
         case "onRampClosed":
-          print("on ramp closed");
+          onRampClosed();
           break;
         case "onRampFailed":
-          print("on ramp failed");
+          onRampFailed();
           break;
       }
       return Future(() => null);
@@ -68,4 +69,35 @@ class Configuration {
   }
 }
 
-class Purchase {}
+class Purchase {
+  String? id;
+  String? endTime;
+  AssetInfo? asset;
+  String? receiverAddress;
+  String? cryptoAmount;
+  String? fiatCurrency;
+  int? fiatValue;
+  int? assetExchangeRate;
+  int? baseRampFee;
+  int? networkFee;
+  int? appliedFee;
+  String? paymentMethodType;
+  String? finalTxHash;
+  String? createdAt;
+  String? updatedAt;
+  String? status;
+  String? escrowAddress;
+  String? escrowDetailsHash;
+
+  static Purchase fromArguments(arguments) {
+    return Purchase();
+  }
+}
+
+class AssetInfo {
+  String? address;
+  String? symbol;
+  String? type;
+  String? name;
+  int? decimals;
+}
