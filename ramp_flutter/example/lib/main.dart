@@ -14,7 +14,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Configuration configuration = Configuration();
+  Configuration _configuration = Configuration();
+  String _result = "";
 
   @override
   Widget build(BuildContext context) {
@@ -23,44 +24,48 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Ramp Demo in Flutter'),
         ),
-        body: Form(
-          child: Column(
-            children: [
-              TextField(
-                decoration: const InputDecoration(hintText: "Widget URL"),
-                onChanged: (text) => configuration.url = text,
-              ),
-              TextField(
-                decoration: const InputDecoration(hintText: "User email"),
-                onChanged: (text) => configuration.userEmailAddress = text,
-              ),
-              TextField(
-                decoration: const InputDecoration(hintText: "User address"),
-                onChanged: (text) => configuration.userAddress = text,
-              ),
-              TextButton(
-                onPressed: () {
-                  RampFlutter.showRamp(configuration, _onPurchaseCreated,
-                      _onRampClosed, _onRampFailed);
-                },
-                child: const Text("Show Ramp"),
-              )
-            ],
+        body: Builder(
+          builder: (context) => Form(
+            child: Column(children: _formFields(context)),
           ),
         ),
       ),
     );
   }
 
-  void _onPurchaseCreated(Purchase purchase) {
-    print(purchase);
+  List<Widget> _formFields(BuildContext context) {
+    return [
+      TextField(
+        decoration: const InputDecoration(hintText: "Widget URL"),
+        onChanged: (text) => _configuration.url = text,
+      ),
+      TextField(
+        decoration: const InputDecoration(hintText: "User email"),
+        onChanged: (text) => _configuration.userEmailAddress = text,
+      ),
+      TextField(
+        decoration: const InputDecoration(hintText: "User address"),
+        onChanged: (text) => _configuration.userAddress = text,
+      ),
+      TextButton(
+        onPressed: () {
+          RampFlutter.showRamp(
+            _configuration,
+            (purchase) => _showSnackBar(context, "Purchase created"),
+            () => _showSnackBar(context, "Ramp widget closed"),
+            () => _showSnackBar(context, "Ramp widget failed"),
+          );
+        },
+        child: const Text("Show Ramp"),
+      ),
+      Text(_result)
+    ];
   }
 
-  void _onRampClosed() {
-    print("_onRampClosed");
-  }
-
-  void _onRampFailed() {
-    print("_onRampFailed");
+  void _showSnackBar(BuildContext context, String text) {
+    print("Text");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(text)),
+    );
   }
 }
