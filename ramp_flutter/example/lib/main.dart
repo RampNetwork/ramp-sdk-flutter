@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
 
 void main() {
@@ -16,30 +14,38 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Configuration configuration = Configuration();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Ramp Demo in Flutter'),
         ),
-        body: Center(
-          child: TextButton(
-            onPressed: () {
-              Configuration configuration = Configuration();
-              configuration.url = "https://ri-widget-staging.firebaseapp.com/";
-              configuration.userEmailAddress =
-                  "mateusz.mail.kontaktowy@gmail.com";
-              configuration.userAddress =
-                  "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7";
-              RampFlutter.showRamp(
-                configuration,
-                _onPurchaseCreated,
-                _onRampClosed,
-                _onRampFailed,
-              );
-            },
-            child: const Text("GO GO GO!"),
+        body: Form(
+          child: Column(
+            children: [
+              TextField(
+                decoration: const InputDecoration(hintText: "Widget URL"),
+                onChanged: (text) => configuration.url = text,
+              ),
+              TextField(
+                decoration: const InputDecoration(hintText: "User email"),
+                onChanged: (text) => configuration.userEmailAddress = text,
+              ),
+              TextField(
+                decoration: const InputDecoration(hintText: "User address"),
+                onChanged: (text) => configuration.userAddress = text,
+              ),
+              TextButton(
+                onPressed: () {
+                  RampFlutter.showRamp(configuration, _onPurchaseCreated,
+                      _onRampClosed, _onRampFailed);
+                },
+                child: const Text("Show Ramp"),
+              )
+            ],
           ),
         ),
       ),
