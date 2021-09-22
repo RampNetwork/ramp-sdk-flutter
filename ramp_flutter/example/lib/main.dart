@@ -14,8 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Configuration _configuration = Configuration();
-  String _result = "";
+  final Configuration _configuration = Configuration();
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +57,10 @@ class _MyAppState extends State<MyApp> {
         },
         child: const Text("Show Ramp"),
       ),
-      Text(_result)
     ];
   }
 
   void _showSnackBar(BuildContext context, String text) {
-    print("Text");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(text)),
     );
