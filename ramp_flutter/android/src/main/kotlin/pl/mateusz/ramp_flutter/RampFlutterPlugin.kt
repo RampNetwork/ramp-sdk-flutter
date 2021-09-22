@@ -32,7 +32,7 @@ class RampFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "showRamp") {
-      showRamp()
+      showRamp(call.arguments)
       result.success(null)
     } else {
       result.notImplemented()
@@ -52,29 +52,19 @@ class RampFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    activity = binding.activity;
+    activity = binding.activity
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
     TODO("Not yet implemented")
   }
 
-  private fun showRamp() {
+  private fun showRamp(arguments: Any) {
     rampSdk = RampSDK()
-    val config = Config(
-      hostLogoUrl = "https://example.com/logo.png",
-      hostAppName = "My App",
-      userAddress = "user_blockchain_address",
-      // optional, skip this param to use the production URL
-      url = "https://ri-widget-staging.firebaseapp.com/",
-      swapAsset = "ETH",
-      fiatCurrency = "USD",
-      fiatValue = "10",
-      userEmailAddress = "test@example.com"
-    )
+    val config = makeConfiguration(arguments) ?: return
     val callback = object : RampCallback {
       override fun onPurchaseFailed() {
-        // ...
+        channel.invokeMethod("onRampFailed", null)
       }
 
       override fun onPurchaseCreated(
@@ -82,13 +72,38 @@ class RampFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         purchaseViewToken: String,
         apiUrl: String
       ) {
-        // ...
+        val purchaseMap = serializePurchase(purchase)
+        channel.invokeMethod("onPurchaseCreated", purchaseMap)
       }
 
       override fun onWidgetClose() {
-        // ...
+        channel.invokeMethod("onRampClosed", null)
       }
     }
     rampSdk.startTransaction(activity, config, callback)
   }
+}
+
+private fun makeConfiguration(arguments: Any): Config? {
+  val map = arguments as? Map<*, *> ?: return null
+  val hostAppName = map["hostAppName"] as? String ?: "Ramp Integration"
+  val hostLogoUrl = map["hostLogoUrl"] as? String ?: "https://ramp.network/assets/images/Logo.svg"
+  val config = Config(hostAppName, hostLogoUrl)
+  
+  config.swapAsset = map["swapAsset"] as? String ?: ""
+  config.swapAmount = map["swapAmount"] as? String ?: ""
+  config.fiatCurrency = map["fiatCurrency"] as? String ?: ""
+  config.fiatValue = map["fiatValue"] as? String ?: ""
+  config.userAddress = map["userAddress"] as? String ?: ""
+  config.userEmailAddress = map["userEmailAddress"] as? String ?: ""
+  config.selectedCountryCode = map["selectedCountryCode"] as? String ?: ""
+  config.defaultAsset = map["defaultAsset"] as? String ?: ""
+  config.webhookStatusUrl = map["webhookStatusUrl"] as? String ?: ""
+  config.hostApiKey = map["hostApiKey"] as? String ?: ""
+
+  return config
+}
+
+private fun serializePurchase(purchase: Purchase): Map<String, Any?> {
+  return emptyMap()
 }

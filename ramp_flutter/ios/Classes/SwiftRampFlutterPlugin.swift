@@ -2,14 +2,6 @@ import Flutter
 import UIKit
 import Ramp
 
-private enum FlutterBridgeMethod: String {
-    case showRamp
-}
-
-private enum FlutterCallbackMethod: String {
-    case onPurchaseCreated, onRampFailed, onRampClosed
-}
-
 public class SwiftRampFlutterPlugin: NSObject {
     let channel: FlutterMethodChannel
     
@@ -39,10 +31,8 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let method = FlutterBridgeMethod(rawValue: call.method)
-        else { result(FlutterError()) ; return }
-        switch method {
-        case .showRamp:
+        switch call.method {
+        case "showRamp":
             guard let viewController = UIApplication.shared.keyWindow?.rootViewController
             else { result(FlutterError()) ; return }
             guard let configuration = Configuration(flutterMethodCallArguments: call.arguments)
@@ -53,25 +43,23 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
             ramp.delegate = self
             viewController.present(ramp, animated: true)
             result(nil)
+        default:
+            result(FlutterError())
         }
     }
 }
 
 extension SwiftRampFlutterPlugin: RampDelegate {
     public func ramp(_ rampViewController: RampViewController, didCreatePurchase purchase: RampPurchase) {
-        print("iOS created", purchase)
-        channel.invokeMethod(FlutterCallbackMethod.onPurchaseCreated.rawValue,
-                             arguments: purchase.toDictionary())
+        channel.invokeMethod("onPurchaseCreated", arguments: purchase.toDictionary())
     }
     
     public func rampPurchaseDidFail(_ rampViewController: RampViewController) {
-        print("iOS failed")
-        channel.invokeMethod(FlutterCallbackMethod.onRampFailed.rawValue, arguments: nil)
+        channel.invokeMethod("onRampFailed", arguments: nil)
     }
     
     public func rampDidClose(_ rampViewController: RampViewController) {
-        print("iOS closed")
-        channel.invokeMethod(FlutterCallbackMethod.onRampClosed.rawValue, arguments: nil)
+        channel.invokeMethod("onRampClosed", arguments: nil)
     }
 }
 
