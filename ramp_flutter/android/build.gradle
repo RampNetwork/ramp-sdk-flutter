@@ -47,7 +47,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.RampNetwork:ramp-sdk-android:1.+'
+        implementation 'com.github.RampNetwork:ramp-sdk-android:feature~on-back-pressed-event-SNAPSHOT'
     }
 }
 
