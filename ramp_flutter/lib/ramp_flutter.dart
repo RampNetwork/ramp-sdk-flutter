@@ -47,6 +47,7 @@ class Configuration {
   String? finalUrl;
   String? containerNode;
   String? hostApiKey;
+  String? deepLinkScheme;
 
   Map<String, dynamic> toMap() {
     return {
@@ -65,6 +66,7 @@ class Configuration {
       'finalUrl': finalUrl,
       'containerNode': containerNode,
       'hostApiKey': hostApiKey,
+      'deepLinkScheme': deepLinkScheme,
     };
   }
 }

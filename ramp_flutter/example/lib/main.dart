@@ -18,6 +18,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    _configuration.deepLinkScheme = 'rampflutterdemo';
+
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
