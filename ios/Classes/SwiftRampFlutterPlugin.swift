@@ -2,8 +2,39 @@ import Flutter
 import UIKit
 import Ramp
 
+private enum RampFlutterError: Error {
+    case flutterViewControllerUnavailable, unableToDecodeConfiguration, unknownCallMethod
+}
+
+private extension Error {
+    var flutterError: FlutterError {
+        guard let rampFlutterError = self as? RampFlutterError
+        else {
+            let nsError = self as NSError
+            return FlutterError(code: String(nsError.code),
+                                message: nsError.description,
+                                details: nsError.userInfo)
+        }
+        
+        switch rampFlutterError {
+        case .flutterViewControllerUnavailable:
+            return FlutterError(code: "flutterViewControllerUnavailable",
+                                message: "FlutterViewController unavailable",
+                                details: nil)
+        case .unableToDecodeConfiguration:
+            return FlutterError(code: "unableToDecodeConfiguration",
+                                message: "Unable to decode Configuration",
+                                details: nil)
+        case .unknownCallMethod:
+            return FlutterError(code: "unknownCallMethod",
+                                message: "Unknown call method",
+                                details: nil)
+        }
+    }
+}
+
 public class SwiftRampFlutterPlugin: NSObject {
-    let channel: FlutterMethodChannel
+    private let channel: FlutterMethodChannel
     
     init(channel: FlutterMethodChannel) {
         self.channel = channel
@@ -13,10 +44,10 @@ public class SwiftRampFlutterPlugin: NSObject {
         guard let delegate = UIApplication.shared.delegate,
               let window = delegate.window,
               let flutterViewController = window?.rootViewController as? FlutterViewController
-        else { throw NSError()  }
+        else { throw RampFlutterError.flutterViewControllerUnavailable  }
         guard let configurationArguments = arguments as? [String: Any],
               let configuration = Configuration(flutterMethodCallArguments: configurationArguments)
-        else { throw NSError() }
+        else { throw RampFlutterError.unableToDecodeConfiguration }
         let rampViewController = try RampViewController.init(configuration: configuration)
         rampViewController.delegate = self
         flutterViewController.present(rampViewController, animated: true)
@@ -33,25 +64,24 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "showRamp":
-            guard let viewController = UIApplication.shared.keyWindow?.rootViewController
-            else { result(FlutterError()) ; return }
-            guard let configuration = Configuration(flutterMethodCallArguments: call.arguments)
-            else { result(FlutterError()) ; return }
-            let ramp: RampViewController
-            do { ramp = try RampViewController(configuration: configuration) }
-            catch { result(FlutterError()) ; return }
-            ramp.delegate = self
-            viewController.present(ramp, animated: true)
-            result(nil)
+            do {
+                try showRamp(arguments: call.arguments)
+                result(nil)
+            }
+            catch {
+                result(error.flutterError)
+            }
         default:
-            result(FlutterError())
+            let error = RampFlutterError.unknownCallMethod
+            result(error.flutterError)
         }
     }
 }
 
 extension SwiftRampFlutterPlugin: RampDelegate {
-    public func ramp(_ rampViewController: RampViewController, didCreatePurchase purchase: RampPurchase) {
-        channel.invokeMethod("onPurchaseCreated", arguments: purchase.toDictionary())
+    public func ramp(_ rampViewController: RampViewController, didCreatePurchase purchase: RampPurchase, purchaseViewToken: String, apiUrl: URL) {
+        channel.invokeMethod("onPurchaseCreated",
+                             arguments: [purchase.toDictionary(), purchaseViewToken, apiUrl.absoluteString])
     }
     
     public func rampPurchaseDidFail(_ rampViewController: RampViewController) {

@@ -7,15 +7,18 @@ class RampFlutter {
 
   static Future<void> showRamp(
     Configuration configuration,
-    Function(Purchase purchase) onPurchaseCreated,
+    Function(Purchase purchase, String purchaseViewToken, String apiUrl)
+        onPurchaseCreated,
     Function() onRampClosed,
     Function() onRampFailed,
   ) async {
     _channel.setMethodCallHandler((call) {
       switch (call.method) {
         case "onPurchaseCreated":
-          Purchase purchase = Purchase.fromArguments(call.arguments);
-          onPurchaseCreated(purchase);
+          Purchase purchase = Purchase.fromArguments(call.arguments[0]);
+          String purchaseViewToken = call.arguments[1];
+          String apiUrl = call.arguments[2];
+          onPurchaseCreated(purchase, purchaseViewToken, apiUrl);
           break;
         case "onRampClosed":
           onRampClosed();

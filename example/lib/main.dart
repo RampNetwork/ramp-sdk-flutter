@@ -47,7 +47,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     return PlatformApp(
       home: PlatformScaffold(
         appBar: PlatformAppBar(title: const Text('Ramp Flutter')),
-        body: Builder(builder: (c) => ListView(children: _formFields(c))),
+        body: Builder(
+          builder: (context) => ListView(children: _formFields(context)),
+        ),
         iosContentPadding: false,
         iosContentBottomPadding: false,
       ),
@@ -111,7 +113,8 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         onPressed: () {
           RampFlutter.showRamp(
             _configuration,
-            (purchase) => _showSnackBar(context, "Purchase created"),
+            (purchase, token, apiUrl) =>
+                _showSnackBar(context, "Purchase created"),
             () => _showSnackBar(context, "Ramp widget closed"),
             () => _showSnackBar(context, "Ramp widget failed"),
           );
@@ -131,8 +134,18 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   void _showSnackBar(BuildContext context, String text) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(text)),
+    showPlatformDialog(
+      context: context,
+      builder: (_) => PlatformAlertDialog(
+        title: const Text('Alert'),
+        content: Text(text),
+        actions: <Widget>[
+          PlatformDialogAction(
+            child: PlatformText('Cancel'),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
     );
   }
 }
