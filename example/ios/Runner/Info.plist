@@ -26,7 +26,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>CFBundleURLName</key>
-			<string>pl.mateusz.ramp</string>
+			<string>network.ramp.ramp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>rampflutterdemo</string>

@@ -1,4 +1,4 @@
-group 'pl.mateusz.ramp_flutter'
+group 'network.ramp.ramp_flutter'
 version '1.0-SNAPSHOT'
 
 buildscript {

@@ -1,4 +1,4 @@
-package pl.mateusz.ramp_flutter
+package network.ramp.ramp_flutter
 
 import android.app.Activity
 import android.content.Context

@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:161438308427:android:e95d2111783f975b35d5ce",
         "android_client_info": {
-          "package_name": "pl.mateusz.ramp_flutter_example"
+          "package_name": "network.ramp.ramp_flutter_example"
         }
       },
       "oauth_client": [
