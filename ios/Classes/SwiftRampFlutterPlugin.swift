@@ -80,8 +80,10 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
 
 extension SwiftRampFlutterPlugin: RampDelegate {
     public func ramp(_ rampViewController: RampViewController, didCreatePurchase purchase: RampPurchase, purchaseViewToken: String, apiUrl: URL) {
-        channel.invokeMethod("onPurchaseCreated",
-                             arguments: [purchase.toDictionary(), purchaseViewToken, apiUrl.absoluteString])
+        let purchaseDictionary = purchase.toDictionary()
+        let urlString = apiUrl.absoluteString
+        let arguments: [Any] = [purchaseDictionary, purchaseViewToken, urlString]
+        channel.invokeMethod("onPurchaseCreated", arguments: arguments)
     }
     
     public func rampPurchaseDidFail(_ rampViewController: RampViewController) {
