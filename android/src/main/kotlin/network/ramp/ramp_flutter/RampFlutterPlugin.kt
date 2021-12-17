@@ -43,8 +43,20 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel.setMethodCallHandler(null)
     }
 
+    override fun onDetachedFromActivity() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        TODO("Not yet implemented")
+    }
+
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        TODO("Not yet implemented")
     }
 
     private fun showRamp(arguments: Any) {
