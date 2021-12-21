@@ -17,7 +17,7 @@ class RampFlutterApp extends StatefulWidget {
 class _RampFlutterAppState extends State<RampFlutterApp> {
   final Configuration _configuration = Configuration();
   final List<String> _environments = [
-    "https://ri-widget-dev.firebaseapp.com",
+    "https://ri-widget-dev2.firebaseapp.com",
     "https://ri-widget-staging.firebaseapp.com",
     "https://buy.ramp.network",
   ];
