@@ -23,11 +23,32 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var context: Context
     private lateinit var activity: Activity
     private lateinit var rampSdk: RampSDK
+    private lateinit var callback: RampCallback
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "ramp_flutter")
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
+        rampSdk = RampSDK()
+        callback = object : RampCallback {
+            override fun onPurchaseFailed() {
+                channel.invokeMethod("onRampFailed", null)
+            }
+
+            override fun onPurchaseCreated(
+                purchase: Purchase,
+                purchaseViewToken: String,
+                apiUrl: String
+            ) {
+                val purchaseMap = serializePurchase(purchase)
+                channel.invokeMethod("onPurchaseCreated", purchaseMap)
+            }
+
+            override fun onWidgetClose() {
+                channel.invokeMethod("onRampClosed", null)
+
+            }
+        }
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -44,11 +65,9 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onDetachedFromActivity() {
-        TODO("Not yet implemented")
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        TODO("Not yet implemented")
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -56,30 +75,10 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        TODO("Not yet implemented")
     }
 
     private fun showRamp(arguments: Any) {
-        rampSdk = RampSDK()
         val config = makeConfiguration(arguments) ?: return
-        val callback = object : RampCallback {
-            override fun onPurchaseFailed() {
-                channel.invokeMethod("onRampFailed", null)
-            }
-
-            override fun onPurchaseCreated(
-                purchase: Purchase,
-                purchaseViewToken: String,
-                apiUrl: String
-            ) {
-                val purchaseMap = serializePurchase(purchase)
-                channel.invokeMethod("onPurchaseCreated", purchaseMap)
-            }
-
-            override fun onWidgetClose() {
-                channel.invokeMethod("onRampClosed", null)
-            }
-        }
         rampSdk.startTransaction(activity, config, callback)
     }
 }
