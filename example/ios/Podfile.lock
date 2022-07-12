@@ -1,17 +1,17 @@
 PODS:
   - Flutter (1.0.0)
-  - Microblink (5.11.1)
-  - Passbase (2.8.3):
-    - Microblink (= 5.11.1)
-  - Ramp (2.0.0):
+  - Microblink (5.16.0)
+  - Passbase (2.13.3):
+    - Microblink (= 5.16.0)
+  - Ramp (3.0.0):
     - Passbase (~> 2.8)
   - ramp_flutter (0.0.1):
     - Flutter
-    - Ramp (~> 2.0.0)
+    - Ramp
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, tag `2.0.0`)
+  - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, branch `offramp`)
   - ramp_flutter (from `.symlinks/plugins/ramp_flutter/ios`)
 
 SPEC REPOS:
@@ -24,23 +24,23 @@ EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
   Ramp:
+    :branch: offramp
     :git: https://github.com/RampNetwork/ramp-sdk-ios
-    :tag: 2.0.0
   ramp_flutter:
     :path: ".symlinks/plugins/ramp_flutter/ios"
 
 CHECKOUT OPTIONS:
   Ramp:
+    :commit: c656b9cd3e917f5699fae178c0fb481a3aa6ba41
     :git: https://github.com/RampNetwork/ramp-sdk-ios
-    :tag: 2.0.0
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  Microblink: 807dd5cc6a9c6a1f7913c7e4450a3cde49dbf894
-  Passbase: 4858a7a9d76a9b5a07f5c12a299b2681c4697f30
-  Ramp: c522303707480a458eef7d05c96e8c9604be4840
-  ramp_flutter: 2fed2262c7882b5b8285c1aaea4f36f2b93b00c1
+  Microblink: 9443ff3c708a97673e4999389626079e10a1bbc1
+  Passbase: 0a99aa0ff15364b6bb7b2bede91467074811d460
+  Ramp: e08a1925be64baf1b56cf6171f4052bf4cc81501
+  ramp_flutter: 61fe902f750eb99f5f27a363f1b49d9bed8cdd35
 
-PODFILE CHECKSUM: e8177b0e82ec4e6a54bcc80fcd6a13b039428192
+PODFILE CHECKSUM: b5c871ad6b41ec349f57be9e2abd3209ad9d4b48
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
