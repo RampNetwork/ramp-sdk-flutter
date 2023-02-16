@@ -30,7 +30,11 @@ public class SwiftRampFlutterPlugin: NSObject {
     }
     
     private func sendCrypto(arguments: Any?) throws {
-        fatalError()
+        guard let transactionHash = arguments as? String
+        else {
+            throw RampFlutterError.unableToDecodeTransactionHash
+        }
+        sendCryptoResponseHandler?(SendCryptoResultPayload(txHash: transactionHash))
     }
 }
 
@@ -139,6 +143,7 @@ private extension SendCryptoPayload {
 private enum RampFlutterError: Error {
     case flutterViewControllerUnavailable
     case unableToDecodeConfiguration
+    case unableToDecodeTransactionHash
     case unknownCallMethod
 }
 
@@ -152,6 +157,10 @@ private extension Error {
         case .unableToDecodeConfiguration:
             return FlutterError(code: "unableToDecodeConfiguration",
                                 message: "Unable to decode Configuration",
+                                details: nil)
+        case .unableToDecodeTransactionHash:
+            return FlutterError(code: "unableToDecodeTransactionHash",
+                                message: "Unable to decode transaction hash",
                                 details: nil)
         case .unknownCallMethod:
             return FlutterError(code: "unknownCallMethod",

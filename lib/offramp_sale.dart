@@ -1,15 +1,15 @@
 class OfframpSale {
-  String? id;
   String? createdAt;
   OfframpCrypto? crypto;
   OfframpFiat? fiat;
+  String? id;
 
   static OfframpSale fromArguments(Map<String, dynamic> arguments) {
     OfframpSale sale = OfframpSale();
-    sale.id = arguments["id"];
     sale.createdAt = arguments["createdAt"];
     sale.crypto = OfframpCrypto.fromArguments(arguments['crypto']);
     sale.fiat = OfframpFiat.fromArguments(arguments['fiat']);
+    sale.id = arguments["id"];
     return sale;
   }
 }
@@ -27,21 +27,19 @@ class OfframpCrypto {
 }
 
 class OfframpAssetInfo {
-  String? address;
-  String? symbol;
   String? chain;
-  String? type;
-  String? name;
   int? decimals;
+  String? name;
+  String? symbol;
+  String? type;
 
   static OfframpAssetInfo fromArguments(Map<String, dynamic> arguments) {
     OfframpAssetInfo assetInfo = OfframpAssetInfo();
-    assetInfo.address = arguments["address"];
-    assetInfo.symbol = arguments["symbol"];
     assetInfo.chain = arguments["chain"];
-    assetInfo.type = arguments["type"];
-    assetInfo.name = arguments["name"];
     assetInfo.decimals = arguments["decimals"];
+    assetInfo.name = arguments["name"];
+    assetInfo.symbol = arguments["symbol"];
+    assetInfo.type = arguments["type"];
     return assetInfo;
   }
 }

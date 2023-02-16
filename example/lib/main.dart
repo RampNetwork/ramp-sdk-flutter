@@ -19,6 +19,7 @@ class RampFlutterApp extends StatefulWidget {
 }
 
 class _RampFlutterAppState extends State<RampFlutterApp> {
+  final ramp = RampFlutter();
   final GlobalKey<NavigatorState> _globalKey = GlobalKey();
   final Configuration _configuration = Configuration();
   final List<String> _predefinedEnvironments = [
@@ -48,13 +49,10 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 //        _configuration.defaultFlow = .onramp
     _configuration.useSendCryptoCallback = true;
 
-    RampFlutter.setupCallbacks(
-      onWidgetConfigDone,
-      onOnrampPurchaseCreated,
-      onSendCryptoRequested,
-      onOfframpSaleCreated,
-      onRampClosed,
-    );
+    ramp.onOnrampPurchaseCreated = onOnrampPurchaseCreated;
+    ramp.onSendCryptoRequested = onSendCryptoRequested;
+    ramp.onOfframpSaleCreated = onOfframpSaleCreated;
+    ramp.onRampClosed = onRampClosed;
 
     super.initState();
   }
@@ -65,10 +63,6 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     setState(() => {});
   }
 
-  void onWidgetConfigDone() {
-    _showAlert("widget config done");
-  }
-
   void onOnrampPurchaseCreated(
       OnrampPurchase purchase, String purchaseViewToken, String apiUrl) {
     _showAlert("purchase created");
@@ -76,6 +70,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   void onSendCryptoRequested(SendCryptoPayload payload) {
     _showAlert("offramp requested");
+    ramp.sendCrypto("123");
   }
 
   void onOfframpSaleCreated(
@@ -228,9 +223,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         if (_useFullCustomUrl) {
           Configuration c = Configuration();
           c.url = _fullCustomUrl;
-          RampFlutter.showRamp(c);
+          ramp.showRamp(c);
         } else {
-          RampFlutter.showRamp(_configuration);
+          ramp.showRamp(_configuration);
         }
       },
       child: PlatformText("Show Ramp"),

@@ -8,52 +8,64 @@ import 'package:ramp_flutter/send_crypto_payload.dart';
 import 'configuration.dart';
 
 class RampFlutter {
-  static const MethodChannel _channel = MethodChannel('ramp_flutter');
+  final MethodChannel _channel = const MethodChannel('ramp_flutter');
 
-  static void setupCallbacks(
-    Function() onWidgetConfigDone,
-    Function(OnrampPurchase purchase, String purchaseViewToken, String apiUrl)
-        onOnrampPurchaseCreated,
-    Function(SendCryptoPayload payload) onSendCryptoRequested,
-    Function(OfframpSale sale, String saleViewToken, String apiUrl)
-        onOfframpSaleCreated,
-    Function() onRampClosed,
-  ) {
-    _channel.setMethodCallHandler((call) {
-      switch (call.method) {
-        case "onOnrampPurchaseCreated":
-          OnrampPurchase purchase =
-              OnrampPurchase.fromArguments(call.arguments[0]);
-          String purchaseViewToken = call.arguments[1];
-          String apiUrl = call.arguments[2];
-          onOnrampPurchaseCreated(purchase, purchaseViewToken, apiUrl);
-          break;
-        case "onSendCryptoRequested":
-          SendCryptoPayload payload =
-              SendCryptoPayload.fromArguments(call.arguments[0]);
-          onSendCryptoRequested(payload);
-          break;
-        case "onOfframpSaleCreated":
-          OfframpSale sale = OfframpSale.fromArguments(call.arguments[0]);
-          String saleViewToken = call.arguments[1];
-          String apiUrl = call.arguments[2];
-          onOfframpSaleCreated(sale, saleViewToken, apiUrl);
-          break;
-        case "onRampClosed":
-          onRampClosed();
-          break;
-      }
-      return Future(() => null);
-    });
+  Function(OnrampPurchase, String, String)? onOnrampPurchaseCreated;
+  Function(SendCryptoPayload payload)? onSendCryptoRequested;
+  Function(OfframpSale, String, String)? onOfframpSaleCreated;
+  Function()? onRampClosed;
+
+  void _handleOnOnrampPurchaseCreated(Map<String, dynamic> arguments) {
+    Map<String, dynamic> payload = arguments[0];
+    String purchaseViewToken = arguments[1];
+    String apiUrl = arguments[2];
+    OnrampPurchase purchase = OnrampPurchase.fromArguments(payload);
+    onOnrampPurchaseCreated!(purchase, purchaseViewToken, apiUrl);
   }
 
-  static Future<void> showRamp(
+  void _handleOnSendCryptoRequested(Map<String, dynamic> arguments) {
+    Map<String, dynamic> payload = arguments[0];
+    SendCryptoPayload sendCrypto = SendCryptoPayload.fromArguments(payload);
+    onSendCryptoRequested!(sendCrypto);
+  }
+
+  void _handleOnOfframpSaleCreated(Map<String, dynamic> arguments) {
+    Map<String, dynamic> payload = arguments[0];
+    String saleViewToken = arguments[1];
+    String apiUrl = arguments[2];
+    OfframpSale sale = OfframpSale.fromArguments(payload);
+    onOfframpSaleCreated!(sale, saleViewToken, apiUrl);
+  }
+
+  void _handleOnRampClosed() {
+    onRampClosed!();
+  }
+
+  Future<void> _didRecieveMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case "onOnrampPurchaseCreated":
+        _handleOnOnrampPurchaseCreated(call.arguments);
+        break;
+      case "onSendCryptoRequested":
+        _handleOnSendCryptoRequested(call.arguments);
+        break;
+      case "onOfframpSaleCreated":
+        _handleOnOfframpSaleCreated(call.arguments);
+        break;
+      case "onRampClosed":
+        _handleOnRampClosed();
+        break;
+    }
+  }
+
+  Future<void> showRamp(
     Configuration configuration,
   ) async {
+    _channel.setMethodCallHandler(_didRecieveMethodCall);
     await _channel.invokeMethod('showRamp', configuration.toMap());
   }
 
-  static Future<void> sendCrypto(String? transactionHash) async {
+  Future<void> sendCrypto(String? transactionHash) async {
     await _channel.invokeMethod('sendCrypto', transactionHash);
   }
 }
