@@ -1,16 +1,16 @@
-class OfframpPurchase {
+class OfframpSale {
   String? id;
   String? createdAt;
   OfframpCrypto? crypto;
   OfframpFiat? fiat;
 
-  static OfframpPurchase fromArguments(Map<String, dynamic> arguments) {
-    OfframpPurchase purchase = OfframpPurchase();
-    purchase.id = arguments["id"];
-    purchase.createdAt = arguments["createdAt"];
-    purchase.crypto = OfframpCrypto.fromArguments(arguments['crypto']);
-    purchase.fiat = OfframpFiat.fromArguments(arguments['fiat']);
-    return purchase;
+  static OfframpSale fromArguments(Map<String, dynamic> arguments) {
+    OfframpSale sale = OfframpSale();
+    sale.id = arguments["id"];
+    sale.createdAt = arguments["createdAt"];
+    sale.crypto = OfframpCrypto.fromArguments(arguments['crypto']);
+    sale.fiat = OfframpFiat.fromArguments(arguments['fiat']);
+    return sale;
   }
 }
 

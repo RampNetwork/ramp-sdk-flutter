@@ -1,4 +1,4 @@
-class Purchase {
+class OnrampPurchase {
   String? id;
   String? endTime;
   PurchaseAssetInfo? asset;
@@ -18,8 +18,8 @@ class Purchase {
   String? escrowAddress;
   String? escrowDetailsHash;
 
-  static Purchase fromArguments(Map<String, dynamic> arguments) {
-    Purchase purchase = Purchase();
+  static OnrampPurchase fromArguments(Map<String, dynamic> arguments) {
+    OnrampPurchase purchase = OnrampPurchase();
     purchase.id = arguments["id"];
     purchase.endTime = arguments["endTime"];
     purchase.asset = PurchaseAssetInfo.fromArguments(arguments["asset"]);

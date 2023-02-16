@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'package:ramp_flutter/configuration.dart';
-import 'package:ramp_flutter/offramp_purchase.dart';
-import 'package:ramp_flutter/purchase.dart';
+import 'package:ramp_flutter/offramp_sale.dart';
+import 'package:ramp_flutter/onramp_purchase.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
 import 'package:ramp_flutter/send_crypto_payload.dart';
 
@@ -34,18 +34,25 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   @override
   void initState() {
     _configuration.fiatValue = "3";
-    _configuration.fiatCurrency = "EUR";
+    _configuration.fiatCurrency = "USD";
     _configuration.defaultAsset = "ETH";
     _configuration.userAddress = "0x4b7f8e04b82ad7f9e4b4cc9e1f81c5938e1b719f";
     _configuration.hostAppName = "Ramp Flutter";
-    _configuration.deepLinkScheme = 'rampflutter';
-    _configuration.url = _predefinedEnvironments[_selectedEnvironment];
+    _configuration.selectedCountryCode = "en";
+    // _configuration.deepLinkScheme = 'rampflutter';
+    // _configuration.url = _predefinedEnvironments[_selectedEnvironment];
+
+    _configuration.url = "https://ri-widget-dev2.firebaseapp.com/";
+    _configuration.hostApiKey = "3qncr4yvxfpro6endeaeu6npkh8qc23e9uadtazq";
+    _configuration.userEmailAddress = "mateusz.jablonski+us@ramp.network";
+//        _configuration.defaultFlow = .onramp
+    _configuration.useSendCryptoCallback = true;
 
     RampFlutter.setupCallbacks(
       onWidgetConfigDone,
-      onPurchaseCreated,
-      onOfframpRequested,
-      onOfframpPurchaseCreated,
+      onOnrampPurchaseCreated,
+      onSendCryptoRequested,
+      onOfframpSaleCreated,
       onRampClosed,
     );
 
@@ -62,18 +69,18 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     _showAlert("widget config done");
   }
 
-  void onPurchaseCreated(
-      Purchase purchase, String purchaseViewToken, String apiUrl) {
+  void onOnrampPurchaseCreated(
+      OnrampPurchase purchase, String purchaseViewToken, String apiUrl) {
     _showAlert("purchase created");
   }
 
-  void onOfframpRequested(SendCryptoPayload payload) {
+  void onSendCryptoRequested(SendCryptoPayload payload) {
     _showAlert("offramp requested");
   }
 
-  void onOfframpPurchaseCreated(
-      OfframpPurchase purchase, String purchaseViewToken, String apiUrl) {
-    _showAlert("offramp purchase created");
+  void onOfframpSaleCreated(
+      OfframpSale sale, String saleViewToken, String apiUrl) {
+    _showAlert("offramp sale created");
   }
 
   void onRampClosed() {
@@ -216,7 +223,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Widget _showRampButton() {
-    return PlatformButton(
+    return PlatformTextButton(
       onPressed: () {
         if (_useFullCustomUrl) {
           Configuration c = Configuration();
@@ -246,7 +253,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   Row _segmentedControl(
       String title, List<String> options, void Function(int) itemSelected) {
     List<Widget> segments = options.asMap().entries.map((entry) {
-      return PlatformButton(
+      return PlatformTextButton(
         onPressed: () => itemSelected(entry.key),
         child: PlatformText(entry.value),
       );

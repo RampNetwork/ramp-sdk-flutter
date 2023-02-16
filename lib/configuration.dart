@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class Configuration {
   // main URL
   String? url;
@@ -22,7 +20,7 @@ class Configuration {
   String? swapAsset;
   String? userAddress;
   String? userEmailAddress;
-  Bool? useSendCryptoCallback;
+  bool? useSendCryptoCallback;
   String? variant;
   String? webhookStatusUrl;
 
