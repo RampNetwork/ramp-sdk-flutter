@@ -19,7 +19,7 @@ final _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 Future<void> _setupNotifications() async {
   const InitializationSettings settings = InitializationSettings(
-    android: AndroidInitializationSettings('app_icon'),
+    android: AndroidInitializationSettings('@mipmap/ic_launcher'),
     iOS: DarwinInitializationSettings(),
   );
 
@@ -42,7 +42,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   final Configuration _configuration = Configuration();
 
   final List<String> _predefinedEnvironments = [
-    "https://ri-widget-dev2.firebaseapp.com",
+    "https://app.5.dev.ramp-network.org",
     "https://ri-widget-staging.firebaseapp.com",
     "https://buy.ramp.network",
   ];
@@ -154,8 +154,8 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   List<Widget> _configurationForm() {
     return [
       _segmentedControl(
-        "Environment:",
-        ["dev", "staging", "production"],
+        "Env:",
+        ["dev", "staging", "prod"],
         _selectEnvironment,
       ),
       PlatformText(
@@ -304,11 +304,13 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Future<void> _showNotification(String title, String message) async {
+    const AndroidNotificationDetails android = AndroidNotificationDetails("channelId", "channelName");
+    const NotificationDetails details =  NotificationDetails(android: android);
     await _localNotificationsPlugin.show(
       1,
       title,
       message,
-      const NotificationDetails(),
+      details,
     );
   }
 }
