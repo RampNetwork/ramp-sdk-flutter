@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
   - Microblink (5.16.0)
   - Passbase (2.13.5):
     - Microblink (= 5.16.0)
@@ -11,6 +13,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, tag `3.0.0`)
   - ramp_flutter (from `.symlinks/plugins/ramp_flutter/ios`)
 
@@ -23,6 +26,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
   Ramp:
     :git: https://github.com/RampNetwork/ramp-sdk-ios
     :tag: 3.0.0
@@ -36,6 +41,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   Microblink: 9443ff3c708a97673e4999389626079e10a1bbc1
   Passbase: bce91be2e3be1b9c72ab42ee91c57a106095bd65
   Ramp: 0c989543f1fabf7409aa2e16a1c883120f063419

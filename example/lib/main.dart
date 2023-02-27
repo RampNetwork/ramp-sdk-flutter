@@ -7,8 +7,27 @@ import 'package:ramp_flutter/onramp_purchase.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
 import 'package:ramp_flutter/send_crypto_payload.dart';
 
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  _setupNotifications();
   runApp(const RampFlutterApp());
+}
+
+final _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+Future<void> _setupNotifications() async {
+  const InitializationSettings settings = InitializationSettings(
+    android: AndroidInitializationSettings('app_icon'),
+    iOS: DarwinInitializationSettings(),
+  );
+
+  await _localNotificationsPlugin.initialize(settings).then((_) {
+    debugPrint('Local Notifications setup success');
+  }).catchError((Object error) {
+    debugPrint('Local Notifications setup error: $error');
+  });
 }
 
 class RampFlutterApp extends StatefulWidget {
@@ -20,8 +39,8 @@ class RampFlutterApp extends StatefulWidget {
 
 class _RampFlutterAppState extends State<RampFlutterApp> {
   final ramp = RampFlutter();
-  final GlobalKey<NavigatorState> _globalKey = GlobalKey();
   final Configuration _configuration = Configuration();
+
   final List<String> _predefinedEnvironments = [
     "https://ri-widget-dev2.firebaseapp.com",
     "https://ri-widget-staging.firebaseapp.com",
@@ -34,20 +53,20 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   @override
   void initState() {
-    _configuration.fiatValue = "3";
-    _configuration.fiatCurrency = "USD";
-    _configuration.defaultAsset = "ETH";
-    _configuration.userAddress = "0x4b7f8e04b82ad7f9e4b4cc9e1f81c5938e1b719f";
-    _configuration.hostAppName = "Ramp Flutter";
-    _configuration.selectedCountryCode = "en";
+    // _configuration.fiatValue = "3";
+    // _configuration.fiatCurrency = "USD";
+    // _configuration.defaultAsset = "ETH";
+    // _configuration.userAddress = "0x4b7f8e04b82ad7f9e4b4cc9e1f81c5938e1b719f";
+    // _configuration.hostAppName = "Ramp Flutter";
+    // _configuration.selectedCountryCode = "pl";
     // _configuration.deepLinkScheme = 'rampflutter';
     // _configuration.url = _predefinedEnvironments[_selectedEnvironment];
 
-    _configuration.url = "https://ri-widget-dev2.firebaseapp.com/";
-    _configuration.hostApiKey = "3qncr4yvxfpro6endeaeu6npkh8qc23e9uadtazq";
-    _configuration.userEmailAddress = "mateusz.jablonski+us@ramp.network";
-//        _configuration.defaultFlow = .onramp
-    _configuration.useSendCryptoCallback = true;
+    // _configuration.url = "https://app.5.dev.ramp-network.org/";
+    // _configuration.hostApiKey = "3qncr4yvxfpro6endeaeu6npkh8qc23e9uadtazq";
+    // _configuration.userEmailAddress = "mateusz.jablonski+pl4@ramp.network";
+    // _configuration.defaultFlow = .onramp
+    // _configuration.useSendCryptoCallback = true;
 
     ramp.onOnrampPurchaseCreated = onOnrampPurchaseCreated;
     ramp.onSendCryptoRequested = onSendCryptoRequested;
@@ -64,31 +83,43 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   void onOnrampPurchaseCreated(
-      OnrampPurchase purchase, String purchaseViewToken, String apiUrl) {
-    _showAlert("purchase created");
+    OnrampPurchase purchase,
+    String purchaseViewToken,
+    String apiUrl,
+  ) {
+    _showNotification("Ramp Notification", "purchase created");
   }
 
   void onSendCryptoRequested(SendCryptoPayload payload) {
-    _showAlert("offramp requested");
+    _showNotification("Ramp Notification", "offramp requested");
     ramp.sendCrypto("123");
   }
 
   void onOfframpSaleCreated(
-      OfframpSale sale, String saleViewToken, String apiUrl) {
-    _showAlert("offramp sale created");
+    OfframpSale sale,
+    String saleViewToken,
+    String apiUrl,
+  ) {
+    _showNotification("Ramp Notification", "offramp sale created");
   }
 
   void onRampClosed() {
-    _showAlert("ramp closed");
+    _showNotification("Ramp Notification", "ramp closed");
   }
 
   @override
   Widget build(BuildContext context) {
     return PlatformApp(
-      navigatorKey: _globalKey,
       home: PlatformScaffold(
-        appBar: PlatformAppBar(title: const Text('Ramp Flutter')),
-        body: ListView(children: _formFields(context)),
+        appBar: PlatformAppBar(
+          title: const Text('Ramp Flutter'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: ListView(
+            children: _formFields(context),
+          ),
+        ),
       ),
     );
   }
@@ -129,7 +160,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       ),
       PlatformText(
         _predefinedEnvironments[_selectedEnvironment],
-        style: const TextStyle(color: Color.fromRGBO(46, 190, 117, 1)),
+        style: const TextStyle(
+          color: Color.fromRGBO(46, 190, 117, 1),
+        ),
       ),
       _textField(
         "User email address",
@@ -255,14 +288,14 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     }).toList();
     List<Widget> children = [PlatformText(title)];
     children.addAll(segments);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: children,
-    );
+    return Row(children: children);
   }
 
-  PlatformTextField _textField(String placeholder,
-      void Function(String) onChanged, String? defaultValue) {
+  PlatformTextField _textField(
+    String placeholder,
+    void Function(String) onChanged,
+    String? defaultValue,
+  ) {
     return PlatformTextField(
       hintText: placeholder,
       onChanged: onChanged,
@@ -270,21 +303,12 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     );
   }
 
-  void _showAlert(String text) {
-    if (_globalKey.currentContext == null) return;
-    BuildContext context = _globalKey.currentContext!;
-    showPlatformDialog(
-      context: context,
-      builder: (_) => PlatformAlertDialog(
-        title: const Text('Alert'),
-        content: Text(text),
-        actions: <Widget>[
-          PlatformDialogAction(
-            child: PlatformText('OK'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
+  Future<void> _showNotification(String title, String message) async {
+    await _localNotificationsPlugin.show(
+      1,
+      title,
+      message,
+      const NotificationDetails(),
     );
   }
 }
