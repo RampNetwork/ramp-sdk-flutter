@@ -16,6 +16,8 @@ import network.ramp.sdk.events.model.Purchase
 import network.ramp.sdk.facade.Config
 import network.ramp.sdk.facade.RampCallback
 import network.ramp.sdk.facade.RampSDK
+import network.ramp.sdk.events.model.Asset
+import network.ramp.sdk.events.model.OfframpSale
 
 /** RampFlutterPlugin */
 class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -29,10 +31,23 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "ramp_flutter")
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
+
         rampSdk = RampSDK()
         callback = object : RampCallback {
             override fun onPurchaseFailed() {
                 channel.invokeMethod("onRampFailed", null)
+            }
+
+            override fun offrampSendCrypto(assetInfo: Asset, amount: String, address: String) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onOfframpSaleCreated(
+                sale: OfframpSale,
+                saleViewToken: String,
+                apiUrl: String
+            ) {
+                TODO("Not yet implemented")
             }
 
             override fun onPurchaseCreated(
@@ -46,7 +61,6 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
             override fun onWidgetClose() {
                 channel.invokeMethod("onRampClosed", null)
-
             }
         }
     }
