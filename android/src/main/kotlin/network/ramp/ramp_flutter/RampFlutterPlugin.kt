@@ -11,13 +11,11 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import network.ramp.sdk.events.model.*
 
-import network.ramp.sdk.events.model.Purchase
 import network.ramp.sdk.facade.Config
 import network.ramp.sdk.facade.RampCallback
 import network.ramp.sdk.facade.RampSDK
-import network.ramp.sdk.events.model.Asset
-import network.ramp.sdk.events.model.OfframpSale
 
 /** RampFlutterPlugin */
 class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -34,12 +32,20 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         rampSdk = RampSDK()
         callback = object : RampCallback {
-            override fun onPurchaseFailed() {
-                channel.invokeMethod("onRampFailed", null)
+            override fun onPurchaseCreated(
+                purchase: Purchase,
+                purchaseViewToken: String,
+                apiUrl: String
+            ) {
+                val purchaseMap = serializePurchase(purchase)
+                val arguments = listOf(purchaseMap, purchaseViewToken, apiUrl)
+                channel.invokeMethod("onOnrampPurchaseCreated", arguments)
             }
 
             override fun offrampSendCrypto(assetInfo: Asset, amount: String, address: String) {
-                TODO("Not yet implemented")
+                val assetMap = serializeAsset(assetInfo)
+                val arguments = listOf(assetMap, amount, address)
+                channel.invokeMethod("onSendCryptoRequested", arguments)
             }
 
             override fun onOfframpSaleCreated(
@@ -47,20 +53,17 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 saleViewToken: String,
                 apiUrl: String
             ) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onPurchaseCreated(
-                purchase: Purchase,
-                purchaseViewToken: String,
-                apiUrl: String
-            ) {
-                val purchaseMap = serializePurchase(purchase)
-                channel.invokeMethod("onPurchaseCreated", purchaseMap)
+                val saleMap = serializeOfframpSale(sale)
+                val arguments = listOf(saleMap, saleViewToken, apiUrl)
+                channel.invokeMethod("onOfframpSaleCreated", arguments)
             }
 
             override fun onWidgetClose() {
                 channel.invokeMethod("onRampClosed", null)
+            }
+
+            override fun onPurchaseFailed() {
+                // no Flutter API
             }
         }
     }
@@ -122,13 +125,7 @@ private fun serializePurchase(purchase: Purchase): Map<String, Any?> {
     return mapOf(
         "id" to purchase.id,
         "endTime" to purchase.endTime,
-        "asset" to mapOf(
-            "address" to purchase.asset.address,
-            "decimals" to purchase.asset.decimals,
-            "name" to purchase.asset.name,
-            "symbol" to purchase.asset.symbol,
-            "type" to purchase.asset.type,
-        ),
+        "asset" to serializeAsset(purchase.asset),
         "receiverAddress" to purchase.receiverAddress,
         "cryptoAmount" to purchase.cryptoAmount,
         "fiatCurrency" to purchase.fiatCurrency,
@@ -141,6 +138,30 @@ private fun serializePurchase(purchase: Purchase): Map<String, Any?> {
         "createdAt" to purchase.createdAt,
         "updatedAt" to purchase.updatedAt,
         "status" to purchase.status,
-        "escrowAddress" to purchase.escrowAddress,
+    )
+}
+
+private fun serializeAsset(asset: Asset): Map<String, Any?> {
+    return mapOf(
+        "address" to asset.address,
+        "decimals" to asset.decimals,
+        "name" to asset.name,
+        "symbol" to asset.symbol,
+        "type" to asset.type,
+    )
+}
+
+private fun serializeOfframpSale(offrampSale: OfframpSale): Map<String, Any?> {
+    return mapOf(
+        "id" to offrampSale.id,
+        "createdAt" to offrampSale.createdAt,
+        "crypto" to mapOf(
+                "amount" to offrampSale.crypto.amount,
+                "assetInfo" to serializeAsset(offrampSale.crypto.assetInfo),
+            ),
+        "fiat" to mapOf(
+            "amount" to offrampSale.fiat.amount,
+            "currencySymbol" to offrampSale.fiat.currencySymbol,
+        )
     )
 }
