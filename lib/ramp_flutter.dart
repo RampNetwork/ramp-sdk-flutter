@@ -15,22 +15,22 @@ class RampFlutter {
   Function(OfframpSale, String, String)? onOfframpSaleCreated;
   Function()? onRampClosed;
 
-  void _handleOnOnrampPurchaseCreated(Map<String, dynamic> arguments) {
-    Map<String, dynamic> payload = arguments[0];
+  void _handleOnOnrampPurchaseCreated(dynamic arguments) {
+    dynamic payload = arguments[0];
     String purchaseViewToken = arguments[1];
     String apiUrl = arguments[2];
     OnrampPurchase purchase = OnrampPurchase.fromArguments(payload);
     onOnrampPurchaseCreated!(purchase, purchaseViewToken, apiUrl);
   }
 
-  void _handleOnSendCryptoRequested(Map<String, dynamic> arguments) {
-    Map<String, dynamic> payload = arguments[0];
+  void _handleOnSendCryptoRequested(dynamic arguments) {
+    dynamic payload = arguments[0];
     SendCryptoPayload sendCrypto = SendCryptoPayload.fromArguments(payload);
     onSendCryptoRequested!(sendCrypto);
   }
 
-  void _handleOnOfframpSaleCreated(Map<String, dynamic> arguments) {
-    Map<String, dynamic> payload = arguments[0];
+  void _handleOnOfframpSaleCreated(dynamic arguments) {
+    dynamic payload = arguments[0];
     String saleViewToken = arguments[1];
     String apiUrl = arguments[2];
     OfframpSale sale = OfframpSale.fromArguments(payload);

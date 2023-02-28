@@ -3,7 +3,7 @@ class SendCryptoPayload {
   String? amount;
   SendCryptoAssetInfo? assetInfo;
 
-  static SendCryptoPayload fromArguments(Map<String, dynamic> arguments) {
+  static SendCryptoPayload fromArguments(dynamic arguments) {
     SendCryptoPayload payload = SendCryptoPayload();
     payload.address = arguments["address"];
     payload.amount = arguments["amount"];
@@ -12,7 +12,7 @@ class SendCryptoPayload {
     return payload;
   }
 
-  Map<String, dynamic> toMap() {
+  dynamic toMap() {
     return {
       'address': address,
       'amount': amount,
@@ -28,7 +28,7 @@ class SendCryptoAssetInfo {
   String? symbol;
   String? type;
 
-  static SendCryptoAssetInfo fromArguments(Map<String, dynamic> arguments) {
+  static SendCryptoAssetInfo fromArguments(dynamic arguments) {
     SendCryptoAssetInfo payload = SendCryptoAssetInfo();
     payload.chain = arguments["chain"];
     payload.decimals = arguments["decimals"];
@@ -38,7 +38,7 @@ class SendCryptoAssetInfo {
     return payload;
   }
 
-  Map<String, dynamic> toMap() {
+  dynamic toMap() {
     return {
       'chain': chain,
       'decimals': decimals,

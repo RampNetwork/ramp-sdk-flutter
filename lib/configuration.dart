@@ -24,7 +24,7 @@ class Configuration {
   String? variant;
   String? webhookStatusUrl;
 
-  Map<String, dynamic> toMap() {
+  dynamic toMap() {
     return {
       'url': url, // main URL
       'containerNode': containerNode,

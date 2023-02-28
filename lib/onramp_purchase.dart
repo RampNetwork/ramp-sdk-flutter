@@ -6,10 +6,10 @@ class OnrampPurchase {
   String? cryptoAmount;
   String? fiatCurrency;
   int? fiatValue;
-  int? assetExchangeRate;
-  int? baseRampFee;
-  int? networkFee;
-  int? appliedFee;
+  double? assetExchangeRate;
+  double? baseRampFee;
+  double? networkFee;
+  double? appliedFee;
   String? paymentMethodType;
   String? finalTxHash;
   String? createdAt;
@@ -18,7 +18,7 @@ class OnrampPurchase {
   String? escrowAddress;
   String? escrowDetailsHash;
 
-  static OnrampPurchase fromArguments(Map<String, dynamic> arguments) {
+  static OnrampPurchase fromArguments(dynamic arguments) {
     OnrampPurchase purchase = OnrampPurchase();
     purchase.id = arguments["id"];
     purchase.endTime = arguments["endTime"];
@@ -49,7 +49,7 @@ class PurchaseAssetInfo {
   String? name;
   int? decimals;
 
-  static PurchaseAssetInfo fromArguments(Map<String, dynamic> arguments) {
+  static PurchaseAssetInfo fromArguments(dynamic arguments) {
     PurchaseAssetInfo assetInfo = PurchaseAssetInfo();
     assetInfo.address = arguments["address"];
     assetInfo.symbol = arguments["symbol"];
