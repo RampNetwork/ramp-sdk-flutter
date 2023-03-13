@@ -45,7 +45,7 @@ class OfframpAssetInfo {
 }
 
 class OfframpFiat {
-  int? amount;
+  double? amount;
   String? currencySymbol;
 
   static OfframpFiat fromArguments(dynamic arguments) {

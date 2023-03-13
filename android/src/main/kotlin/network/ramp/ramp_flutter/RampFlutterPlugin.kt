@@ -2,8 +2,6 @@ package network.ramp.ramp_flutter
 
 import android.app.Activity
 import android.content.Context
-import androidx.annotation.NonNull
-
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -11,9 +9,11 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import network.ramp.sdk.events.model.*
-
+import network.ramp.sdk.events.model.Asset
+import network.ramp.sdk.events.model.OfframpSale
+import network.ramp.sdk.events.model.Purchase
 import network.ramp.sdk.facade.Config
+import network.ramp.sdk.facade.Flow
 import network.ramp.sdk.facade.RampCallback
 import network.ramp.sdk.facade.RampSDK
 
@@ -25,18 +25,14 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var rampSdk: RampSDK
     private lateinit var callback: RampCallback
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "ramp_flutter")
         channel.setMethodCallHandler(this)
         context = flutterPluginBinding.applicationContext
 
         rampSdk = RampSDK()
         callback = object : RampCallback {
-            override fun onPurchaseCreated(
-                purchase: Purchase,
-                purchaseViewToken: String,
-                apiUrl: String
-            ) {
+            override fun onPurchaseCreated(purchase: Purchase, purchaseViewToken: String, apiUrl: String) {
                 val purchaseMap = serializePurchase(purchase)
                 val arguments = listOf(purchaseMap, purchaseViewToken, apiUrl)
                 channel.invokeMethod("onOnrampPurchaseCreated", arguments)
@@ -44,15 +40,11 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
             override fun offrampSendCrypto(assetInfo: Asset, amount: String, address: String) {
                 val assetMap = serializeAsset(assetInfo)
-                val arguments = listOf(assetMap, amount, address)
+                val arguments = listOf(mapOf("address" to address, "amount" to amount, "assetInfo" to assetMap))
                 channel.invokeMethod("onSendCryptoRequested", arguments)
             }
 
-            override fun onOfframpSaleCreated(
-                sale: OfframpSale,
-                saleViewToken: String,
-                apiUrl: String
-            ) {
+            override fun onOfframpSaleCreated(sale: OfframpSale, saleViewToken: String, apiUrl: String) {
                 val saleMap = serializeOfframpSale(sale)
                 val arguments = listOf(saleMap, saleViewToken, apiUrl)
                 channel.invokeMethod("onOfframpSaleCreated", arguments)
@@ -68,16 +60,19 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
     }
 
-    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    override fun onMethodCall(call: MethodCall, result: Result) {
         if (call.method == "showRamp") {
             showRamp(call.arguments)
+            result.success(null)
+        } else if (call.method == "sendCrypto") {
+            sendCrypto(call.arguments)
             result.success(null)
         } else {
             result.notImplemented()
         }
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
     }
 
@@ -98,6 +93,11 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val config = makeConfiguration(arguments) ?: return
         rampSdk.startTransaction(activity, config, callback)
     }
+
+    private fun sendCrypto(arguments: Any) {
+        val txHash = arguments as? String
+        rampSdk.onOfframpCryptoSent(txHash)
+    }
 }
 
 private fun makeConfiguration(arguments: Any): Config? {
@@ -107,18 +107,36 @@ private fun makeConfiguration(arguments: Any): Config? {
     val url = map["url"] as? String ?: "https://buy.ramp.network"
     val config = Config(hostAppName, hostLogoUrl, url)
 
-    config.swapAsset = map["swapAsset"] as? String ?: ""
-    config.swapAmount = map["swapAmount"] as? String ?: ""
+    config.defaultAsset = map["defaultAsset"] as? String ?: ""
+    val rawDefaultFlow = map["defaultFlow"] as? String ?: ""
+    unwrapFlow(rawDefaultFlow)?.let { flow -> config.defaultFlow = flow }
+
+    val rawEnabledFlows = map["enabledFlows"] as? List<String> ?: listOf()
+    val enabledFlows = rawEnabledFlows.mapNotNull { unwrapFlow(it) }
+    if (enabledFlows.isNotEmpty()) {
+        config.enabledFlows = HashSet(enabledFlows)
+    }
+
     config.fiatCurrency = map["fiatCurrency"] as? String ?: ""
     config.fiatValue = map["fiatValue"] as? String ?: ""
+    config.hostApiKey = map["hostApiKey"] as? String ?: ""
+    config.selectedCountryCode = map["selectedCountryCode"] as? String ?: ""
+    config.swapAmount = map["swapAmount"] as? String ?: ""
+    config.swapAsset = map["swapAsset"] as? String ?: ""
     config.userAddress = map["userAddress"] as? String ?: ""
     config.userEmailAddress = map["userEmailAddress"] as? String ?: ""
-    config.selectedCountryCode = map["selectedCountryCode"] as? String ?: ""
-    config.defaultAsset = map["defaultAsset"] as? String ?: ""
+    config.useSendCryptoCallback = map["useSendCryptoCallback"] as? Boolean ?: false
     config.webhookStatusUrl = map["webhookStatusUrl"] as? String ?: ""
-    config.hostApiKey = map["hostApiKey"] as? String ?: ""
 
     return config
+}
+
+private fun unwrapFlow(rawFlow: String): Flow? {
+    return when(rawFlow) {
+        "ONRAMP" -> Flow.ONRAMP
+        "OFFRAMP" -> Flow.OFFRAMP
+        else -> null
+    }
 }
 
 private fun serializePurchase(purchase: Purchase): Map<String, Any?> {

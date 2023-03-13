@@ -62,9 +62,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     // _configuration.deepLinkScheme = 'rampflutter';
     // _configuration.url = _predefinedEnvironments[_selectedEnvironment];
 
-    // _configuration.url = "https://app.5.dev.ramp-network.org/";
+    // _configuration.url = "https://app.dev.ramp-network.org";
     // _configuration.hostApiKey = "3qncr4yvxfpro6endeaeu6npkh8qc23e9uadtazq";
-    // _configuration.userEmailAddress = "mateusz.jablonski+pl4@ramp.network";
+    // _configuration.userEmailAddress = "mateusz.jablonski+pl11@ramp.network";
     // _configuration.defaultFlow = .onramp
     // _configuration.useSendCryptoCallback = true;
 
@@ -87,11 +87,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     String purchaseViewToken,
     String apiUrl,
   ) {
-    _showNotification("Ramp Notification", "purchase created");
+    _showNotification("Ramp Notification", "onramp purchase created");
   }
 
   void onSendCryptoRequested(SendCryptoPayload payload) {
-    _showNotification("Ramp Notification", "offramp requested");
+    _showNotification("Ramp Notification", "send crypto requested");
     ramp.sendCrypto("123");
   }
 
@@ -304,8 +304,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Future<void> _showNotification(String title, String message) async {
-    const AndroidNotificationDetails android = AndroidNotificationDetails("channelId", "channelName");
-    const NotificationDetails details =  NotificationDetails(android: android);
+    const AndroidNotificationDetails android =
+        AndroidNotificationDetails("channelId", "channelName");
+    const NotificationDetails details = NotificationDetails(android: android);
     await _localNotificationsPlugin.show(
       1,
       title,

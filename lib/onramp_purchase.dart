@@ -44,18 +44,18 @@ class OnrampPurchase {
 
 class PurchaseAssetInfo {
   String? address;
+  int? decimals;
+  String? name;
   String? symbol;
   String? type;
-  String? name;
-  int? decimals;
 
   static PurchaseAssetInfo fromArguments(dynamic arguments) {
     PurchaseAssetInfo assetInfo = PurchaseAssetInfo();
     assetInfo.address = arguments["address"];
+    assetInfo.decimals = arguments["decimals"];
+    assetInfo.name = arguments["name"];
     assetInfo.symbol = arguments["symbol"];
     assetInfo.type = arguments["type"];
-    assetInfo.name = arguments["name"];
-    assetInfo.decimals = arguments["decimals"];
     return assetInfo;
   }
 }
