@@ -140,21 +140,6 @@ private extension SendCryptoPayload {
     }
 }
 
-extension SendCryptoPayload: Encodable {
-    enum CodingKeys: CodingKey {
-        case assetInfo
-        case amount
-        case address
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(assetInfo, forKey: .assetInfo)
-        try container.encode(amount, forKey: .amount)
-        try container.encode(address, forKey: .address)
-    }
-}
-
 private enum RampFlutterError: Error {
     case flutterViewControllerUnavailable
     case unableToDecodeConfiguration

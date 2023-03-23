@@ -61,14 +61,18 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
-        if (call.method == "showRamp") {
-            showRamp(call.arguments)
-            result.success(null)
-        } else if (call.method == "sendCrypto") {
-            sendCrypto(call.arguments)
-            result.success(null)
-        } else {
-            result.notImplemented()
+        when (call.method) {
+            "showRamp" -> {
+                showRamp(call.arguments)
+                result.success(null)
+            }
+            "sendCrypto" -> {
+                sendCrypto(call.arguments)
+                result.success(null)
+            }
+            else -> {
+                result.notImplemented()
+            }
         }
     }
 

@@ -2,11 +2,7 @@ PODS:
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
-  - Microblink (5.16.0)
-  - Passbase (2.13.5):
-    - Microblink (= 5.16.0)
-  - Ramp (3.0.0):
-    - Passbase (~> 2.8)
+  - Ramp (4.0.0)
   - ramp_flutter (0.0.1):
     - Flutter
     - Ramp
@@ -14,14 +10,8 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
-  - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, tag `3.0.0`)
+  - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, branch `codable`)
   - ramp_flutter (from `.symlinks/plugins/ramp_flutter/ios`)
-
-SPEC REPOS:
-  https://github.com/passbase/cocoapods-specs.git:
-    - Passbase
-  https://github.com/passbase/microblink-cocoapods-specs.git:
-    - Microblink
 
 EXTERNAL SOURCES:
   Flutter:
@@ -29,24 +19,22 @@ EXTERNAL SOURCES:
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   Ramp:
+    :branch: codable
     :git: https://github.com/RampNetwork/ramp-sdk-ios
-    :tag: 3.0.0
   ramp_flutter:
     :path: ".symlinks/plugins/ramp_flutter/ios"
 
 CHECKOUT OPTIONS:
   Ramp:
+    :commit: ac9afb318a3e4784d4f1751b840cae0c055c0433
     :git: https://github.com/RampNetwork/ramp-sdk-ios
-    :tag: 3.0.0
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
-  Microblink: 9443ff3c708a97673e4999389626079e10a1bbc1
-  Passbase: bce91be2e3be1b9c72ab42ee91c57a106095bd65
-  Ramp: 0c989543f1fabf7409aa2e16a1c883120f063419
+  Ramp: e0988926ce78f6cd0870b4f3565651c6cc0555a2
   ramp_flutter: 61fe902f750eb99f5f27a363f1b49d9bed8cdd35
 
-PODFILE CHECKSUM: 404a454d15c6a9b4e5b6ca7259b02c148bd2ac44
+PODFILE CHECKSUM: 6840530279cb099967547e5dd550ff0372a503fe
 
 COCOAPODS: 1.11.3
