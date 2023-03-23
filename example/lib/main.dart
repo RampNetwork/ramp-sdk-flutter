@@ -42,7 +42,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   final Configuration _configuration = Configuration();
 
   final List<String> _predefinedEnvironments = [
-    "https://app.5.dev.ramp-network.org",
+    "https://app.dev.ramp-network.org",
     "https://ri-widget-staging.firebaseapp.com",
     "https://buy.ramp.network",
   ];
@@ -57,16 +57,16 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     // _configuration.fiatCurrency = "USD";
     // _configuration.defaultAsset = "ETH";
     // _configuration.userAddress = "0x4b7f8e04b82ad7f9e4b4cc9e1f81c5938e1b719f";
-    // _configuration.hostAppName = "Ramp Flutter";
+    _configuration.hostAppName = "Ramp Flutter";
     // _configuration.selectedCountryCode = "pl";
     // _configuration.deepLinkScheme = 'rampflutter';
-    // _configuration.url = _predefinedEnvironments[_selectedEnvironment];
+    _configuration.url = _predefinedEnvironments[_selectedEnvironment];
 
     // _configuration.url = "https://app.dev.ramp-network.org";
     // _configuration.hostApiKey = "3qncr4yvxfpro6endeaeu6npkh8qc23e9uadtazq";
     // _configuration.userEmailAddress = "mateusz.jablonski+pl11@ramp.network";
-    // _configuration.defaultFlow = .onramp
-    // _configuration.useSendCryptoCallback = true;
+    _configuration.enabledFlows = ["ONRAMP", "OFFRAMP"];
+    _configuration.useSendCryptoCallback = true;
 
     ramp.onOnrampPurchaseCreated = onOnrampPurchaseCreated;
     ramp.onSendCryptoRequested = onSendCryptoRequested;
