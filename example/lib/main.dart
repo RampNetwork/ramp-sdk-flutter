@@ -53,18 +53,8 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   @override
   void initState() {
-    // _configuration.fiatValue = "3";
-    // _configuration.fiatCurrency = "USD";
-    // _configuration.defaultAsset = "ETH";
-    // _configuration.userAddress = "0x4b7f8e04b82ad7f9e4b4cc9e1f81c5938e1b719f";
     _configuration.hostAppName = "Ramp Flutter";
-    // _configuration.selectedCountryCode = "pl";
-    // _configuration.deepLinkScheme = 'rampflutter';
     _configuration.url = _predefinedEnvironments[_selectedEnvironment];
-
-    // _configuration.url = "https://app.dev.ramp-network.org";
-    // _configuration.hostApiKey = "3qncr4yvxfpro6endeaeu6npkh8qc23e9uadtazq";
-    // _configuration.userEmailAddress = "mateusz.jablonski+pl11@ramp.network";
     _configuration.enabledFlows = ["ONRAMP", "OFFRAMP"];
     _configuration.useSendCryptoCallback = true;
 
