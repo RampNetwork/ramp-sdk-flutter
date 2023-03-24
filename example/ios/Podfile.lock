@@ -2,15 +2,15 @@ PODS:
   - Flutter (1.0.0)
   - flutter_local_notifications (0.0.1):
     - Flutter
-  - Ramp (4.0.0)
-  - ramp_flutter (0.0.1):
+  - Ramp (4.0.1)
+  - ramp_flutter (1.0.1):
     - Flutter
     - Ramp
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
-  - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, branch `codable`)
+  - Ramp (from `https://github.com/RampNetwork/ramp-sdk-ios`, tag `4.0.1`)
   - ramp_flutter (from `.symlinks/plugins/ramp_flutter/ios`)
 
 EXTERNAL SOURCES:
@@ -19,22 +19,22 @@ EXTERNAL SOURCES:
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
   Ramp:
-    :branch: codable
     :git: https://github.com/RampNetwork/ramp-sdk-ios
+    :tag: 4.0.1
   ramp_flutter:
     :path: ".symlinks/plugins/ramp_flutter/ios"
 
 CHECKOUT OPTIONS:
   Ramp:
-    :commit: ac9afb318a3e4784d4f1751b840cae0c055c0433
     :git: https://github.com/RampNetwork/ramp-sdk-ios
+    :tag: 4.0.1
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
-  Ramp: e0988926ce78f6cd0870b4f3565651c6cc0555a2
-  ramp_flutter: 61fe902f750eb99f5f27a363f1b49d9bed8cdd35
+  Ramp: 3f843fb75cac12ad40842afa3226bae36dc93521
+  ramp_flutter: 412e68fa0ee3196fc043f83555534574796edf2f
 
-PODFILE CHECKSUM: 6840530279cb099967547e5dd550ff0372a503fe
+PODFILE CHECKSUM: 7f986e104b8408620e8b1e38a24d26db71675075
 
 COCOAPODS: 1.11.3
