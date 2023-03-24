@@ -7,6 +7,7 @@ import 'package:ramp_flutter/send_crypto_payload.dart';
 
 import 'configuration.dart';
 
+/// Wrapper class for Ramp Flutter widget
 class RampFlutter {
   final MethodChannel _channel = const MethodChannel('ramp_flutter');
 

@@ -1,17 +1,15 @@
-#
-# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint ramp_flutter.podspec` to validate before publishing.
-#
 Pod::Spec.new do |s|
   s.name             = 'ramp_flutter'
-  s.version          = '0.0.1'
-  s.summary          = 'A new flutter plugin project.'
+  s.version          = '1.0.1'
+  s.summary          = 'Ramp iOS wrapper for Flutter.'
   s.description      = <<-DESC
-A new flutter plugin project.
+  Ramp for Flutter is a simple wrapper for native iOS and Android Ramp SDKs.
+  Unified API lets you write code once and use on any of the platforms.
+  Ramp Flutter SDK supports iOS and Android platforms.
                        DESC
-  s.homepage         = 'http://example.com'
-  s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.homepage         = 'https://docs.ramp.network/mobile/flutter-sdk/'
+  s.license          = 'proprietary'
+  s.author           = { 'Ramp Network' => 'dev@ramp.network' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
