@@ -53,10 +53,6 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             override fun onWidgetClose() {
                 channel.invokeMethod("onRampClosed", null)
             }
-
-            override fun onPurchaseFailed() {
-                // no Flutter API
-            }
         }
     }
 
