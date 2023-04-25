@@ -26,7 +26,7 @@ class Configuration {
 
   dynamic toMap() {
     return {
-      'url': url, // main URL
+      'url': url ?? 'https://buy.ramp.network', // main URL
       'containerNode': containerNode,
       'deepLinkScheme': deepLinkScheme,
       'defaultAsset': defaultAsset,
