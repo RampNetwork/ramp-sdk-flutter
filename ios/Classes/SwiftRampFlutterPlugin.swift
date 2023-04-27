@@ -2,39 +2,9 @@ import Flutter
 import UIKit
 import Ramp
 
-private enum RampFlutterError: Error {
-    case flutterViewControllerUnavailable, unableToDecodeConfiguration, unknownCallMethod
-}
-
-private extension Error {
-    var flutterError: FlutterError {
-        guard let rampFlutterError = self as? RampFlutterError
-        else {
-            let nsError = self as NSError
-            return FlutterError(code: String(nsError.code),
-                                message: nsError.description,
-                                details: nsError.userInfo)
-        }
-        
-        switch rampFlutterError {
-        case .flutterViewControllerUnavailable:
-            return FlutterError(code: "flutterViewControllerUnavailable",
-                                message: "FlutterViewController unavailable",
-                                details: nil)
-        case .unableToDecodeConfiguration:
-            return FlutterError(code: "unableToDecodeConfiguration",
-                                message: "Unable to decode Configuration",
-                                details: nil)
-        case .unknownCallMethod:
-            return FlutterError(code: "unknownCallMethod",
-                                message: "Unknown call method",
-                                details: nil)
-        }
-    }
-}
-
 public class SwiftRampFlutterPlugin: NSObject {
     private let channel: FlutterMethodChannel
+    private var sendCryptoResponseHandler: ((SendCryptoResultPayload) -> Void)?
     
     init(channel: FlutterMethodChannel) {
         self.channel = channel
@@ -44,13 +14,27 @@ public class SwiftRampFlutterPlugin: NSObject {
         guard let delegate = UIApplication.shared.delegate,
               let window = delegate.window,
               let flutterViewController = window?.rootViewController as? FlutterViewController
-        else { throw RampFlutterError.flutterViewControllerUnavailable  }
+        else {
+            throw RampFlutterError.flutterViewControllerUnavailable
+        }
+        
         guard let configurationArguments = arguments as? [String: Any],
-              let configuration = Configuration(flutterMethodCallArguments: configurationArguments)
-        else { throw RampFlutterError.unableToDecodeConfiguration }
-        let rampViewController = try RampViewController.init(configuration: configuration)
+              let configuration = try? Configuration.from(configurationArguments)
+        else {
+            throw RampFlutterError.unableToDecodeConfiguration
+        }
+        
+        let rampViewController = try RampViewController(configuration: configuration)
         rampViewController.delegate = self
         flutterViewController.present(rampViewController, animated: true)
+    }
+    
+    private func sendCrypto(arguments: Any?) throws {
+        guard let transactionHash = arguments as? String
+        else {
+            throw RampFlutterError.unableToDecodeTransactionHash
+        }
+        sendCryptoResponseHandler?(SendCryptoResultPayload(txHash: transactionHash))
     }
 }
 
@@ -71,6 +55,16 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
             catch {
                 result(error.flutterError)
             }
+            
+        case "sendCrypto":
+            do {
+                try sendCrypto(arguments: call.arguments)
+                result(nil)
+            }
+            catch {
+                result(error.flutterError)
+            }
+            
         default:
             let error = RampFlutterError.unknownCallMethod
             result(error.flutterError)
@@ -79,15 +73,34 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
 }
 
 extension SwiftRampFlutterPlugin: RampDelegate {
-    public func ramp(_ rampViewController: RampViewController, didCreatePurchase purchase: RampPurchase, purchaseViewToken: String, apiUrl: URL) {
-        let purchaseDictionary = purchase.toDictionary()
-        let urlString = apiUrl.absoluteString
-        let arguments: [Any] = [purchaseDictionary, purchaseViewToken, urlString]
-        channel.invokeMethod("onPurchaseCreated", arguments: arguments)
+    public func ramp(_ rampViewController: RampViewController,
+                     didCreateOnrampPurchase purchase: OnrampPurchase,
+                     _ purchaseViewToken: String,
+                     _ apiUrl: URL) {
+        guard let purchase = try? purchase.toDictionary() else { return }
+        let apiUrl = apiUrl.absoluteString
+        channel.invokeMethod("onOnrampPurchaseCreated",
+                             arguments: [purchase, purchaseViewToken, apiUrl])
+
     }
     
-    public func rampPurchaseDidFail(_ rampViewController: RampViewController) {
-        channel.invokeMethod("onRampFailed", arguments: nil)
+    public func ramp(_ rampViewController: RampViewController,
+                     didRequestSendCrypto payload: SendCryptoPayload,
+                     responseHandler: @escaping (SendCryptoResultPayload) -> Void) {
+        guard let payload = try? payload.toDictionary() else { return }
+        self.sendCryptoResponseHandler = responseHandler
+        channel.invokeMethod("onSendCryptoRequested",
+                             arguments: [payload])
+    }
+    
+    public func ramp(_ rampViewController: RampViewController,
+                     didCreateOfframpSale sale: OfframpSale,
+                     _ saleViewToken: String,
+                     _ apiUrl: URL) {
+        guard let sale = try? sale.toDictionary() else { return }
+        let url = apiUrl.absoluteString
+        channel.invokeMethod("onOfframpSaleCreated",
+                             arguments: [sale, saleViewToken, url])
     }
     
     public func rampDidClose(_ rampViewController: RampViewController) {
@@ -96,55 +109,68 @@ extension SwiftRampFlutterPlugin: RampDelegate {
 }
 
 private extension Configuration {
-    init?(flutterMethodCallArguments arguments: Any?) {
-        guard let arguments = arguments as? [String: Any] else { return nil }
-        self.init()
-        self.swapAsset = arguments["swapAsset"] as? String
-        self.swapAmount = arguments["swapAmount"] as? String
-        self.fiatCurrency = arguments["fiatCurrency"] as? String
-        self.fiatValue = arguments["fiatValue"] as? String
-        self.userAddress = arguments["userAddress"] as? String
-        self.hostLogoUrl = arguments["hostLogoUrl"] as? String
-        self.hostAppName = arguments["hostAppName"] as? String
-        self.userEmailAddress = arguments["userEmailAddress"] as? String
-        self.selectedCountryCode = arguments["selectedCountryCode"] as? String
-        self.defaultAsset = arguments["defaultAsset"] as? String
-        self.url = arguments["url"] as? String
-        self.webhookStatusUrl = arguments["webhookStatusUrl"] as? String
-        self.finalUrl = arguments["finalUrl"] as? String
-        self.containerNode = arguments["containerNode"] as? String
-        self.hostApiKey = arguments["hostApiKey"] as? String
-        self.deepLinkScheme = arguments["deepLinkScheme"] as? String
+    static func from(_ dictionary: [String: Any]) throws -> Configuration {
+        let data = try JSONSerialization.data(withJSONObject: dictionary)
+        let configuration = try JSONDecoder().decode(Configuration.self, from: data)
+        return configuration
     }
 }
 
-private extension RampPurchase {
-    func toDictionary() -> [String: Any?] {
-        return [
-            "id": id,
-            "endTime": endTime,
-            "asset": [
-                "address": asset.address,
-                "decimals": asset.decimals,
-                "name": asset.name,
-                "symbol": asset.symbol,
-                "type": asset.type,
-            ] as [String: Any?],
-            "receiverAddress": receiverAddress,
-            "cryptoAmount": cryptoAmount,
-            "fiatCurrency": fiatCurrency,
-            "fiatValue": fiatValue,
-            "assetExchangeRate": assetExchangeRate,
-            "baseRampFee": baseRampFee,
-            "networkFee": networkFee,
-            "appliedFee": appliedFee,
-            "paymentMethodType": paymentMethodType,
-            "finalTxHash": finalTxHash,
-            "createdAt": createdAt,
-            "updatedAt": updatedAt,
-            "status": status,
-            "escrowAddress": escrowAddress,
-            "escrowDetailsHash": escrowDetailsHash,
-        ]
+private extension OnrampPurchase {
+    func toDictionary() throws -> Any {
+        let data = try JSONEncoder().encode(self)
+        let dictionary = try JSONSerialization.jsonObject(with: data)
+        return dictionary
+    }
+}
+
+private extension OfframpSale {
+    func toDictionary() throws -> Any {
+        let data = try JSONEncoder().encode(self)
+        let dictionary = try JSONSerialization.jsonObject(with: data)
+        return dictionary
+    }
+}
+
+private extension SendCryptoPayload {
+    func toDictionary() throws -> Any {
+        let data = try JSONEncoder().encode(self)
+        let dictionary = try JSONSerialization.jsonObject(with: data)
+        return dictionary
+    }
+}
+
+private enum RampFlutterError: Error {
+    case flutterViewControllerUnavailable
+    case unableToDecodeConfiguration
+    case unableToDecodeTransactionHash
+    case unknownCallMethod
+}
+
+private extension Error {
+    var flutterError: FlutterError {
+        switch self as? RampFlutterError {
+        case .flutterViewControllerUnavailable:
+            return FlutterError(code: "flutterViewControllerUnavailable",
+                                message: "FlutterViewController unavailable",
+                                details: nil)
+        case .unableToDecodeConfiguration:
+            return FlutterError(code: "unableToDecodeConfiguration",
+                                message: "Unable to decode Configuration",
+                                details: nil)
+        case .unableToDecodeTransactionHash:
+            return FlutterError(code: "unableToDecodeTransactionHash",
+                                message: "Unable to decode transaction hash",
+                                details: nil)
+        case .unknownCallMethod:
+            return FlutterError(code: "unknownCallMethod",
+                                message: "Unknown call method",
+                                details: nil)
+        case .none:
+            let nsError = self as NSError
+            return FlutterError(code: String(nsError.code),
+                                message: nsError.description,
+                                details: nsError.userInfo)
+        }
     }
 }

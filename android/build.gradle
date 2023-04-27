@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -19,7 +19,6 @@ rootProject.allprojects {
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
-        maven { url 'https://button.passbase.com/__android' }
     }
 }
 
@@ -47,7 +46,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.RampNetwork:ramp-sdk-android:1.+'
+        implementation 'com.github.RampNetwork:ramp-sdk-android:3.0.0'
     }
 }
 
