@@ -46,7 +46,7 @@ android {
     }
 
     dependencies {
-        implementation 'com.github.RampNetwork:ramp-sdk-android:3.0.0'
+        implementation 'com.github.RampNetwork:ramp-sdk-android:3.0.+'
     }
 }
 
