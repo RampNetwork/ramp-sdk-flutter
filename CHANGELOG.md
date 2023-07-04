@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+* Fix missing `onPurchaseFailed` callback
+
 ## 2.0.0
 
 * Update native ramp sdk to support off-ramp
