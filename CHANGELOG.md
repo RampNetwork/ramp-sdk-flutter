@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.2
+
+* Update the default URL to the app
+
 ## 2.0.1
 
 * Fix missing `onPurchaseFailed` callback

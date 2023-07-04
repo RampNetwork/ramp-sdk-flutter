@@ -1,6 +1,6 @@
 name: ramp_flutter
 description: Ramp for Flutter is a simple wrapper for native iOS and Android Ramp SDKs. Unified API lets you write code once and use on any of the platforms. Ramp Flutter SDK supports iOS and Android platforms.
-version: 2.0.1
+version: 2.0.2
 homepage: https://ramp.network/
 
 environment:
