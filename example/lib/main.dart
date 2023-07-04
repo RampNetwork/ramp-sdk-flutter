@@ -44,7 +44,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   final List<String> _predefinedEnvironments = [
     "https://app.dev.ramp-network.org",
     "https://ri-widget-staging.firebaseapp.com",
-    "https://buy.ramp.network",
+    "https://app.ramp.network",
   ];
 
   int _selectedEnvironment = 1;
