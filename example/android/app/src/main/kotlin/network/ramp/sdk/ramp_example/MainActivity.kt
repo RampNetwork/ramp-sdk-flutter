@@ -1,4 +1,4 @@
-package network.ramp.ramp_flutter_example
+package network.ramp.sdk.ramp_example
 
 import io.flutter.embedding.android.FlutterActivity
 
