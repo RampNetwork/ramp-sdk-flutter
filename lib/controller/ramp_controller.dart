@@ -12,7 +12,7 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class RampController {
-  late WebViewController _controller;
+  late WebViewController webViewController;
   Configuration? _configuration;
   EventDelegate? _eventDelegate;
 
@@ -28,12 +28,12 @@ class RampController {
     } else {
       params = const PlatformWebViewControllerCreationParams();
     }
-    _controller = WebViewController.fromPlatformCreationParams(params);
-    if (_controller.platform is AndroidWebViewController) {
-      (_controller.platform as AndroidWebViewController)
+    webViewController = WebViewController.fromPlatformCreationParams(params);
+    if (webViewController.platform is AndroidWebViewController) {
+      (webViewController.platform as AndroidWebViewController)
           .setMediaPlaybackRequiresUserGesture(false);
     }
-    _controller.addJavaScriptChannel(
+    webViewController.addJavaScriptChannel(
       RampController.jsMessageChannelName,
       onMessageReceived: _handleJavaScriptMessage,
     );
@@ -50,7 +50,7 @@ class RampController {
   void start() {
     Configuration configuration = _configuration ?? Configuration();
     Uri configurationUri = configuration.configurationUrl();
-    _controller.loadRequest(configurationUri);
+    webViewController.loadRequest(configurationUri);
   }
 
   void _handleJavaScriptMessage(JavaScriptMessage message) {
@@ -84,7 +84,7 @@ class RampController {
 
       case "WIDGET_CLOSE":
         developer.log('🟢 widget close requested');
-        _handleWidgetCloseEvent();
+        _handleWidgetCloseEvent(messageJson);
 
       case "CLOSE":
         developer.log('🟡 widget close request duplicate');
@@ -141,7 +141,7 @@ class RampController {
     }
   }
 
-  void _handleWidgetCloseEvent() {
+  void _handleWidgetCloseEvent(Map<String, dynamic> messageJson) {
     if (_eventDelegate != null && _eventDelegate!.onRampClosed != null) {
       _eventDelegate!.onRampClosed!();
     }

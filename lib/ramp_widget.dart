@@ -1,23 +1,29 @@
-import 'dart:convert';
-import 'dart:developer' as developer;
-
 import 'package:flutter/widgets.dart';
 import 'package:ramp/model/configuration.dart';
 import 'package:ramp/controller/event_delegate.dart';
-import 'package:ramp/model/offramp_sale.dart';
-import 'package:ramp/model/onramp_purchase.dart';
-import 'package:ramp/model/send_crypto_payload.dart';
 import 'package:ramp/controller/ramp_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'ramp_platform_interface.dart';
-
-// import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class Ramp {
   Future<String?> getPlatformVersion() {
     return RampPlatform.instance.getPlatformVersion();
   }
+}
+
+class RampWidget2 extends StatelessWidget {
+  RampController controller;
+
+  RampWidget2({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return WebViewWidget(controller: controller.webViewController);
+  }
+
+  void setController(RampController controller) {
+    this.controller = controller;
+  } 
 }
 
 class RampWidget extends StatefulWidget {
@@ -31,13 +37,7 @@ class RampWidget extends StatefulWidget {
 }
 
 class _RampWidgetState extends State<RampWidget> {
-  final JsonDecoder _jsonDecoder = const JsonDecoder();
-
   late WebViewController _controller;
-  late Function(OnrampPurchase, String, Uri)? onOnrampPurchaseCreated;
-  late Function(OfframpSale, String, Uri)? onOfframpSaleCreated;
-  late Function(SendCryptoPayload)? onSendCryptoRequested;
-  late Function()? onRampClosed;
 
   @override
   void initState() {
@@ -74,7 +74,6 @@ class _RampWidgetState extends State<RampWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return WebViewWidget(controller: _controller);
   }
 
 

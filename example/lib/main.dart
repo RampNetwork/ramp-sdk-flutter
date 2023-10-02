@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ramp/controller/ramp_controller.dart';
+import 'package:ramp/model/configuration.dart';
 import 'dart:async';
 
 import 'package:ramp/ramp_widget.dart';
@@ -16,14 +18,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  Future<void> initPlatformState() async {}
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -34,6 +28,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   Widget rampWidget() {
+    Configuration configuration = Configuration();
+    RampController controller = RampController()
+      ..setConfiguration(configuration);
+    return RampWidget2(controller: controller);
+
     return RampWidget(
       onOnrampPurchaseCreated: (purchase, token, apiUrl) =>
           // ignore: avoid_print
