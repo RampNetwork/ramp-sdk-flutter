@@ -11,10 +11,10 @@ class Ramp {
   }
 }
 
-class RampWidget2 extends StatelessWidget {
+class RampWidget extends StatelessWidget {
   RampController controller;
 
-  RampWidget2({super.key, required this.controller});
+  RampWidget({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -23,58 +23,58 @@ class RampWidget2 extends StatelessWidget {
 
   void setController(RampController controller) {
     this.controller = controller;
-  } 
+  }
 }
 
-class RampWidget extends StatefulWidget {
-  Configuration? configuration;
-  EventDelegate? eventDelegate;
+// class RampWidget extends StatefulWidget {
+//   Configuration? configuration;
+//   EventDelegate? eventDelegate;
 
-  RampWidget({super.key, this.configuration, this.eventDelegate});
+//   RampWidget({super.key, this.configuration, this.eventDelegate});
 
-  @override
-  State<RampWidget> createState() => _RampWidgetState();
-}
+//   @override
+//   State<RampWidget> createState() => _RampWidgetState();
+// }
 
-class _RampWidgetState extends State<RampWidget> {
-  late WebViewController _controller;
+// class _RampWidgetState extends State<RampWidget> {
+//   late WebViewController _controller;
 
-  @override
-  void initState() {
-    super.initState();
-    onOnrampPurchaseCreated = widget.onOnrampPurchaseCreated;
-    onSendCryptoRequested = widget.onSendCryptoRequested;
-    onOfframpSaleCreated = widget.onOfframpSaleCreated;
-    onRampClosed = widget.onRampClosed;
-    initPlatformState();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     onOnrampPurchaseCreated = widget.onOnrampPurchaseCreated;
+//     onSendCryptoRequested = widget.onSendCryptoRequested;
+//     onOfframpSaleCreated = widget.onOfframpSaleCreated;
+//     onRampClosed = widget.onRampClosed;
+//     initPlatformState();
+//   }
 
-  Future<void> initPlatformState() async {
+//   Future<void> initPlatformState() async {
 
-    PlatformWebViewControllerCreationParams params;
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      params = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-      );
-    } else {
-      params = const PlatformWebViewControllerCreationParams();
-    }
-    _controller = WebViewController.fromPlatformCreationParams(params)
-    ..setNavigationDelegate(delegate)
-    // if (_controller.platform is AndroidWebViewController) {
-    //   (_controller.platform as AndroidWebViewController)
-    //       .setMediaPlaybackRequiresUserGesture(false);
-    // }
-    _controller.addJavaScriptChannel(
-      'RampInstantMobile',
-      onMessageReceived: _handleJavaScriptMessage,
-    );
-    _controller.loadRequest(rampUrl);
-  }
+//     PlatformWebViewControllerCreationParams params;
+//     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+//       params = WebKitWebViewControllerCreationParams(
+//         allowsInlineMediaPlayback: true,
+//       );
+//     } else {
+//       params = const PlatformWebViewControllerCreationParams();
+//     }
+//     _controller = WebViewController.fromPlatformCreationParams(params)
+//     ..setNavigationDelegate(delegate)
+//     // if (_controller.platform is AndroidWebViewController) {
+//     //   (_controller.platform as AndroidWebViewController)
+//     //       .setMediaPlaybackRequiresUserGesture(false);
+//     // }
+//     _controller.addJavaScriptChannel(
+//       'RampInstantMobile',
+//       onMessageReceived: _handleJavaScriptMessage,
+//     );
+//     _controller.loadRequest(rampUrl);
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//   }
 
 
-}
+// }

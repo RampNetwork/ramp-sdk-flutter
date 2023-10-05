@@ -49,6 +49,8 @@ class RampController {
 
   void start() {
     Configuration configuration = _configuration ?? Configuration();
+    developer.log('🟣 ramp controller started');
+    developer.inspect(configuration);
     Uri configurationUri = configuration.configurationUrl();
     webViewController.loadRequest(configurationUri);
   }

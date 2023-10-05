@@ -26,28 +26,6 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
-  Widget rampWidget() {
-    Configuration configuration = Configuration();
-    RampController controller = RampController()
-      ..setConfiguration(configuration);
-    return RampWidget2(controller: controller);
-
-    return RampWidget(
-      onOnrampPurchaseCreated: (purchase, token, apiUrl) =>
-          // ignore: avoid_print
-          print("Purchase created: $token"),
-      onOfframpSaleCreated: (sale, token, apiUrl) =>
-          // ignore: avoid_print
-          print("Sale created: $token"),
-      onSendCryptoRequested: (payload) =>
-          // ignore: avoid_print
-          print("Send crypto requested: $payload"),
-      onRampClosed: () =>
-          // ignore: avoid_print
-          print("Ramp closed"),
-    );
-  }
 }
 
 class BottomSheetExample extends StatelessWidget {
@@ -67,12 +45,21 @@ class BottomSheetExample extends StatelessWidget {
             builder: (BuildContext context) {
               return Container(
                 height: MediaQuery.of(context).size.height * 0.8,
-                child: const RampWidget(),
+                child: _rampWidget(),
               );
             },
           );
         },
       ),
     );
+  }
+
+  Widget _rampWidget() {
+    Configuration configuration = Configuration();
+    RampController controller = RampController()
+      ..setConfiguration(configuration);
+    RampWidget widget = RampWidget(controller: controller);
+    controller.start();
+    return widget;
   }
 }
