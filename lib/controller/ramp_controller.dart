@@ -12,9 +12,9 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class RampController {
-  late WebViewController webViewController;
-  Configuration? _configuration;
-  EventDelegate? _eventDelegate;
+  late final WebViewController webViewController;
+  Configuration? configuration;
+  EventDelegate? eventDelegate;
 
   final JsonDecoder _jsonDecoder = const JsonDecoder();
   static const jsMessageChannelName = "RampInstantMobile";
@@ -39,16 +39,8 @@ class RampController {
     );
   }
 
-  void setConfiguration(Configuration configuration) {
-    _configuration = configuration;
-  }
-
-  void setEventDeletage(EventDelegate eventDelegate) {
-    _eventDelegate = eventDelegate;
-  }
-
   void start() {
-    Configuration configuration = _configuration ?? Configuration();
+    Configuration configuration = this.configuration ?? Configuration();
     developer.log('🟣 ramp controller started');
     developer.inspect(configuration);
     Uri configurationUri = configuration.configurationUrl();
@@ -107,9 +99,9 @@ class RampController {
 
     developer.inspect(purchase);
 
-    if (_eventDelegate != null &&
-        _eventDelegate!.onOnrampPurchaseCreated != null) {
-      _eventDelegate!.onOnrampPurchaseCreated!(
+    if (eventDelegate != null &&
+        eventDelegate!.onOnrampPurchaseCreated != null) {
+      eventDelegate!.onOnrampPurchaseCreated!(
           purchase, purchaseViewToken, apiUrl);
     }
   }
@@ -124,9 +116,8 @@ class RampController {
 
     developer.inspect(sale);
 
-    if (_eventDelegate != null &&
-        _eventDelegate!.onOfframpSaleCreated != null) {
-      _eventDelegate!.onOfframpSaleCreated!(sale, saleViewToken, apiUrl);
+    if (eventDelegate != null && eventDelegate!.onOfframpSaleCreated != null) {
+      eventDelegate!.onOfframpSaleCreated!(sale, saleViewToken, apiUrl);
     }
   }
 
@@ -137,15 +128,14 @@ class RampController {
 
     developer.inspect(sendCryptoRequest);
 
-    if (_eventDelegate != null &&
-        _eventDelegate!.onSendCryptoRequested != null) {
-      _eventDelegate!.onSendCryptoRequested!(sendCryptoRequest);
+    if (eventDelegate != null && eventDelegate!.onSendCryptoRequested != null) {
+      eventDelegate!.onSendCryptoRequested!(sendCryptoRequest);
     }
   }
 
   void _handleWidgetCloseEvent(Map<String, dynamic> messageJson) {
-    if (_eventDelegate != null && _eventDelegate!.onRampClosed != null) {
-      _eventDelegate!.onRampClosed!();
+    if (eventDelegate != null && eventDelegate!.onRampClosed != null) {
+      eventDelegate!.onRampClosed!();
     }
   }
 }
