@@ -2,7 +2,7 @@ import Flutter
 import UIKit
 import Ramp
 
-public class SwiftRampFlutterPlugin: NSObject {
+public class RampFlutterPlugin: NSObject {
     private let channel: FlutterMethodChannel
     private var sendCryptoResponseHandler: ((SendCryptoResultPayload) -> Void)?
     
@@ -38,10 +38,10 @@ public class SwiftRampFlutterPlugin: NSObject {
     }
 }
 
-extension SwiftRampFlutterPlugin: FlutterPlugin {
+extension RampFlutterPlugin: FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "ramp_flutter", binaryMessenger: registrar.messenger())
-        let instance = SwiftRampFlutterPlugin(channel: channel)
+        let instance = RampFlutterPlugin(channel: channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
     
@@ -72,7 +72,7 @@ extension SwiftRampFlutterPlugin: FlutterPlugin {
     }
 }
 
-extension SwiftRampFlutterPlugin: RampDelegate {
+extension RampFlutterPlugin: RampDelegate {
     public func ramp(_ rampViewController: RampViewController,
                      didCreateOnrampPurchase purchase: OnrampPurchase,
                      _ purchaseViewToken: String,
