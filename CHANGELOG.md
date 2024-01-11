@@ -7,6 +7,7 @@ Dev log:
     `flutter create --org network.ramp --template=plugin --platforms=android,ios -i swift -a kotlin ramp_flutter`
 - reset this changelog file, added this section
 - commited relatively safe updated config files and implementation files
+- updated iOS side of things + lib pubspec
 
 ## 2.0.2
 
