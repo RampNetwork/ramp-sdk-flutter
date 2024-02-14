@@ -1,13 +1,7 @@
 # Changelog
 
-## 3.0.0-alpha
-Dev log:
-- removed all files from Git repo to have history diffed
-- regenerated whole project using command:
-    `flutter create --org network.ramp --template=plugin --platforms=android,ios -i swift -a kotlin ramp_flutter`
-- reset this changelog file, added this section
-- commited relatively safe updated config files and implementation files
-- updated iOS side of things + lib pubspec
+## 3.0.0
+* Regenerated plugin to fix platform specific dependencies 
 
 ## 2.0.2
 
