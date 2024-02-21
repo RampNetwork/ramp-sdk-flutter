@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   Ramp Flutter SDK supports iOS and Android platforms.
                        DESC
   s.homepage         = 'https://docs.ramp.network/mobile/flutter-sdk/'
-  s.license          = 'proprietary'
+  s.license          = 'MIT'
   s.author           = { 'Ramp Network' => 'dev@ramp.network' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
