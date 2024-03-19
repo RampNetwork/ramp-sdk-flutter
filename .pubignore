@@ -8,3 +8,6 @@ build/
 
 example/ios
 example/android
+
+pubspec.lock
+ramp_flutter.iml
