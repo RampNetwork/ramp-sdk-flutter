@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.0.0
+* Regenerated plugin to fix platform specific dependencies 
+
 ## 2.0.2
 
 * Update the default URL to the app
