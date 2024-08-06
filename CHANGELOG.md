@@ -1,6 +1,11 @@
 # Changelog
 
+## 4.0.0
+
+* Upgraded Android SDK dependency version to 4.0.+
+
 ## 3.0.0
+
 * Regenerated plugin to fix platform specific dependencies 
 
 ## 2.0.2
