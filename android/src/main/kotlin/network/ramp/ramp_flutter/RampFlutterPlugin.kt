@@ -32,8 +32,6 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
         rampSdk = RampSDK()
         callback = object : RampCallback {
-            override fun onPurchaseFailed() {
-            }
             override fun onPurchaseCreated(purchase: Purchase, purchaseViewToken: String, apiUrl: String) {
                 val purchaseMap = serializePurchase(purchase)
                 val arguments = listOf(purchaseMap, purchaseViewToken, apiUrl)
