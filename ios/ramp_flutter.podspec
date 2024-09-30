@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version          = '1.0.1'
   s.summary          = 'Ramp Network iOS wrapper for Flutter.'
   s.description      = <<-DESC
-  Ramp Network for Flutter is a simple wrapper for native iOS and Android Ramp Networkn SDKs.
+  Ramp Network for Flutter is a simple wrapper for native iOS and Android Ramp Network SDKs.
   Unified API lets you write code once and use on any of the platforms.
   Ramp Network Flutter SDK supports iOS and Android platforms.
                        DESC
