@@ -1,6 +1,6 @@
 # Ramp Network Flutter
 
-Official Flutter wrapper for Ramp
+Official Flutter wrapper for Ramp Network
 
 ## Getting Started
 
