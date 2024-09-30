@@ -102,7 +102,7 @@ class RampFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
 private fun makeConfiguration(arguments: Any): Config? {
     val map = arguments as? Map<*, *> ?: return null
-    val hostAppName = map["hostAppName"] as? String ?: "Ramp Integration"
+    val hostAppName = map["hostAppName"] as? String ?: "Ramp Network Integration"
     val hostLogoUrl = map["hostLogoUrl"] as? String ?: "https://ramp.network/assets/images/Logo.svg"
     val url = map["url"] as? String ?: "https://app.ramp.network"
     val config = Config(hostAppName, hostLogoUrl, url)

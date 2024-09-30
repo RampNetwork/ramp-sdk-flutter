@@ -18,7 +18,7 @@
 
 ## 2.0.0
 
-* Update native ramp sdk to support off-ramp
+* Update native Ramp Network sdk to support off-ramp
 
 ## 1.0.2
 

@@ -53,7 +53,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   @override
   void initState() {
-    _configuration.hostAppName = "Ramp Flutter";
+    _configuration.hostAppName = "Ramp Network Flutter";
     _configuration.url = _predefinedEnvironments[_selectedEnvironment];
     _configuration.enabledFlows = ["ONRAMP", "OFFRAMP"];
     _configuration.useSendCryptoCallback = true;
@@ -77,11 +77,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     String purchaseViewToken,
     String apiUrl,
   ) {
-    _showNotification("Ramp Notification", "onramp purchase created");
+    _showNotification("Ramp Network Notification", "onramp purchase created");
   }
 
   void onSendCryptoRequested(SendCryptoPayload payload) {
-    _showNotification("Ramp Notification", "send crypto requested");
+    _showNotification("Ramp Network Notification", "send crypto requested");
     ramp.sendCrypto("123");
   }
 
@@ -90,11 +90,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     String saleViewToken,
     String apiUrl,
   ) {
-    _showNotification("Ramp Notification", "offramp sale created");
+    _showNotification("Ramp Network Notification", "offramp sale created");
   }
 
   void onRampClosed() {
-    _showNotification("Ramp Notification", "ramp closed");
+    _showNotification("Ramp Network Notification", "ramp closed");
   }
 
   @override
@@ -102,7 +102,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     return PlatformApp(
       home: PlatformScaffold(
         appBar: PlatformAppBar(
-          title: const Text('Ramp Flutter'),
+          title: const Text('Ramp Network Flutter'),
         ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
