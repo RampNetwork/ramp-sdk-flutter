@@ -1,6 +1,6 @@
 name: ramp_flutter
 description: Ramp Network for Flutter is a simple wrapper for native iOS and Android Ramp Network SDKs. Unified API lets you write code once and use on any of the platforms. Ramp Network Flutter SDK supports iOS and Android platforms.
-version: 4.0.0
+version: 4.0.1
 homepage: https://ramp.network/
 
 environment:
