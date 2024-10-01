@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.1
+
+* Updated package documentation
+
 ## 4.0.0
 
 * Upgraded Android SDK dependency version to 4.0.+
