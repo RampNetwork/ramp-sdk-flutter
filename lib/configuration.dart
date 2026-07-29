@@ -1,34 +1,56 @@
+/// Builds a Ramp widget [Uri]. Not held by [RampFlutter] after construction —
+/// call [buildWidgetUrl] and pass the result into [RampFlutter].
 class Configuration {
+  const Configuration({
+    this.url,
+    this.containerNode,
+    this.deepLinkScheme,
+    this.defaultAsset,
+    this.defaultFlow,
+    this.enabledFlows,
+    this.fiatCurrency,
+    this.fiatValue,
+    this.finalUrl,
+    this.hostApiKey,
+    this.hostAppName,
+    this.hostLogoUrl,
+    this.offrampAsset,
+    this.offrampWebhookV3Url,
+    this.selectedCountryCode,
+    this.swapAmount,
+    this.swapAsset,
+    this.userAddress,
+    this.userEmailAddress,
+    this.useSendCryptoCallback,
+    this.webhookStatusUrl,
+  });
+
   static const String defaultUrl = 'https://app.rampnetwork.com';
   static const String sdkType = 'FLUTTER';
   static const String sdkVersion = '5.0.0';
   static const String mobileSdkVariant = 'sdk-mobile';
 
-  String? url;
-
-  String? containerNode;
-  String? deepLinkScheme;
-  String? defaultAsset;
-  String? defaultFlow;
-  List<String>? enabledFlows;
-  String? fiatCurrency;
-  String? fiatValue;
-  String? finalUrl;
-  String? hostApiKey;
-  String? hostAppName;
-  String? hostLogoUrl;
-  String? offrampAsset;
-  String? offrampWebhookV3Url;
-  String? selectedCountryCode;
-  String? swapAmount;
-  String? swapAsset;
-  String? userAddress;
-  String? userEmailAddress;
-  bool? useSendCryptoCallback;
-
-  /// Ignored when building the URL; the SDK always sends [mobileSdkVariant].
-  String? variant;
-  String? webhookStatusUrl;
+  final String? url;
+  final String? containerNode;
+  final String? deepLinkScheme;
+  final String? defaultAsset;
+  final String? defaultFlow;
+  final List<String>? enabledFlows;
+  final String? fiatCurrency;
+  final String? fiatValue;
+  final String? finalUrl;
+  final String? hostApiKey;
+  final String? hostAppName;
+  final String? hostLogoUrl;
+  final String? offrampAsset;
+  final String? offrampWebhookV3Url;
+  final String? selectedCountryCode;
+  final String? swapAmount;
+  final String? swapAsset;
+  final String? userAddress;
+  final String? userEmailAddress;
+  final bool? useSendCryptoCallback;
+  final String? webhookStatusUrl;
 
   Uri buildWidgetUrl() {
     final base = Uri.parse((url != null && url!.trim().isNotEmpty) ? url!.trim() : defaultUrl);

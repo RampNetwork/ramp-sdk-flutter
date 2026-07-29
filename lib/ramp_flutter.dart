@@ -5,11 +5,10 @@ import 'package:ramp_flutter/src/ramp_webview.dart';
 import 'package:ramp_flutter/widget_event.dart';
 
 class RampFlutter {
-  RampFlutter(Configuration configuration) : _webView = RampWebView(configuration.buildWidgetUrl());
+  RampFlutter(Uri widgetUrl) : _webView = RampWebView(widgetUrl);
 
-  /// Test-only: load a concrete widget URL without going through [Configuration].
-  @visibleForTesting
-  RampFlutter.withWidgetUrl(Uri widgetUrl) : _webView = RampWebView(widgetUrl);
+  factory RampFlutter.fromConfiguration(Configuration configuration) =>
+      RampFlutter(configuration.buildWidgetUrl());
 
   final RampWebView _webView;
 

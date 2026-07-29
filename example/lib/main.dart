@@ -22,29 +22,30 @@ class RampFlutterApp extends StatefulWidget {
 }
 
 class _RampFlutterAppState extends State<RampFlutterApp> {
-  final Configuration _configuration = Configuration();
   final ValueNotifier<List<_DebugEvent>> _debugEvents = ValueNotifier<List<_DebugEvent>>(const []);
   var _nextDebugEventId = 0;
 
   final List<String> _predefinedEnvironments = [
-    "https://app.dev.ramp-network.org",
-    "https://app.demo.ramp.network",
-    "https://app.rampnetwork.com",
+    'https://app.dev.ramp-network.org',
+    'https://app.demo.ramp.network',
+    'https://app.rampnetwork.com',
   ];
 
   int _selectedEnvironment = 0;
+  String? _userEmailAddress;
+  String? _fiatValue;
+  String? _fiatCurrency;
+  String? _defaultAsset = 'BTC_BTC';
+  String? _offrampAsset;
+  String? _userAddress;
+  String? _hostAppName = 'Ramp Network Flutter';
+  String? _hostApiKey;
+  String? _defaultFlow = 'ONRAMP';
+  List<String> _enabledFlows = ['ONRAMP', 'OFFRAMP', 'SWAP'];
 
   @override
   void initState() {
-    _configuration.hostAppName = "Ramp Network Flutter";
-    _configuration.hostLogoUrl = "https://assets.rampnetwork.com/misc/ramp-network-logo.svg";
-    _configuration.defaultFlow = "ONRAMP";
-    _configuration.enabledFlows = ["ONRAMP", "OFFRAMP", "SWAP"];
-    _configuration.defaultAsset = "BTC_BTC";
-    _configuration.useSendCryptoCallback = true;
-    _configuration.deepLinkScheme = "rampflutterdemo";
     _applyEnvironment(_selectedEnvironment);
-
     super.initState();
   }
 
@@ -61,8 +62,26 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   void _applyEnvironment(int id) {
     _selectedEnvironment = id;
-    _configuration.url = _predefinedEnvironments[id];
-    _configuration.hostApiKey = id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
+    _hostApiKey = id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
+  }
+
+  Configuration _buildConfiguration() {
+    return Configuration(
+      url: _predefinedEnvironments[_selectedEnvironment],
+      hostAppName: _hostAppName,
+      hostLogoUrl: 'https://assets.rampnetwork.com/misc/ramp-network-logo.svg',
+      defaultFlow: _defaultFlow,
+      enabledFlows: List<String>.from(_enabledFlows),
+      defaultAsset: _defaultAsset,
+      offrampAsset: _offrampAsset,
+      useSendCryptoCallback: true,
+      deepLinkScheme: 'rampflutterdemo',
+      hostApiKey: _hostApiKey,
+      userEmailAddress: _userEmailAddress,
+      fiatValue: _fiatValue,
+      fiatCurrency: _fiatCurrency,
+      userAddress: _userAddress,
+    );
   }
 
   void _addDebugEvent(String label, [Map<String, Object?> data = const {}]) {
@@ -76,7 +95,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Future<void> _showRamp(BuildContext context) async {
-    final ramp = RampFlutter(_configuration);
+    final ramp = RampFlutter.fromConfiguration(_buildConfiguration());
 
     ramp.onWidgetEvent = (event) {
       switch (event) {
@@ -202,58 +221,53 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Widget _appInfo() {
-    return const Text("App version: Flutter WebView");
+    return const Text('App version: Flutter WebView');
   }
 
   List<Widget> _configurationForm() {
     return [
-      _segmentedControl("Env:", ["dev", "demo", "prod"], _selectEnvironment),
+      _segmentedControl('Env:', ['dev', 'demo', 'prod'], _selectEnvironment),
       Text(
         _predefinedEnvironments[_selectedEnvironment],
         style: const TextStyle(color: Color.fromRGBO(46, 190, 117, 1)),
       ),
-      _textField(
-        "User email address",
-        (text) => _configuration.userEmailAddress = text,
-        _configuration.userEmailAddress,
-      ),
-      _textField("Fiat value", (text) => _configuration.fiatValue = text, _configuration.fiatValue),
-      _textField("Fiat currency", (text) => _configuration.fiatCurrency = text, _configuration.fiatCurrency),
-      _textField("Default asset", (text) => _configuration.defaultAsset = text, _configuration.defaultAsset),
-      _textField("Offramp asset", (text) => _configuration.offrampAsset = text, _configuration.offrampAsset),
-      _textField("User address", (text) => _configuration.userAddress = text, _configuration.userAddress),
-      _textField("Host app name", (text) => _configuration.hostAppName = text, _configuration.hostAppName),
-      _textField("Host API key", (text) => _configuration.hostApiKey = text, _configuration.hostApiKey),
-      _segmentedControl("Default flow:", ["ONRAMP", "OFFRAMP"], (index) {
+      _textField('User email address', (text) => _userEmailAddress = text, _userEmailAddress),
+      _textField('Fiat value', (text) => _fiatValue = text, _fiatValue),
+      _textField('Fiat currency', (text) => _fiatCurrency = text, _fiatCurrency),
+      _textField('Default asset', (text) => _defaultAsset = text, _defaultAsset),
+      _textField('Offramp asset', (text) => _offrampAsset = text, _offrampAsset),
+      _textField('User address', (text) => _userAddress = text, _userAddress),
+      _textField('Host app name', (text) => _hostAppName = text, _hostAppName),
+      _textField('Host API key', (text) => _hostApiKey = text, _hostApiKey),
+      _segmentedControl('Default flow:', ['ONRAMP', 'OFFRAMP'], (index) {
         if (index == 0) {
-          _configuration.defaultFlow = "ONRAMP";
+          _defaultFlow = 'ONRAMP';
         }
         if (index == 1) {
-          _configuration.defaultFlow = "OFFRAMP";
+          _defaultFlow = 'OFFRAMP';
         }
+        setState(() {});
       }),
-      _enabledFlows(),
+      _enabledFlowsSection(),
     ];
   }
 
-  Widget _enabledFlows() {
-    final flows = _configuration.enabledFlows ?? [];
-
+  Widget _enabledFlowsSection() {
     Widget flowSwitch(String name) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(name),
           Switch(
-            value: flows.contains(name),
+            value: _enabledFlows.contains(name),
             onChanged: (enabled) {
-              if (enabled) {
-                flows.add(name);
-              } else {
-                flows.remove(name);
-              }
-              _configuration.enabledFlows = flows;
-              setState(() {});
+              setState(() {
+                if (enabled) {
+                  _enabledFlows = [..._enabledFlows, name];
+                } else {
+                  _enabledFlows = _enabledFlows.where((flow) => flow != name).toList();
+                }
+              });
             },
           ),
         ],
@@ -263,14 +277,14 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Enabled flows:"),
-        Row(children: [flowSwitch("ONRAMP"), flowSwitch("OFFRAMP"), flowSwitch("SWAP")]),
+        const Text('Enabled flows:'),
+        Row(children: [flowSwitch('ONRAMP'), flowSwitch('OFFRAMP'), flowSwitch('SWAP')]),
       ],
     );
   }
 
   Widget _showRampButton(BuildContext context) {
-    return TextButton(onPressed: () => _showRamp(context), child: const Text("Show Ramp"));
+    return TextButton(onPressed: () => _showRamp(context), child: const Text('Show Ramp'));
   }
 
   Row _segmentedControl(String title, List<String> options, void Function(int) itemSelected) {

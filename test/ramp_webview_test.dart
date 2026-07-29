@@ -9,7 +9,7 @@ import 'package:ramp_flutter/widget_event.dart';
 void main() {
   group('Configuration.buildWidgetUrl', () {
     test('uses default base URL and SDK metadata', () {
-      final url = Configuration().buildWidgetUrl();
+      final url = const Configuration().buildWidgetUrl();
 
       expect(url.scheme, 'https');
       expect(url.host, 'app.rampnetwork.com');
@@ -19,18 +19,16 @@ void main() {
     });
 
     test('merges configuration fields and joins enabled flows', () {
-      final url =
-          (Configuration()
-                ..url = 'https://app.dev.ramp-network.org/custom'
-                ..hostApiKey = 'key'
-                ..hostAppName = 'App'
-                ..offrampAsset = 'ETH'
-                ..offrampWebhookV3Url = 'https://example.com/hook'
-                ..enabledFlows = ['ONRAMP', 'OFFRAMP']
-                ..defaultFlow = 'OFFRAMP'
-                ..useSendCryptoCallback = true
-                ..variant = 'ignored')
-              .buildWidgetUrl();
+      final url = const Configuration(
+        url: 'https://app.dev.ramp-network.org/custom',
+        hostApiKey: 'key',
+        hostAppName: 'App',
+        offrampAsset: 'ETH',
+        offrampWebhookV3Url: 'https://example.com/hook',
+        enabledFlows: ['ONRAMP', 'OFFRAMP'],
+        defaultFlow: 'OFFRAMP',
+        useSendCryptoCallback: true,
+      ).buildWidgetUrl();
 
       expect(url.host, 'app.dev.ramp-network.org');
       expect(url.path, '/custom');
@@ -41,11 +39,7 @@ void main() {
     });
 
     test('omits null and empty optional fields', () {
-      final url =
-          (Configuration()
-                ..hostApiKey = ''
-                ..fiatValue = null)
-              .buildWidgetUrl();
+      final url = const Configuration(hostApiKey: '', fiatValue: null).buildWidgetUrl();
 
       expect(url.queryParameters.containsKey('hostApiKey'), isFalse);
       expect(url.queryParameters.containsKey('fiatValue'), isFalse);
@@ -57,7 +51,7 @@ void main() {
 
     test('ignores non-JSON and unknown types', () {
       final events = <WidgetEvent>[];
-      final ramp = RampFlutter.withWidgetUrl(widgetUrl)..onWidgetEvent = events.add;
+      final ramp = RampFlutter(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage('not json');
       ramp.handleJavaScriptMessage('42');
@@ -68,7 +62,7 @@ void main() {
 
     test('parses supported widget events', () {
       final events = <WidgetEvent>[];
-      final ramp = RampFlutter.withWidgetUrl(widgetUrl)..onWidgetEvent = events.add;
+      final ramp = RampFlutter(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage(
         jsonEncode({'type': 'WIDGET_CONFIG_DONE', 'payload': null, 'widgetInstanceId': 'w1'}),
@@ -184,7 +178,7 @@ void main() {
 
     test('rejects unsupported SEND_CRYPTO eventVersion', () {
       final events = <WidgetEvent>[];
-      final ramp = RampFlutter.withWidgetUrl(widgetUrl)..onWidgetEvent = events.add;
+      final ramp = RampFlutter(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage(
         jsonEncode({

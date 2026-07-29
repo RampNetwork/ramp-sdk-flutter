@@ -29,7 +29,14 @@ The SDK provides the Ramp WebView; your app owns presentation (route, bottom
 sheet, dialog, etc.) and must call `dispose` when it is dismissed.
 
 ```dart
-final ramp = RampFlutter(configuration)
+final widgetUrl = Configuration(
+  hostApiKey: 'YOUR_API_KEY',
+  hostAppName: 'My App',
+  hostLogoUrl: 'https://example.com/logo.png',
+  enabledFlows: ['ONRAMP', 'OFFRAMP'],
+).buildWidgetUrl();
+
+final ramp = RampFlutter(widgetUrl)
   ..onWidgetEvent = (event) {
     switch (event) {
       case PurchaseCreated(:final payload):
@@ -66,13 +73,8 @@ await showModalBottomSheet<void>(
 ramp.dispose();
 ```
 
-```dart
-final configuration = Configuration()
-  ..hostApiKey = 'YOUR_API_KEY'
-  ..hostAppName = 'My App'
-  ..hostLogoUrl = 'https://example.com/logo.png'
-  ..enabledFlows = ['ONRAMP', 'OFFRAMP'];
-```
+`Configuration` only builds the widget [Uri]; `RampFlutter` takes that URL (or use
+`RampFlutter.fromConfiguration(...)`).
 
 For more configuration parameters see
 [Ramp Network Flutter documentation](https://docs.ramp.network/mobile/flutter-sdk/).
