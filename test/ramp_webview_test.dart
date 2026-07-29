@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ramp_flutter/configuration.dart';
-import 'package:ramp_flutter/internal/ramp_webview_controller.dart';
+import 'package:ramp_flutter/ramp_flutter.dart';
 
 void main() {
   group('Configuration.buildWidgetUrl', () {
@@ -55,29 +55,29 @@ void main() {
     });
   });
 
-  group('RampWebViewController events', () {
+  group('RampFlutter events', () {
     final widgetUrl = Uri.parse('https://app.rampnetwork.com/');
 
     test('forwards JSON event maps and ignores non-JSON twins', () {
       final events = <Map<String, dynamic>>[];
-      final controller = RampWebViewController(widgetUrl)
+      final ramp = RampFlutter.withWidgetUrl(widgetUrl)
         ..onWidgetEvent = events.add;
 
-      controller.handleJavaScriptMessage('not json');
-      controller.handleJavaScriptMessage('42');
-      controller.handleJavaScriptMessage(
+      ramp.handleJavaScriptMessage('not json');
+      ramp.handleJavaScriptMessage('42');
+      ramp.handleJavaScriptMessage(
         '{widgetInstanceId: abc, type: WIDGET_CONFIG_DONE, payload: null}',
       );
-      controller.handleJavaScriptMessage(jsonEncode({
+      ramp.handleJavaScriptMessage(jsonEncode({
         'type': 'WIDGET_CONFIG_DONE',
         'payload': null,
         'widgetInstanceId': 'abc',
       }));
-      controller.handleJavaScriptMessage(jsonEncode({
+      ramp.handleJavaScriptMessage(jsonEncode({
         'type': 'PURCHASE_CREATED',
         'payload': {'purchase': {'id': 'purchase-id'}},
       }));
-      controller.handleJavaScriptMessage(jsonEncode({'type': 'CLOSE'}));
+      ramp.handleJavaScriptMessage(jsonEncode({'type': 'CLOSE'}));
 
       expect(events, [
         {
