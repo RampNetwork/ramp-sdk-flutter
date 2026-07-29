@@ -1,6 +1,6 @@
 class Configuration {
   static const String defaultUrl = 'https://app.rampnetwork.com';
-  static const String sdkType = 'Flutter';
+  static const String sdkType = 'FLUTTER';
   static const String sdkVersion = '5.0.0';
   static const String mobileSdkVariant = 'sdk-mobile';
 

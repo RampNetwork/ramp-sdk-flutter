@@ -38,6 +38,8 @@ class RampWebViewController {
       params = const PlatformWebViewControllerCreationParams();
     }
 
+    debugPrint('RampFlutter: loading $_widgetUrl');
+
     final controller = WebViewController.fromPlatformCreationParams(
       params,
       onPermissionRequest: (request) {
@@ -55,6 +57,21 @@ class RampWebViewController {
       ..setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (request) => _onNavigationRequest(request),
+          onPageStarted: (url) => debugPrint('RampFlutter: page started $url'),
+          onPageFinished: (url) => debugPrint('RampFlutter: page finished $url'),
+          onWebResourceError: (error) {
+            debugPrint(
+              'RampFlutter: resource error '
+              'code=${error.errorCode} type=${error.errorType} '
+              'desc=${error.description} url=${error.url}',
+            );
+          },
+          onHttpError: (error) {
+            debugPrint(
+              'RampFlutter: HTTP error '
+              'status=${error.response?.statusCode} uri=${error.request?.uri}',
+            );
+          },
         ),
       )
       ..addJavaScriptChannel(
@@ -78,13 +95,16 @@ class RampWebViewController {
   ) async {
     final uri = Uri.tryParse(request.url);
     if (uri == null) {
+      debugPrint('RampFlutter: blocking invalid navigation ${request.url}');
       return NavigationDecision.prevent;
     }
 
     if (_isWidgetNavigation(uri)) {
+      debugPrint('RampFlutter: allow navigation $uri');
       return NavigationDecision.navigate;
     }
 
+    debugPrint('RampFlutter: open external $uri');
     await _openExternal(uri);
     return NavigationDecision.prevent;
   }

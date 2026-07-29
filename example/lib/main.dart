@@ -9,6 +9,8 @@ import 'package:ramp_flutter/send_crypto_payload.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'secrets.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   _setupNotifications();
@@ -43,20 +45,23 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   final List<String> _predefinedEnvironments = [
     "https://app.dev.ramp-network.org",
-    "https://ri-widget-staging.firebaseapp.com",
+    "https://app.demo.ramp.network",
     "https://app.rampnetwork.com",
   ];
 
-  int _selectedEnvironment = 1;
+  int _selectedEnvironment = 0;
 
   @override
   void initState() {
     _configuration.hostAppName = "Ramp Network Flutter";
-    _configuration.hostLogoUrl = "https://ramp.network/assets/images/Logo.svg";
-    _configuration.url = _predefinedEnvironments[_selectedEnvironment];
-    _configuration.enabledFlows = ["ONRAMP", "OFFRAMP"];
+    _configuration.hostLogoUrl =
+        "https://assets.rampnetwork.com/misc/ramp-network-logo.svg";
+    _configuration.defaultFlow = "ONRAMP";
+    _configuration.enabledFlows = ["ONRAMP", "OFFRAMP", "SWAP"];
+    _configuration.defaultAsset = "BTC_BTC";
     _configuration.useSendCryptoCallback = true;
     _configuration.deepLinkScheme = "rampflutterdemo";
+    _applyEnvironment(_selectedEnvironment);
 
     ramp.onOnrampPurchaseCreated = onOnrampPurchaseCreated;
     ramp.onSendCryptoRequested = onSendCryptoRequested;
@@ -67,9 +72,16 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   void _selectEnvironment(int id) {
-    _selectedEnvironment = id;
-    _configuration.url = _predefinedEnvironments[_selectedEnvironment];
+    _applyEnvironment(id);
     setState(() => {});
+  }
+
+  void _applyEnvironment(int id) {
+    _selectedEnvironment = id;
+    _configuration.url = _predefinedEnvironments[id];
+    // Dev/internal key only; demo/prod need their own keys.
+    _configuration.hostApiKey =
+        id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
   }
 
   void onOnrampPurchaseCreated(
@@ -128,7 +140,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     return [
       _segmentedControl(
         "Env:",
-        ["dev", "staging", "prod"],
+        ["dev", "demo", "prod"],
         _selectEnvironment,
       ),
       PlatformText(
@@ -219,13 +231,32 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         setState(() => {});
       },
     );
-    return Row(children: [
-      PlatformText("Enabled: "),
-      PlatformText("ONRAMP"),
-      onRamp,
-      PlatformText("OFFRAMP"),
-      offRamp,
-    ]);
+    PlatformSwitch swap = PlatformSwitch(
+      value: flows.contains("SWAP"),
+      onChanged: (enabled) {
+        if (enabled) {
+          flows.add("SWAP");
+        } else {
+          flows.remove("SWAP");
+        }
+        _configuration.enabledFlows = flows;
+        setState(() => {});
+      },
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PlatformText("Enabled flows:"),
+        Row(children: [
+          PlatformText("ONRAMP"),
+          onRamp,
+          PlatformText("OFFRAMP"),
+          offRamp,
+          PlatformText("SWAP"),
+          swap,
+        ]),
+      ],
+    );
   }
 
   Widget _showRampButton(BuildContext context) {

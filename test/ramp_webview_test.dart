@@ -14,7 +14,7 @@ void main() {
 
       expect(url.scheme, 'https');
       expect(url.host, 'app.rampnetwork.com');
-      expect(url.queryParameters['sdkType'], 'Flutter');
+      expect(url.queryParameters['sdkType'], 'FLUTTER');
       expect(url.queryParameters['sdkVersion'], '5.0.0');
       expect(url.queryParameters['variant'], 'sdk-mobile');
     });
