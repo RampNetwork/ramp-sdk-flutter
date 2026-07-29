@@ -3,9 +3,6 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ramp_flutter/configuration.dart';
 import 'package:ramp_flutter/internal/ramp_webview_controller.dart';
-import 'package:ramp_flutter/offramp_sale.dart';
-import 'package:ramp_flutter/onramp_purchase.dart';
-import 'package:ramp_flutter/send_crypto_payload.dart';
 
 void main() {
   group('Configuration.buildWidgetUrl', () {
@@ -61,94 +58,38 @@ void main() {
   group('RampWebViewController events', () {
     final widgetUrl = Uri.parse('https://app.rampnetwork.com/');
 
-    test('forwards purchase events with numeric coercion', () {
-      OnrampPurchase? purchase;
-      String? token;
-      String? apiUrl;
+    test('forwards every widget event on onWidgetEvent', () {
+      final events = <Map<String, dynamic>>[];
       final controller = RampWebViewController(widgetUrl)
-        ..onOnrampPurchaseCreated = (p, t, url) {
-          purchase = p;
-          token = t;
-          apiUrl = url;
-        };
-
-      controller.handleJavaScriptMessage(jsonEncode({
-        'type': 'PURCHASE_CREATED',
-        'payload': {
-          'purchase': {
-            'id': 'purchase-id',
-            'asset': {'decimals': 18, 'name': 'Ether', 'symbol': 'ETH'},
-            'fiatValue': 100.5,
-            'assetExchangeRate': 2,
-          },
-          'purchaseViewToken': 'view-token',
-          'apiUrl': 'https://api.ramp.network',
-        },
-      }));
-
-      expect(purchase?.id, 'purchase-id');
-      expect(token, 'view-token');
-      expect(apiUrl, 'https://api.ramp.network');
-      expect(purchase?.fiatValue, 100.5);
-      expect(purchase?.assetExchangeRate, 2.0);
-    });
-
-    test('forwards sale events with whole-number fiat amounts', () {
-      OfframpSale? sale;
-      final controller = RampWebViewController(widgetUrl)
-        ..onOfframpSaleCreated = (s, token, url) => sale = s;
-
-      controller.handleJavaScriptMessage(jsonEncode({
-        'type': 'OFFRAMP_SALE_CREATED',
-        'payload': {
-          'sale': {
-            'id': 'sale-id',
-            'crypto': {
-              'amount': '1000000000000000000',
-              'assetInfo': {
-                'chain': 'ETH',
-                'decimals': 18,
-                'name': 'Ether',
-                'symbol': 'ETH',
-              },
-            },
-            'fiat': {'amount': 100, 'currencySymbol': 'EUR'},
-          },
-          'saleViewToken': 'view-token',
-          'apiUrl': 'https://api.ramp.network',
-        },
-      }));
-
-      expect(sale?.id, 'sale-id');
-      expect(sale?.fiat?.amount, 100.0);
-      expect(sale?.crypto?.assetInfo?.chain, 'ETH');
-    });
-
-    test('forwards send crypto requests and both close events', () {
-      SendCryptoPayload? payload;
-      var closedCount = 0;
-      final controller = RampWebViewController(widgetUrl)
-        ..onSendCryptoRequested = (p) {
-          payload = p;
-        }
-        ..onClosed = () => closedCount++;
+        ..onWidgetEvent = events.add;
 
       controller.handleJavaScriptMessage('not json');
       controller.handleJavaScriptMessage('42');
       controller.handleJavaScriptMessage(jsonEncode({
-        'type': 'SEND_CRYPTO',
-        'payload': {
-          'address': '0xabc',
-          'amount': '1',
-          'assetInfo': {'chain': 'ETH'},
-        },
+        'type': 'WIDGET_CONFIG_DONE',
+        'payload': {'ok': true},
+      }));
+      controller.handleJavaScriptMessage(jsonEncode({
+        'type': 'PURCHASE_CREATED',
+        'payload': {'purchase': {'id': 'purchase-id'}},
       }));
       controller.handleJavaScriptMessage(jsonEncode({'type': 'CLOSE'}));
-      controller.handleJavaScriptMessage(jsonEncode({'type': 'WIDGET_CLOSE'}));
 
-      expect(payload?.address, '0xabc');
-      expect(payload?.assetInfo?.chain, 'ETH');
-      expect(closedCount, 2);
+      expect(events, [
+        {'type': 'RAW', 'payload': 'not json'},
+        {'type': 'RAW', 'payload': 42},
+        {
+          'type': 'WIDGET_CONFIG_DONE',
+          'payload': {'ok': true},
+        },
+        {
+          'type': 'PURCHASE_CREATED',
+          'payload': {
+            'purchase': {'id': 'purchase-id'},
+          },
+        },
+        {'type': 'CLOSE'},
+      ]);
     });
   });
 }

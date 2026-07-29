@@ -26,13 +26,12 @@ dependencies:
 
 ```dart
 final ramp = RampFlutter();
-ramp.onOnrampPurchaseCreated = (purchase, token, apiUrl) {};
-ramp.onOfframpSaleCreated = (sale, token, apiUrl) {};
-ramp.onSendCryptoRequested = (payload) {
-  // Send crypto, then:
-  ramp.sendCrypto(txHash);
+ramp.onWidgetEvent = (event) {
+  // Every widget JS event, e.g. PURCHASE_CREATED, SEND_CRYPTO, CLOSE, ...
+  if (event['type'] == 'SEND_CRYPTO') {
+    ramp.sendCrypto(txHash);
+  }
 };
-ramp.onRampClosed = () {};
 
 final configuration = Configuration()
   ..hostApiKey = 'YOUR_API_KEY'
@@ -46,6 +45,7 @@ await ramp.showRamp(context, configuration);
 `showRamp` uses Flutter's [showModalBottomSheet](https://api.flutter.dev/flutter/material/showModalBottomSheet.html).
 The host app must provide a `MaterialApp` (or equivalent `MaterialLocalizations`)
 above the `BuildContext` you pass in. Swipe down from the drag handle to dismiss.
+`CLOSE` / `WIDGET_CLOSE` also dismiss the sheet.
 
 For more configuration parameters see
 [Ramp Network Flutter documentation](https://docs.ramp.network/mobile/flutter-sdk/).

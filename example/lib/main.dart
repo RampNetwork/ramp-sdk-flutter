@@ -1,11 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 import 'package:ramp_flutter/configuration.dart';
-import 'package:ramp_flutter/offramp_sale.dart';
-import 'package:ramp_flutter/onramp_purchase.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
-import 'package:ramp_flutter/send_crypto_payload.dart';
 
 import 'secrets.dart';
 
@@ -46,10 +45,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     _configuration.deepLinkScheme = "rampflutterdemo";
     _applyEnvironment(_selectedEnvironment);
 
-    ramp.onOnrampPurchaseCreated = onOnrampPurchaseCreated;
-    ramp.onSendCryptoRequested = onSendCryptoRequested;
-    ramp.onOfframpSaleCreated = onOfframpSaleCreated;
-    ramp.onRampClosed = onRampClosed;
+    ramp.onWidgetEvent = onWidgetEvent;
 
     super.initState();
   }
@@ -67,36 +63,21 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
   }
 
-  void onOnrampPurchaseCreated(
-    OnrampPurchase purchase,
-    String purchaseViewToken,
-    String apiUrl,
-  ) {
-    _showEvent("onramp purchase created");
-  }
-
-  void onSendCryptoRequested(SendCryptoPayload payload) {
-    _showEvent("send crypto requested");
-    ramp.sendCrypto("123");
-  }
-
-  void onOfframpSaleCreated(
-    OfframpSale sale,
-    String saleViewToken,
-    String apiUrl,
-  ) {
-    _showEvent("offramp sale created");
-  }
-
-  void onRampClosed() {
-    _showEvent("ramp closed");
-  }
-
-  void _showEvent(String message) {
-    debugPrint('Ramp example: $message');
+  void onWidgetEvent(Map<String, dynamic> event) {
+    final encoded = const JsonEncoder.withIndent('  ').convert(event);
+    debugPrint('Ramp example event:\n$encoded');
     _messengerKey.currentState
       ?..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text(message)));
+      ..showSnackBar(
+        SnackBar(
+          content: Text(encoded),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+
+    if (event['type'] == 'SEND_CRYPTO') {
+      ramp.sendCrypto('123');
+    }
   }
 
   @override

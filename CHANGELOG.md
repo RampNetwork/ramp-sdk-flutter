@@ -12,9 +12,8 @@
   `variant`.
 * Default base URL is now `https://app.rampnetwork.com`.
 * Raise minimum platforms to Android 7.0 (API 24) and iOS 13.
-* Fix numeric event fields crashing on whole-number JSON values;
-  `OnrampPurchase.fiatValue` is now `double?`.
-* Remove unused `SendCryptoPayload.toMap` and `SendCryptoAssetInfo.toMap`.
+* Breaking: expose a single `onWidgetEvent` callback for all widget JS events;
+  remove specialized purchase/sale/send-crypto/close callbacks and related DTOs.
 
 ## 4.0.1
 

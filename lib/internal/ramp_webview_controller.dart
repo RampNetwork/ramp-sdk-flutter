@@ -7,11 +7,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-import '../offramp_sale.dart';
-import '../onramp_purchase.dart';
-import '../send_crypto_payload.dart';
-
-/// Owns the widget WebView and forwards Ramp Instant JS events to Dart callbacks.
+/// Owns the widget WebView and forwards Ramp Instant JS events to Dart.
 class RampWebViewController {
   RampWebViewController(this._widgetUrl);
 
@@ -20,10 +16,8 @@ class RampWebViewController {
   final Uri _widgetUrl;
   WebViewController? _webView;
 
-  Function(OnrampPurchase, String, String)? onOnrampPurchaseCreated;
-  Function(OfframpSale, String, String)? onOfframpSaleCreated;
-  Function(SendCryptoPayload)? onSendCryptoRequested;
-  Function()? onClosed;
+  /// Called for every widget JS message.
+  Function(Map<String, dynamic> event)? onWidgetEvent;
 
   WebViewController get webViewController =>
       _webView ??= _createWebViewController();
@@ -113,7 +107,6 @@ class RampWebViewController {
     if (uri.scheme == 'about') return true;
     if (uri.host.isEmpty) return true;
     if (uri.host == _widgetUrl.host) return true;
-    // Allow same-site Ramp hosts during widget redirects.
     return _trustedRampHost.hasMatch(uri.host);
   }
 
@@ -134,7 +127,6 @@ class RampWebViewController {
     }
   }
 
-  /// Extracts a browser URL from an Android `intent://` URI when present.
   static Uri? _intentFallbackUrl(Uri intentUri) {
     final browserFallback = intentUri.queryParameters['browser_fallback_url'];
     if (browserFallback != null && browserFallback.isNotEmpty) {
@@ -172,41 +164,20 @@ class RampWebViewController {
     try {
       event = jsonDecode(message);
     } on FormatException {
+      onWidgetEvent?.call({
+        'type': 'RAW',
+        'payload': message,
+      });
       return;
     }
-    if (event is! Map) return;
-    final eventMap = Map<String, dynamic>.from(event);
-
-    final payload = eventMap['payload'];
-    switch (eventMap['type']) {
-      case 'PURCHASE_CREATED':
-        if (payload is! Map) return;
-        final payloadMap = Map<String, dynamic>.from(payload);
-        onOnrampPurchaseCreated?.call(
-          OnrampPurchase.fromArguments(payloadMap['purchase']),
-          payloadMap['purchaseViewToken'] as String? ?? '',
-          payloadMap['apiUrl'] as String? ?? '',
-        );
-        break;
-      case 'OFFRAMP_SALE_CREATED':
-        if (payload is! Map) return;
-        final payloadMap = Map<String, dynamic>.from(payload);
-        onOfframpSaleCreated?.call(
-          OfframpSale.fromArguments(payloadMap['sale']),
-          payloadMap['saleViewToken'] as String? ?? '',
-          payloadMap['apiUrl'] as String? ?? '',
-        );
-        break;
-      case 'SEND_CRYPTO':
-        onSendCryptoRequested?.call(
-          SendCryptoPayload.fromArguments(payload),
-        );
-        break;
-      case 'CLOSE':
-      case 'WIDGET_CLOSE':
-        onClosed?.call();
-        break;
+    if (event is! Map) {
+      onWidgetEvent?.call({
+        'type': 'RAW',
+        'payload': event,
+      });
+      return;
     }
+    onWidgetEvent?.call(Map<String, dynamic>.from(event));
   }
 }
 
