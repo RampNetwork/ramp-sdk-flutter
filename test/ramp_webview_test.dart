@@ -25,8 +25,9 @@ void main() {
         outAsset: 'ETH_ETH',
         inAssetValue: '10000',
         offrampWebhookV3Url: 'https://example.com/hook',
-        enabledFlows: ['ONRAMP', 'OFFRAMP'],
-        defaultFlow: 'OFFRAMP',
+        enabledFlows: [Flow.ONRAMP, Flow.OFFRAMP],
+        defaultFlow: Flow.OFFRAMP,
+        paymentMethodType: PaymentMethodType.CARD_PAYMENT,
         useSendCryptoCallback: true,
       ).buildWidgetUrl();
 
@@ -38,6 +39,8 @@ void main() {
       expect(url.queryParameters['inAsset'], 'EUR');
       expect(url.queryParameters['outAsset'], 'ETH_ETH');
       expect(url.queryParameters['inAssetValue'], '10000');
+      expect(url.queryParameters['defaultFlow'], 'OFFRAMP');
+      expect(url.queryParameters['paymentMethodType'], 'CARD_PAYMENT');
       expect(url.queryParameters['useSendCryptoCallbackVersion'], '1');
     });
 

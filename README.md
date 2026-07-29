@@ -37,7 +37,7 @@ final ramp = RampFlutter(
   Configuration(
     hostApiKey: 'YOUR_API_KEY',
     hostAppName: 'My App',
-    enabledFlows: ['ONRAMP', 'OFFRAMP'],
+    enabledFlows: [Flow.ONRAMP, Flow.OFFRAMP],
     outAsset: 'BTC_BTC',
   ),
 )

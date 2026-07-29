@@ -36,8 +36,8 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   String? _userAddress;
   String? _hostAppName = 'Ramp Network Flutter';
   String? _hostApiKey;
-  String? _defaultFlow = 'ONRAMP';
-  List<String> _enabledFlows = ['ONRAMP', 'OFFRAMP', 'SWAP'];
+  Flow? _defaultFlow = Flow.ONRAMP;
+  List<Flow> _enabledFlows = [Flow.ONRAMP, Flow.OFFRAMP, Flow.SWAP];
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       url: _predefinedEnvironments[_selectedEnvironment],
       hostAppName: _hostAppName,
       defaultFlow: _defaultFlow,
-      enabledFlows: List<String>.from(_enabledFlows),
+      enabledFlows: List<Flow>.from(_enabledFlows),
       enabledCryptoAssets: enabledCryptoAssets,
       inAsset: _inAsset,
       inAssetValue: _inAssetValue,
@@ -230,10 +230,10 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       _textField('Host API key', (text) => _hostApiKey = text, _hostApiKey),
       _segmentedControl('Default flow:', ['ONRAMP', 'OFFRAMP'], (index) {
         if (index == 0) {
-          _defaultFlow = 'ONRAMP';
+          _defaultFlow = Flow.ONRAMP;
         }
         if (index == 1) {
-          _defaultFlow = 'OFFRAMP';
+          _defaultFlow = Flow.OFFRAMP;
         }
         setState(() {});
       }),
@@ -242,19 +242,19 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Widget _enabledFlowsSection() {
-    Widget flowSwitch(String name) {
+    Widget flowSwitch(Flow flow) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(name),
+          Text(flow.name),
           Switch(
-            value: _enabledFlows.contains(name),
+            value: _enabledFlows.contains(flow),
             onChanged: (enabled) {
               setState(() {
                 if (enabled) {
-                  _enabledFlows = [..._enabledFlows, name];
+                  _enabledFlows = [..._enabledFlows, flow];
                 } else {
-                  _enabledFlows = _enabledFlows.where((flow) => flow != name).toList();
+                  _enabledFlows = _enabledFlows.where((value) => value != flow).toList();
                 }
               });
             },
@@ -267,7 +267,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Enabled flows:'),
-        Row(children: [flowSwitch('ONRAMP'), flowSwitch('OFFRAMP'), flowSwitch('SWAP')]),
+        Row(children: [flowSwitch(Flow.ONRAMP), flowSwitch(Flow.OFFRAMP), flowSwitch(Flow.SWAP)]),
       ],
     );
   }

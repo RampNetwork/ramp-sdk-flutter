@@ -1,3 +1,9 @@
+import 'package:ramp_flutter/src/flow.dart';
+import 'package:ramp_flutter/src/payment_method_type.dart';
+
+export 'package:ramp_flutter/src/flow.dart';
+export 'package:ramp_flutter/src/payment_method_type.dart';
+
 class Configuration {
   const Configuration({
     this.url,
@@ -12,6 +18,7 @@ class Configuration {
     this.hostApiKey,
     this.hostAppName,
     this.offrampWebhookV3Url,
+    this.paymentMethodType,
     this.selectedCountryCode,
     this.userAddress,
     this.userEmailAddress,
@@ -24,8 +31,8 @@ class Configuration {
   static const String sdkVersion = '5.0.0';
 
   final String? url;
-  final String? defaultFlow;
-  final List<String>? enabledFlows;
+  final Flow? defaultFlow;
+  final List<Flow>? enabledFlows;
   final List<String>? enabledCryptoAssets;
   final String? inAsset;
   final String? inAssetValue;
@@ -35,6 +42,7 @@ class Configuration {
   final String? hostApiKey;
   final String? hostAppName;
   final String? offrampWebhookV3Url;
+  final PaymentMethodType? paymentMethodType;
   final String? selectedCountryCode;
   final String? userAddress;
   final String? userEmailAddress;
@@ -52,8 +60,9 @@ class Configuration {
 
     final queryParameters = <String, String>{
       ...base.queryParameters,
-      if (_nonEmpty(defaultFlow)) 'defaultFlow': defaultFlow!,
-      if (enabledFlows != null && enabledFlows!.isNotEmpty) 'enabledFlows': enabledFlows!.join(','),
+      if (defaultFlow != null) 'defaultFlow': defaultFlow!.name,
+      if (enabledFlows != null && enabledFlows!.isNotEmpty)
+        'enabledFlows': enabledFlows!.map((flow) => flow.name).join(','),
       if (enabledCryptoAssets != null && enabledCryptoAssets!.isNotEmpty)
         'enabledCryptoAssets': enabledCryptoAssets!.join(','),
       if (_nonEmpty(inAsset)) 'inAsset': inAsset!,
@@ -64,6 +73,7 @@ class Configuration {
       if (_nonEmpty(hostApiKey)) 'hostApiKey': hostApiKey!,
       if (_nonEmpty(hostAppName)) 'hostAppName': hostAppName!,
       if (_nonEmpty(offrampWebhookV3Url)) 'offrampWebhookV3Url': offrampWebhookV3Url!,
+      if (paymentMethodType != null) 'paymentMethodType': paymentMethodType!.name,
       if (_nonEmpty(selectedCountryCode)) 'selectedCountryCode': selectedCountryCode!,
       if (_nonEmpty(userAddress)) 'userAddress': userAddress!,
       if (_nonEmpty(userEmailAddress)) 'userEmailAddress': userEmailAddress!,
