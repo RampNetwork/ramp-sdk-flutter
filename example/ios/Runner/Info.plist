@@ -42,9 +42,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>X</string>
+	<string>Camera access is required for identity verification in Ramp Network.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>X</string>
+	<string>Photo library access is used to upload verification documents in Ramp Network.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

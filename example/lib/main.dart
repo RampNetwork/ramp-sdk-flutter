@@ -44,19 +44,19 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   final List<String> _predefinedEnvironments = [
     "https://app.dev.ramp-network.org",
     "https://ri-widget-staging.firebaseapp.com",
-    "https://app.ramp.network",
+    "https://app.rampnetwork.com",
   ];
 
   int _selectedEnvironment = 1;
-  bool _useFullCustomUrl = false;
-  String _fullCustomUrl = "";
 
   @override
   void initState() {
     _configuration.hostAppName = "Ramp Network Flutter";
+    _configuration.hostLogoUrl = "https://ramp.network/assets/images/Logo.svg";
     _configuration.url = _predefinedEnvironments[_selectedEnvironment];
     _configuration.enabledFlows = ["ONRAMP", "OFFRAMP"];
     _configuration.useSendCryptoCallback = true;
+    _configuration.deepLinkScheme = "rampflutterdemo";
 
     ramp.onOnrampPurchaseCreated = onOnrampPurchaseCreated;
     ramp.onSendCryptoRequested = onSendCryptoRequested;
@@ -100,14 +100,16 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   @override
   Widget build(BuildContext context) {
     return PlatformApp(
-      home: PlatformScaffold(
-        appBar: PlatformAppBar(
-          title: const Text('Ramp Network Flutter'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-          child: ListView(
-            children: _formFields(context),
+      home: Builder(
+        builder: (context) => PlatformScaffold(
+          appBar: PlatformAppBar(
+            title: const Text('Ramp Network Flutter'),
+          ),
+          body: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: ListView(
+              children: _formFields(context),
+            ),
           ),
         ),
       ),
@@ -115,30 +117,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   List<Widget> _formFields(BuildContext context) {
-    List<Widget> widgets = [];
-    widgets.add(_useFullCustomUrlToggle());
-    if (_useFullCustomUrl) {
-      widgets.addAll(_customUrlForm());
-    } else {
-      widgets.addAll(_configurationForm());
-    }
-    widgets.add(_showRampButton());
-    widgets.add(_appInfo());
-    return widgets;
+    return [..._configurationForm(), _showRampButton(context), _appInfo()];
   }
 
   Widget _appInfo() {
-    return PlatformText("App version: Flutter");
-  }
-
-  List<Widget> _customUrlForm() {
-    return [
-      _textField(
-        "Full custom URL",
-        (text) => _fullCustomUrl = text,
-        _fullCustomUrl,
-      )
-    ];
+    return PlatformText("App version: Flutter WebView");
   }
 
   List<Widget> _configurationForm() {
@@ -173,6 +156,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         "Default asset",
         (text) => _configuration.defaultAsset = text,
         _configuration.defaultAsset,
+      ),
+      _textField(
+        "Offramp asset",
+        (text) => _configuration.offrampAsset = text,
+        _configuration.offrampAsset,
       ),
       _textField(
         "User address",
@@ -240,31 +228,10 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     ]);
   }
 
-  Widget _showRampButton() {
+  Widget _showRampButton(BuildContext context) {
     return PlatformTextButton(
-      onPressed: () {
-        if (_useFullCustomUrl) {
-          Configuration c = Configuration();
-          c.url = _fullCustomUrl;
-          ramp.showRamp(c);
-        } else {
-          ramp.showRamp(_configuration);
-        }
-      },
+      onPressed: () => ramp.showRamp(context, _configuration),
       child: PlatformText("Show Ramp"),
-    );
-  }
-
-  Widget _useFullCustomUrlToggle() {
-    return Row(
-      children: [
-        PlatformText("Use full custom URL"),
-        const Spacer(),
-        PlatformSwitch(
-          value: _useFullCustomUrl,
-          onChanged: (value) => setState(() => _useFullCustomUrl = value),
-        )
-      ],
     );
   }
 

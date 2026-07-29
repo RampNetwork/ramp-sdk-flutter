@@ -42,7 +42,7 @@ android {
 
     defaultConfig {
         applicationId "network.ramp.ramp_flutter_example"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -57,8 +57,4 @@ android {
 
 flutter {
     source '../..'
-}
-
-dependencies {
-    implementation 'com.github.RampNetwork:ramp-sdk-android:3.+'
 }

@@ -5,7 +5,7 @@ class OnrampPurchase {
   String? receiverAddress;
   String? cryptoAmount;
   String? fiatCurrency;
-  int? fiatValue;
+  double? fiatValue;
   double? assetExchangeRate;
   double? baseRampFee;
   double? networkFee;
@@ -26,11 +26,11 @@ class OnrampPurchase {
     purchase.receiverAddress = arguments["receiverAddress"];
     purchase.cryptoAmount = arguments["cryptoAmount"];
     purchase.fiatCurrency = arguments["fiatCurrency"];
-    purchase.fiatValue = arguments["fiatValue"];
-    purchase.assetExchangeRate = arguments["assetExchangeRate"];
-    purchase.baseRampFee = arguments["baseRampFee"];
-    purchase.networkFee = arguments["networkFee"];
-    purchase.appliedFee = arguments["appliedFee"];
+    purchase.fiatValue = _toDouble(arguments["fiatValue"]);
+    purchase.assetExchangeRate = _toDouble(arguments["assetExchangeRate"]);
+    purchase.baseRampFee = _toDouble(arguments["baseRampFee"]);
+    purchase.networkFee = _toDouble(arguments["networkFee"]);
+    purchase.appliedFee = _toDouble(arguments["appliedFee"]);
     purchase.paymentMethodType = arguments["paymentMethodType"];
     purchase.finalTxHash = arguments["finalTxHash"];
     purchase.createdAt = arguments["createdAt"];
@@ -42,6 +42,8 @@ class OnrampPurchase {
   }
 }
 
+double? _toDouble(dynamic value) => (value as num?)?.toDouble();
+
 class PurchaseAssetInfo {
   String? address;
   int? decimals;
@@ -51,6 +53,7 @@ class PurchaseAssetInfo {
 
   static PurchaseAssetInfo fromArguments(dynamic arguments) {
     PurchaseAssetInfo assetInfo = PurchaseAssetInfo();
+    if (arguments == null) return assetInfo;
     assetInfo.address = arguments["address"];
     assetInfo.decimals = arguments["decimals"];
     assetInfo.name = arguments["name"];

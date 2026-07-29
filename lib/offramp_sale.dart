@@ -20,6 +20,7 @@ class OfframpCrypto {
 
   static OfframpCrypto fromArguments(dynamic arguments) {
     OfframpCrypto crypto = OfframpCrypto();
+    if (arguments == null) return crypto;
     crypto.amount = arguments["amount"];
     crypto.assetInfo = OfframpAssetInfo.fromArguments(arguments["assetInfo"]);
     return crypto;
@@ -35,6 +36,7 @@ class OfframpAssetInfo {
 
   static OfframpAssetInfo fromArguments(dynamic arguments) {
     OfframpAssetInfo assetInfo = OfframpAssetInfo();
+    if (arguments == null) return assetInfo;
     assetInfo.chain = arguments["chain"];
     assetInfo.decimals = arguments["decimals"];
     assetInfo.name = arguments["name"];
@@ -50,7 +52,8 @@ class OfframpFiat {
 
   static OfframpFiat fromArguments(dynamic arguments) {
     OfframpFiat fiat = OfframpFiat();
-    fiat.amount = arguments["amount"];
+    if (arguments == null) return fiat;
+    fiat.amount = (arguments["amount"] as num?)?.toDouble();
     fiat.currencySymbol = arguments["currencySymbol"];
     return fiat;
   }

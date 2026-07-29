@@ -1,5 +1,20 @@
 # Changelog
 
+## 5.0.0
+
+* Rewrite the SDK to load the Ramp widget in a Flutter WebView instead of the
+  native iOS/Android Ramp SDKs.
+* Breaking: `showRamp` now requires a `BuildContext` and pushes a fullscreen
+  route (`showRamp(context, configuration)`).
+* Add `Configuration.offrampAsset` and build the widget URL in Dart
+  (`Configuration.buildWidgetUrl`), including `sdkType` / `sdkVersion` /
+  `variant`.
+* Default base URL is now `https://app.rampnetwork.com`.
+* Raise minimum platforms to Android 7.0 (API 24) and iOS 13.
+* Fix numeric event fields crashing on whole-number JSON values;
+  `OnrampPurchase.fiatValue` is now `double?`.
+* Remove unused `SendCryptoPayload.toMap` and `SendCryptoAssetInfo.toMap`.
+
 ## 4.0.1
 
 * Updated package documentation

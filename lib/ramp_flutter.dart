@@ -1,72 +1,61 @@
-import 'dart:async';
-
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:ramp_flutter/configuration.dart';
+import 'package:ramp_flutter/internal/ramp_webview_controller.dart';
+import 'package:ramp_flutter/internal/ramp_webview_page.dart';
 import 'package:ramp_flutter/offramp_sale.dart';
 import 'package:ramp_flutter/onramp_purchase.dart';
 import 'package:ramp_flutter/send_crypto_payload.dart';
 
-import 'configuration.dart';
-
-/// Wrapper class for Ramp Network Flutter widget
+/// Flutter API for presenting the Ramp Network widget.
 class RampFlutter {
-  final MethodChannel _channel = const MethodChannel('ramp_flutter');
+  RampWebViewController? _activeController;
 
   Function(OnrampPurchase, String, String)? onOnrampPurchaseCreated;
   Function(SendCryptoPayload payload)? onSendCryptoRequested;
   Function(OfframpSale, String, String)? onOfframpSaleCreated;
   Function()? onRampClosed;
 
-  void _handleOnOnrampPurchaseCreated(dynamic arguments) {
-    dynamic payload = arguments[0];
-    String purchaseViewToken = arguments[1];
-    String apiUrl = arguments[2];
-    OnrampPurchase purchase = OnrampPurchase.fromArguments(payload);
-    onOnrampPurchaseCreated!(purchase, purchaseViewToken, apiUrl);
-  }
-
-  void _handleOnSendCryptoRequested(dynamic arguments) {
-    dynamic payload = arguments[0];
-    SendCryptoPayload sendCrypto = SendCryptoPayload.fromArguments(payload);
-    onSendCryptoRequested!(sendCrypto);
-  }
-
-  void _handleOnOfframpSaleCreated(dynamic arguments) {
-    dynamic payload = arguments[0];
-    String saleViewToken = arguments[1];
-    String apiUrl = arguments[2];
-    OfframpSale sale = OfframpSale.fromArguments(payload);
-    onOfframpSaleCreated!(sale, saleViewToken, apiUrl);
-  }
-
-  void _handleOnRampClosed() {
-    onRampClosed!();
-  }
-
-  Future<void> _didRecieveMethodCall(MethodCall call) async {
-    switch (call.method) {
-      case "onOnrampPurchaseCreated":
-        _handleOnOnrampPurchaseCreated(call.arguments);
-        break;
-      case "onSendCryptoRequested":
-        _handleOnSendCryptoRequested(call.arguments);
-        break;
-      case "onOfframpSaleCreated":
-        _handleOnOfframpSaleCreated(call.arguments);
-        break;
-      case "onRampClosed":
-        _handleOnRampClosed();
-        break;
-    }
-  }
-
+  /// Builds the widget URL from [configuration] and pushes a fullscreen route.
   Future<void> showRamp(
+    BuildContext context,
     Configuration configuration,
   ) async {
-    _channel.setMethodCallHandler(_didRecieveMethodCall);
-    await _channel.invokeMethod('showRamp', configuration.toMap());
+    final navigator = Navigator.of(context, rootNavigator: true);
+    final widgetUrl = configuration.buildWidgetUrl();
+    final controller = RampWebViewController(widgetUrl)
+      ..onOnrampPurchaseCreated = onOnrampPurchaseCreated
+      ..onOfframpSaleCreated = onOfframpSaleCreated
+      ..onSendCryptoRequested = onSendCryptoRequested;
+
+    _activeController = controller;
+
+    controller.onClosed = () {
+      if (navigator.canPop()) {
+        navigator.pop();
+      }
+    };
+
+    await navigator.push(
+      PageRouteBuilder<void>(
+        opaque: true,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return RampWebViewPage(controller: controller);
+        },
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+
+    controller.dispose();
+    if (identical(_activeController, controller)) {
+      _activeController = null;
+    }
+    onRampClosed?.call();
   }
 
+  /// Completes an off-ramp send-crypto request with an optional [transactionHash].
   Future<void> sendCrypto(String? transactionHash) async {
-    await _channel.invokeMethod('sendCrypto', transactionHash);
+    await _activeController?.sendCrypto(transactionHash);
   }
 }

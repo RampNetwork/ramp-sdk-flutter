@@ -5,19 +5,12 @@ class SendCryptoPayload {
 
   static SendCryptoPayload fromArguments(dynamic arguments) {
     SendCryptoPayload payload = SendCryptoPayload();
+    if (arguments == null) return payload;
     payload.address = arguments["address"];
     payload.amount = arguments["amount"];
     payload.assetInfo =
         SendCryptoAssetInfo.fromArguments(arguments["assetInfo"]);
     return payload;
-  }
-
-  dynamic toMap() {
-    return {
-      'address': address,
-      'amount': amount,
-      'assetInfo': assetInfo,
-    };
   }
 }
 
@@ -30,21 +23,12 @@ class SendCryptoAssetInfo {
 
   static SendCryptoAssetInfo fromArguments(dynamic arguments) {
     SendCryptoAssetInfo payload = SendCryptoAssetInfo();
+    if (arguments == null) return payload;
     payload.chain = arguments["chain"];
     payload.decimals = arguments["decimals"];
     payload.name = arguments["name"];
     payload.symbol = arguments["symbol"];
     payload.type = arguments["type"];
     return payload;
-  }
-
-  dynamic toMap() {
-    return {
-      'chain': chain,
-      'decimals': decimals,
-      'name': name,
-      'symbol': symbol,
-      'type': type,
-    };
   }
 }
