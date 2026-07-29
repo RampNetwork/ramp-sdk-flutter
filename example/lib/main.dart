@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'package:ramp_flutter/ramp_flutter.dart';
 
-import 'secrets.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const RampFlutterApp());
@@ -59,7 +57,6 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   void _applyEnvironment(int id) {
     _selectedEnvironment = id;
-    _hostApiKey = id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
   }
 
   Configuration _buildConfiguration() {
