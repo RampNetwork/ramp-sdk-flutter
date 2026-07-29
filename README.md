@@ -31,12 +31,15 @@ sheet, dialog, etc.) and must call `dispose` when it is dismissed.
 ```dart
 final ramp = RampFlutter(configuration)
   ..onWidgetEvent = (event) {
-    // Every widget JS event, e.g. PURCHASE_CREATED, SEND_CRYPTO, CLOSE, ...
-    if (event['type'] == 'SEND_CRYPTO') {
-      ramp.sendCrypto(txHash);
-    }
-    if (event['type'] == 'CLOSE' || event['type'] == 'WIDGET_CLOSE') {
-      Navigator.of(context).pop();
+    switch (event) {
+      case PurchaseCreated():
+        break;
+      case OfframpSaleCreated():
+        break;
+      case SendCryptoRequested(:final payload):
+        ramp.sendCrypto(txHash);
+      case RampClosed():
+        Navigator.of(context).pop();
     }
   };
 

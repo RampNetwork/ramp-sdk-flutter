@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:ramp_flutter/configuration.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
+import 'package:ramp_flutter/widget_event.dart';
 
 import 'secrets.dart';
 
@@ -21,8 +22,7 @@ class RampFlutterApp extends StatefulWidget {
 
 class _RampFlutterAppState extends State<RampFlutterApp> {
   final Configuration _configuration = Configuration();
-  final ValueNotifier<List<_DebugEvent>> _debugEvents =
-      ValueNotifier<List<_DebugEvent>>(const []);
+  final ValueNotifier<List<_DebugEvent>> _debugEvents = ValueNotifier<List<_DebugEvent>>(const []);
   var _nextDebugEventId = 0;
 
   final List<String> _predefinedEnvironments = [
@@ -36,8 +36,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   @override
   void initState() {
     _configuration.hostAppName = "Ramp Network Flutter";
-    _configuration.hostLogoUrl =
-        "https://assets.rampnetwork.com/misc/ramp-network-logo.svg";
+    _configuration.hostLogoUrl = "https://assets.rampnetwork.com/misc/ramp-network-logo.svg";
     _configuration.defaultFlow = "ONRAMP";
     _configuration.enabledFlows = ["ONRAMP", "OFFRAMP", "SWAP"];
     _configuration.defaultAsset = "BTC_BTC";
@@ -62,37 +61,38 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   void _applyEnvironment(int id) {
     _selectedEnvironment = id;
     _configuration.url = _predefinedEnvironments[id];
-    // Dev/internal key only; demo/prod need their own keys.
-    _configuration.hostApiKey =
-        id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
+    _configuration.hostApiKey = id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
   }
 
-  void _addDebugEvent(Map<String, dynamic> event) {
-    final encoded = const JsonEncoder.withIndent('  ').convert(event);
+  void _addDebugEvent(String label, [Map<String, Object?> data = const {}]) {
+    final encoded = const JsonEncoder.withIndent('  ').convert({'event': label, ...data});
     debugPrint('Ramp example event:\n$encoded');
-    _debugEvents.value = [
-      ..._debugEvents.value,
-      _DebugEvent(_nextDebugEventId++, encoded),
-    ];
+    _debugEvents.value = [..._debugEvents.value, _DebugEvent(_nextDebugEventId++, encoded)];
   }
 
   void _removeDebugEvent(int id) {
-    _debugEvents.value =
-        _debugEvents.value.where((e) => e.id != id).toList(growable: false);
+    _debugEvents.value = _debugEvents.value.where((e) => e.id != id).toList(growable: false);
   }
 
   Future<void> _showRamp(BuildContext context) async {
     final ramp = RampFlutter(_configuration);
 
     ramp.onWidgetEvent = (event) {
-      _addDebugEvent(event);
-
-      final type = event['type'];
-      if (type == 'SEND_CRYPTO') {
-        ramp.sendCrypto('123');
+      switch (event) {
+        case PurchaseCreated():
+          _addDebugEvent('PURCHASE_CREATED');
+        case OfframpSaleCreated():
+          _addDebugEvent('OFFRAMP_SALE_CREATED');
+        case SendCryptoRequested(:final payload):
+          _addDebugEvent('SEND_CRYPTO', {
+            'address': payload.address,
+            'amount': payload.amount,
+            'asset': payload.assetInfo?.symbol,
+          });
+          ramp.sendCrypto('123');
+        case RampClosed():
+          _addDebugEvent('CLOSE');
       }
-      // Do not auto-pop on CLOSE/WIDGET_CLOSE — keep banners visible;
-      // dismiss the sheet manually.
     };
 
     await showModalBottomSheet<void>(
@@ -151,16 +151,12 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     return MaterialApp(
       home: Builder(
         builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: const Text('Ramp Network Flutter'),
-          ),
+          appBar: AppBar(title: const Text('Ramp Network Flutter')),
           body: Stack(
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: ListView(
-                  children: _formFields(context),
-                ),
+                child: ListView(children: _formFields(context)),
               ),
               Positioned(
                 left: 8,
@@ -189,69 +185,31 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   List<Widget> _configurationForm() {
     return [
-      _segmentedControl(
-        "Env:",
-        ["dev", "demo", "prod"],
-        _selectEnvironment,
-      ),
+      _segmentedControl("Env:", ["dev", "demo", "prod"], _selectEnvironment),
       Text(
         _predefinedEnvironments[_selectedEnvironment],
-        style: const TextStyle(
-          color: Color.fromRGBO(46, 190, 117, 1),
-        ),
+        style: const TextStyle(color: Color.fromRGBO(46, 190, 117, 1)),
       ),
       _textField(
         "User email address",
         (text) => _configuration.userEmailAddress = text,
         _configuration.userEmailAddress,
       ),
-      _textField(
-        "Fiat value",
-        (text) => _configuration.fiatValue = text,
-        _configuration.fiatValue,
-      ),
-      _textField(
-        "Fiat currency",
-        (text) => _configuration.fiatCurrency = text,
-        _configuration.fiatCurrency,
-      ),
-      _textField(
-        "Default asset",
-        (text) => _configuration.defaultAsset = text,
-        _configuration.defaultAsset,
-      ),
-      _textField(
-        "Offramp asset",
-        (text) => _configuration.offrampAsset = text,
-        _configuration.offrampAsset,
-      ),
-      _textField(
-        "User address",
-        (text) => _configuration.userAddress = text,
-        _configuration.userAddress,
-      ),
-      _textField(
-        "Host app name",
-        (text) => _configuration.hostAppName = text,
-        _configuration.hostAppName,
-      ),
-      _textField(
-        "Host API key",
-        (text) => _configuration.hostApiKey = text,
-        _configuration.hostApiKey,
-      ),
-      _segmentedControl(
-        "Default flow:",
-        ["ONRAMP", "OFFRAMP"],
-        (index) {
-          if (index == 0) {
-            _configuration.defaultFlow = "ONRAMP";
-          }
-          if (index == 1) {
-            _configuration.defaultFlow = "OFFRAMP";
-          }
-        },
-      ),
+      _textField("Fiat value", (text) => _configuration.fiatValue = text, _configuration.fiatValue),
+      _textField("Fiat currency", (text) => _configuration.fiatCurrency = text, _configuration.fiatCurrency),
+      _textField("Default asset", (text) => _configuration.defaultAsset = text, _configuration.defaultAsset),
+      _textField("Offramp asset", (text) => _configuration.offrampAsset = text, _configuration.offrampAsset),
+      _textField("User address", (text) => _configuration.userAddress = text, _configuration.userAddress),
+      _textField("Host app name", (text) => _configuration.hostAppName = text, _configuration.hostAppName),
+      _textField("Host API key", (text) => _configuration.hostApiKey = text, _configuration.hostApiKey),
+      _segmentedControl("Default flow:", ["ONRAMP", "OFFRAMP"], (index) {
+        if (index == 0) {
+          _configuration.defaultFlow = "ONRAMP";
+        }
+        if (index == 1) {
+          _configuration.defaultFlow = "OFFRAMP";
+        }
+      }),
       _enabledFlows(),
     ];
   }
@@ -284,43 +242,23 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Enabled flows:"),
-        Row(
-          children: [
-            flowSwitch("ONRAMP"),
-            flowSwitch("OFFRAMP"),
-            flowSwitch("SWAP"),
-          ],
-        ),
+        Row(children: [flowSwitch("ONRAMP"), flowSwitch("OFFRAMP"), flowSwitch("SWAP")]),
       ],
     );
   }
 
   Widget _showRampButton(BuildContext context) {
-    return TextButton(
-      onPressed: () => _showRamp(context),
-      child: const Text("Show Ramp"),
-    );
+    return TextButton(onPressed: () => _showRamp(context), child: const Text("Show Ramp"));
   }
 
-  Row _segmentedControl(
-    String title,
-    List<String> options,
-    void Function(int) itemSelected,
-  ) {
+  Row _segmentedControl(String title, List<String> options, void Function(int) itemSelected) {
     final segments = options.asMap().entries.map((entry) {
-      return TextButton(
-        onPressed: () => itemSelected(entry.key),
-        child: Text(entry.value),
-      );
+      return TextButton(onPressed: () => itemSelected(entry.key), child: Text(entry.value));
     }).toList();
     return Row(children: [Text(title), ...segments]);
   }
 
-  TextField _textField(
-    String placeholder,
-    void Function(String) onChanged,
-    String? defaultValue,
-  ) {
+  TextField _textField(String placeholder, void Function(String) onChanged, String? defaultValue) {
     return TextField(
       decoration: InputDecoration(hintText: placeholder),
       onChanged: onChanged,
@@ -337,11 +275,7 @@ class _DebugEvent {
 }
 
 class _DebugEventList extends StatelessWidget {
-  const _DebugEventList({
-    required this.eventsListenable,
-    required this.maxHeight,
-    required this.onDismiss,
-  });
+  const _DebugEventList({required this.eventsListenable, required this.maxHeight, required this.onDismiss});
 
   final ValueNotifier<List<_DebugEvent>> eventsListenable;
   final double maxHeight;
@@ -375,20 +309,12 @@ class _DebugEventList extends StatelessWidget {
                       Expanded(
                         child: Text(
                           event.body,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontFamily: 'Courier',
-                          ),
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontFamily: 'Courier'),
                         ),
                       ),
                       IconButton(
                         visualDensity: VisualDensity.compact,
-                        icon: const Icon(
-                          Icons.close,
-                          color: Colors.white70,
-                          size: 18,
-                        ),
+                        icon: const Icon(Icons.close, color: Colors.white70, size: 18),
                         onPressed: () => onDismiss(event.id),
                       ),
                     ],

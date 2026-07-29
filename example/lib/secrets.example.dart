@@ -1,7 +1,4 @@
-/// Local secrets for the example app. Do not commit this file.
-///
-/// Copy [secrets.example.dart] to [secrets.dart] and fill in values.
+/// Copy to [secrets.dart] and fill in values. Do not commit secrets.dart.
 class ExampleSecrets {
-  /// Dev/internal widget host API key.
   static const String hostApiKeyInternal = 'YOUR_HOST_API_KEY_INTERNAL';
 }

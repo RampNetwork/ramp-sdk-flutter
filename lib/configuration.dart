@@ -4,7 +4,6 @@ class Configuration {
   static const String sdkVersion = '5.0.0';
   static const String mobileSdkVariant = 'sdk-mobile';
 
-  /// Base widget URL (scheme + host + optional path). Query is built from fields below.
   String? url;
 
   String? containerNode;
@@ -26,15 +25,13 @@ class Configuration {
   String? userAddress;
   String? userEmailAddress;
   bool? useSendCryptoCallback;
+
   /// Ignored when building the URL; the SDK always sends [mobileSdkVariant].
   String? variant;
   String? webhookStatusUrl;
 
-  /// Builds the widget URL from [url] and configuration query parameters.
   Uri buildWidgetUrl() {
-    final base = Uri.parse(
-      (url != null && url!.trim().isNotEmpty) ? url!.trim() : defaultUrl,
-    );
+    final base = Uri.parse((url != null && url!.trim().isNotEmpty) ? url!.trim() : defaultUrl);
 
     final queryParameters = <String, String>{
       ...base.queryParameters,
@@ -42,8 +39,7 @@ class Configuration {
       if (_nonEmpty(deepLinkScheme)) 'deepLinkScheme': deepLinkScheme!,
       if (_nonEmpty(defaultAsset)) 'defaultAsset': defaultAsset!,
       if (_nonEmpty(defaultFlow)) 'defaultFlow': defaultFlow!,
-      if (enabledFlows != null && enabledFlows!.isNotEmpty)
-        'enabledFlows': enabledFlows!.join(','),
+      if (enabledFlows != null && enabledFlows!.isNotEmpty) 'enabledFlows': enabledFlows!.join(','),
       if (_nonEmpty(fiatCurrency)) 'fiatCurrency': fiatCurrency!,
       if (_nonEmpty(fiatValue)) 'fiatValue': fiatValue!,
       if (_nonEmpty(finalUrl)) 'finalUrl': finalUrl!,
@@ -51,10 +47,8 @@ class Configuration {
       if (_nonEmpty(hostAppName)) 'hostAppName': hostAppName!,
       if (_nonEmpty(hostLogoUrl)) 'hostLogoUrl': hostLogoUrl!,
       if (_nonEmpty(offrampAsset)) 'offrampAsset': offrampAsset!,
-      if (_nonEmpty(offrampWebhookV3Url))
-        'offrampWebhookV3Url': offrampWebhookV3Url!,
-      if (_nonEmpty(selectedCountryCode))
-        'selectedCountryCode': selectedCountryCode!,
+      if (_nonEmpty(offrampWebhookV3Url)) 'offrampWebhookV3Url': offrampWebhookV3Url!,
+      if (_nonEmpty(selectedCountryCode)) 'selectedCountryCode': selectedCountryCode!,
       if (_nonEmpty(swapAmount)) 'swapAmount': swapAmount!,
       if (_nonEmpty(swapAsset)) 'swapAsset': swapAsset!,
       if (_nonEmpty(userAddress)) 'userAddress': userAddress!,
