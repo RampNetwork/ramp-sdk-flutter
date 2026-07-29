@@ -27,84 +27,97 @@ class RampWebView {
   WebViewController _ensureController() => _controller ??= _createController();
 
   WebViewController _createController() {
-    final PlatformWebViewControllerCreationParams params;
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      params = WebKitWebViewControllerCreationParams(allowsInlineMediaPlayback: true);
-    } else {
-      params = const PlatformWebViewControllerCreationParams();
-    }
+    final controller = WebViewController.fromPlatformCreationParams(
+      _platformParams(),
+      onPermissionRequest: _onPermissionRequest,
+    )
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(_navigationDelegate())
+      ..addJavaScriptChannel(
+        _channelName,
+        onMessageReceived: (message) => handleJavaScriptMessage(message.message),
+      );
 
-    final controller =
-        WebViewController.fromPlatformCreationParams(
-            params,
-            onPermissionRequest: (request) {
-              final onlyCamera = request.types.every((type) => type == WebViewPermissionResourceType.camera);
-              if (onlyCamera) {
-                request.grant();
-              } else {
-                debugPrint('RampFlutter: deny WebView permission types=${request.types}');
-                request.deny();
-              }
-            },
-          )
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..setNavigationDelegate(
-            NavigationDelegate(
-              onNavigationRequest: (request) {
-                final uri = Uri.tryParse(request.url);
-                if (uri == null) {
-                  debugPrint('RampFlutter: block navigation — invalid URL ${request.url}');
-                  return NavigationDecision.prevent;
-                }
-                if (shouldOpenExternally(uri, _widgetUrl)) {
-                  openExternalUrl(uri);
-                  return NavigationDecision.prevent;
-                }
-                return NavigationDecision.navigate;
-              },
-              onCreateWindow: (url) {
-                final uri = Uri.tryParse(url);
-                if (uri == null) {
-                  debugPrint('RampFlutter: create window ignored — invalid URL $url');
-                  return;
-                }
-                openExternalUrl(uri);
-              },
-              onPageStarted: (_) {
-                _pageReady = false;
-              },
-              onPageFinished: (_) {
-                _pageReady = true;
-                _flushPendingHostEvents();
-              },
-              onWebResourceError: (error) {
-                debugPrint(
-                  'RampFlutter: resource error '
-                  'code=${error.errorCode} type=${error.errorType} '
-                  'desc=${error.description} url=${error.url}',
-                );
-              },
-              onHttpError: (error) {
-                debugPrint(
-                  'RampFlutter: HTTP error '
-                  'status=${error.response?.statusCode} uri=${error.request?.uri}',
-                );
-              },
-            ),
-          )
-          ..addJavaScriptChannel(
-            _channelName,
-            onMessageReceived: (message) => handleJavaScriptMessage(message.message),
-          );
-
-    final platform = controller.platform;
-    if (platform is AndroidWebViewController) {
-      platform.setMediaPlaybackRequiresUserGesture(false);
-      platform.setOnShowFileSelector(showAndroidFileSelector);
-    }
-
+    _configureAndroid(controller);
     controller.loadRequest(_widgetUrl);
     return controller;
+  }
+
+  PlatformWebViewControllerCreationParams _platformParams() {
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      return WebKitWebViewControllerCreationParams(allowsInlineMediaPlayback: true);
+    }
+    return const PlatformWebViewControllerCreationParams();
+  }
+
+  NavigationDelegate _navigationDelegate() {
+    return NavigationDelegate(
+      onNavigationRequest: _onNavigationRequest,
+      onCreateWindow: _onCreateWindow,
+      onPageStarted: (_) => _pageReady = false,
+      onPageFinished: (_) {
+        _pageReady = true;
+        _flushPendingHostEvents();
+      },
+      onWebResourceError: _onWebResourceError,
+      onHttpError: _onHttpError,
+    );
+  }
+
+  void _onPermissionRequest(WebViewPermissionRequest request) {
+    final onlyCamera = request.types.every((type) => type == WebViewPermissionResourceType.camera);
+    if (onlyCamera) {
+      request.grant();
+      return;
+    }
+    debugPrint('RampFlutter: deny WebView permission types=${request.types}');
+    request.deny();
+  }
+
+  NavigationDecision _onNavigationRequest(NavigationRequest request) {
+    final uri = Uri.tryParse(request.url);
+    if (uri == null) {
+      debugPrint('RampFlutter: block navigation — invalid URL ${request.url}');
+      return NavigationDecision.prevent;
+    }
+    if (shouldOpenExternally(uri, _widgetUrl)) {
+      openExternalUrl(uri);
+      return NavigationDecision.prevent;
+    }
+    return NavigationDecision.navigate;
+  }
+
+  void _onCreateWindow(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) {
+      debugPrint('RampFlutter: create window ignored — invalid URL $url');
+      return;
+    }
+    openExternalUrl(uri);
+  }
+
+  void _onWebResourceError(WebResourceError error) {
+    debugPrint(
+      'RampFlutter: resource error '
+      'code=${error.errorCode} type=${error.errorType} '
+      'desc=${error.description} url=${error.url}',
+    );
+  }
+
+  void _onHttpError(HttpResponseError error) {
+    debugPrint(
+      'RampFlutter: HTTP error '
+      'status=${error.response?.statusCode} uri=${error.request?.uri}',
+    );
+  }
+
+  void _configureAndroid(WebViewController controller) {
+    final platform = controller.platform;
+    if (platform is! AndroidWebViewController) {
+      return;
+    }
+    platform.setMediaPlaybackRequiresUserGesture(false);
+    platform.setOnShowFileSelector(showAndroidFileSelector);
   }
 
   Future<void> postHostEvent(HostEvent event) {
