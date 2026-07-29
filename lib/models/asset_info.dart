@@ -1,6 +1,5 @@
-part of '../widget_event.dart';
+import 'package:ramp_flutter/models/json_map.dart';
 
-/// Asset metadata shared by purchase / send-crypto / sale payloads.
 class AssetInfo {
   const AssetInfo({
     this.uai,
@@ -12,7 +11,6 @@ class AssetInfo {
     this.decimals,
   });
 
-  /// UAI is undefined for assets that don't have a SLIP-44 coin ID.
   final String? uai;
   final String? address;
   final String? symbol;

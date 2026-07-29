@@ -8,7 +8,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-/// Owns the widget WebView. Not part of the public SDK surface.
 class RampWebView {
   RampWebView(this._widgetUrl);
 

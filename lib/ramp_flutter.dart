@@ -4,7 +4,6 @@ import 'package:ramp_flutter/host_event.dart';
 import 'package:ramp_flutter/src/ramp_webview.dart';
 import 'package:ramp_flutter/widget_event.dart';
 
-/// Public API for embedding the Ramp Network widget.
 class RampFlutter {
   RampFlutter(Configuration configuration) : _webView = RampWebView(configuration.buildWidgetUrl());
 
@@ -22,10 +21,8 @@ class RampFlutter {
 
   Widget get view => _webView.view;
 
-  /// Posts a host → widget event (`HostEventTypes`).
   Future<void> postHostEvent(HostEvent event) => _webView.postHostEvent(event);
 
-  /// Convenience for [SendCryptoResult.txHash].
   Future<void> sendCrypto(String? transactionHash) => _webView.sendCrypto(transactionHash);
 
   void dispose() => _webView.dispose();

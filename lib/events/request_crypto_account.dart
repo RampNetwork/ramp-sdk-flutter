@@ -9,7 +9,6 @@ final class RequestCryptoAccount extends WidgetEvent {
 class RequestCryptoAccountPayload {
   const RequestCryptoAccountPayload({this.type, this.assetSymbol});
 
-  /// Ramp's internal chain id (e.g. `"ETH"`, `"POLYGON"`).
   final String? type;
   final String? assetSymbol;
 

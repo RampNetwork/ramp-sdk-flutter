@@ -1,6 +1,12 @@
-import 'package:ramp_flutter/events/json_map.dart';
+import 'package:ramp_flutter/models/asset_info.dart';
+import 'package:ramp_flutter/models/json_map.dart';
+import 'package:ramp_flutter/models/purchase_details.dart';
+import 'package:ramp_flutter/models/sale_details.dart';
 
-part 'events/asset_info.dart';
+export 'package:ramp_flutter/models/asset_info.dart';
+export 'package:ramp_flutter/models/purchase_details.dart';
+export 'package:ramp_flutter/models/sale_details.dart';
+
 part 'events/offramp_sale_created.dart';
 part 'events/purchase_created.dart';
 part 'events/request_crypto_account.dart';
@@ -9,7 +15,6 @@ part 'events/widget_close.dart';
 part 'events/widget_config_done.dart';
 part 'events/widget_config_failed.dart';
 
-/// Incoming widget → host events for the Flutter SDK surface.
 sealed class WidgetEvent {
   const WidgetEvent({this.widgetInstanceId});
 
