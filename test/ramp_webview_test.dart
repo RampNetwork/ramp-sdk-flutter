@@ -24,7 +24,13 @@ void main() {
         inAsset: 'EUR',
         outAsset: 'ETH_ETH',
         inAssetValue: '10000',
+        outAssetValue: '500000',
+        finalUrl: 'https://example.com/done',
+        webhookStatusUrl: 'https://example.com/purchase-hook',
         offrampWebhookV3Url: 'https://example.com/hook',
+        selectedCountryCode: 'PL',
+        userAddress: '0xabc',
+        userEmailAddress: 'user@example.com',
         enabledFlows: [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP],
         defaultFlow: TransactionFlow.OFFRAMP,
         paymentMethodType: PaymentMethodType.CARD_PAYMENT,
@@ -34,21 +40,39 @@ void main() {
       expect(url.host, 'app.dev.ramp-network.org');
       expect(url.path, '/custom');
       expect(url.queryParameters['hostApiKey'], 'key');
+      expect(url.queryParameters['hostAppName'], 'App');
       expect(url.queryParameters['enabledFlows'], 'ONRAMP,OFFRAMP');
       expect(url.queryParameters['enabledCryptoAssets'], 'ETH_*,BTC_BTC');
       expect(url.queryParameters['inAsset'], 'EUR');
       expect(url.queryParameters['outAsset'], 'ETH_ETH');
       expect(url.queryParameters['inAssetValue'], '10000');
+      expect(url.queryParameters['outAssetValue'], '500000');
+      expect(url.queryParameters['finalUrl'], 'https://example.com/done');
+      expect(url.queryParameters['webhookStatusUrl'], 'https://example.com/purchase-hook');
+      expect(url.queryParameters['offrampWebhookV3Url'], 'https://example.com/hook');
+      expect(url.queryParameters['selectedCountryCode'], 'PL');
+      expect(url.queryParameters['userAddress'], '0xabc');
+      expect(url.queryParameters['userEmailAddress'], 'user@example.com');
       expect(url.queryParameters['defaultFlow'], 'OFFRAMP');
       expect(url.queryParameters['paymentMethodType'], 'CARD_PAYMENT');
       expect(url.queryParameters['useSendCryptoCallbackVersion'], '1');
     });
 
     test('omits null and empty optional fields', () {
-      final url = const Configuration(hostApiKey: '', inAssetValue: null).buildWidgetUrl();
+      final url = const Configuration(
+        hostApiKey: '',
+        inAssetValue: null,
+        enabledFlows: [],
+        enabledCryptoAssets: [],
+        url: '   ',
+      ).buildWidgetUrl();
 
+      expect(url.host, 'app.rampnetwork.com');
       expect(url.queryParameters.containsKey('hostApiKey'), isFalse);
       expect(url.queryParameters.containsKey('inAssetValue'), isFalse);
+      expect(url.queryParameters.containsKey('enabledFlows'), isFalse);
+      expect(url.queryParameters.containsKey('enabledCryptoAssets'), isFalse);
+      expect(url.queryParameters.containsKey('useSendCryptoCallbackVersion'), isFalse);
     });
 
     test('rejects an untrusted base URL', () {
