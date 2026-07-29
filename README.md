@@ -43,8 +43,9 @@ final configuration = Configuration()
 await ramp.showRamp(context, configuration);
 ```
 
-`showRamp` requires a `BuildContext` with a `Navigator` and presents a
-fullscreen WebView route.
+`showRamp` uses Flutter's [showModalBottomSheet](https://api.flutter.dev/flutter/material/showModalBottomSheet.html).
+The host app must provide a `MaterialApp` (or equivalent `MaterialLocalizations`)
+above the `BuildContext` you pass in. Swipe down from the drag handle to dismiss.
 
 For more configuration parameters see
 [Ramp Network Flutter documentation](https://docs.ramp.network/mobile/flutter-sdk/).

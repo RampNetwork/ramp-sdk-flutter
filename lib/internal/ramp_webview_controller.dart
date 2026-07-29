@@ -38,7 +38,19 @@ class RampWebViewController {
       params = const PlatformWebViewControllerCreationParams();
     }
 
-    final controller = WebViewController.fromPlatformCreationParams(params)
+    final controller = WebViewController.fromPlatformCreationParams(
+      params,
+      onPermissionRequest: (request) {
+        final onlyCamera = request.types.every(
+          (type) => type == WebViewPermissionResourceType.camera,
+        );
+        if (onlyCamera) {
+          request.grant();
+        } else {
+          request.deny();
+        }
+      },
+    )
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -48,23 +60,13 @@ class RampWebViewController {
       ..addJavaScriptChannel(
         _channelName,
         onMessageReceived: (message) => handleJavaScriptMessage(message.message),
-      )
-      ..setOnPlatformPermissionRequest((request) {
-        final onlyCamera = request.types.every(
-          (type) => type == WebViewPermissionResourceType.camera,
-        );
-        if (onlyCamera) {
-          request.grant();
-        } else {
-          request.deny();
-        }
-      });
+      );
 
     final platform = controller.platform;
     if (platform is AndroidWebViewController) {
       platform.setMediaPlaybackRequiresUserGesture(false);
       // Document upload on Android needs a host-provided file picker; not wired
-      // here. KYC camera is handled via setOnPlatformPermissionRequest.
+      // here. KYC camera is handled via onPermissionRequest.
     }
 
     controller.loadRequest(_widgetUrl);

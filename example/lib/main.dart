@@ -99,10 +99,10 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformApp(
+    return MaterialApp(
       home: Builder(
-        builder: (context) => PlatformScaffold(
-          appBar: PlatformAppBar(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
             title: const Text('Ramp Network Flutter'),
           ),
           body: Padding(

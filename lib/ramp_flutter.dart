@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:ramp_flutter/configuration.dart';
 import 'package:ramp_flutter/internal/ramp_webview_controller.dart';
 import 'package:ramp_flutter/internal/ramp_webview_page.dart';
@@ -15,12 +15,15 @@ class RampFlutter {
   Function(OfframpSale, String, String)? onOfframpSaleCreated;
   Function()? onRampClosed;
 
-  /// Builds the widget URL from [configuration] and pushes a fullscreen route.
+  /// Builds the widget URL from [configuration] and presents it in a
+  /// [showModalBottomSheet].
+  ///
+  /// Requires a [MaterialApp] (or other ancestor that provides
+  /// [MaterialLocalizations]) above [context].
   Future<void> showRamp(
     BuildContext context,
     Configuration configuration,
   ) async {
-    final navigator = Navigator.of(context, rootNavigator: true);
     final widgetUrl = configuration.buildWidgetUrl();
     final controller = RampWebViewController(widgetUrl)
       ..onOnrampPurchaseCreated = onOnrampPurchaseCreated
@@ -29,22 +32,41 @@ class RampFlutter {
 
     _activeController = controller;
 
-    controller.onClosed = () {
-      if (navigator.canPop()) {
-        navigator.pop();
-      }
-    };
+    await showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      enableDrag: true,
+      isDismissible: true,
+      useSafeArea: true,
+      builder: (sheetContext) {
+        controller.onClosed = () {
+          if (Navigator.of(sheetContext).canPop()) {
+            Navigator.of(sheetContext).pop();
+          }
+        };
 
-    await navigator.push(
-      PageRouteBuilder<void>(
-        opaque: true,
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return RampWebViewPage(controller: controller);
-        },
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
+        return SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.92,
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 28,
+                child: Center(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.all(Radius.circular(2)),
+                    ),
+                    child: SizedBox(width: 36, height: 4),
+                  ),
+                ),
+              ),
+              Expanded(child: RampWebViewPage(controller: controller)),
+            ],
+          ),
+        );
+      },
     );
 
     controller.dispose();
