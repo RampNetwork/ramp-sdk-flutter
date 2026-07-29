@@ -83,35 +83,11 @@ For more configuration parameters see
 
 - Off-widget navigations (other https hosts, custom schemes, `intent:`) and
   `target=_blank` / `window.open` open in the system browser via
-  `NavigationDelegate` + a fork of `webview_flutter`
+  `NavigationDelegate` and a forked `webview_flutter`
   ([mateusz-ramp/flutter_packages](https://github.com/mateusz-ramp/flutter_packages/tree/webview-target-blank)
-  branch `webview-target-blank`). Host apps (and `example/`) must declare
-  matching `dependency_overrides`:
-
-```yaml
-dependency_overrides:
-  webview_flutter:
-    git:
-      url: https://github.com/mateusz-ramp/flutter_packages.git
-      ref: webview-target-blank
-      path: packages/webview_flutter/webview_flutter
-  webview_flutter_android:
-    git:
-      url: https://github.com/mateusz-ramp/flutter_packages.git
-      ref: webview-target-blank
-      path: packages/webview_flutter/webview_flutter_android
-  webview_flutter_wkwebview:
-    git:
-      url: https://github.com/mateusz-ramp/flutter_packages.git
-      ref: webview-target-blank
-      path: packages/webview_flutter/webview_flutter_wkwebview
-  webview_flutter_platform_interface:
-    git:
-      url: https://github.com/mateusz-ramp/flutter_packages.git
-      ref: webview-target-blank
-      path: packages/webview_flutter/webview_flutter_platform_interface
-```
-
+  / commit `a37d157`), declared as a direct dependency of this package so hosts
+  pick it up transitively (no host `dependency_overrides` required unless
+  another package pins pub.dev `webview_flutter`).
 - Android WebView `<input type="file">` uses `file_picker` (and the camera via
   `image_picker` when capture is requested). Host apps need camera / photo
   library usage descriptions (see Getting Started). iOS WKWebView handles file

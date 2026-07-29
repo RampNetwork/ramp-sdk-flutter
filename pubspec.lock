@@ -473,7 +473,7 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/webview_flutter/webview_flutter"
-      ref: webview-target-blank
+      ref: a37d157a9160fbd509484e9bb176be038c4d153c
       resolved-ref: a37d157a9160fbd509484e9bb176be038c4d153c
       url: "https://github.com/mateusz-ramp/flutter_packages.git"
     source: git
@@ -482,16 +482,16 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/webview_flutter/webview_flutter_android"
-      ref: webview-target-blank
+      ref: a37d157a9160fbd509484e9bb176be038c4d153c
       resolved-ref: a37d157a9160fbd509484e9bb176be038c4d153c
       url: "https://github.com/mateusz-ramp/flutter_packages.git"
     source: git
     version: "4.13.0"
   webview_flutter_platform_interface:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       path: "packages/webview_flutter/webview_flutter_platform_interface"
-      ref: webview-target-blank
+      ref: a37d157a9160fbd509484e9bb176be038c4d153c
       resolved-ref: a37d157a9160fbd509484e9bb176be038c4d153c
       url: "https://github.com/mateusz-ramp/flutter_packages.git"
     source: git
@@ -500,7 +500,7 @@ packages:
     dependency: "direct main"
     description:
       path: "packages/webview_flutter/webview_flutter_wkwebview"
-      ref: webview-target-blank
+      ref: a37d157a9160fbd509484e9bb176be038c4d153c
       resolved-ref: a37d157a9160fbd509484e9bb176be038c4d153c
       url: "https://github.com/mateusz-ramp/flutter_packages.git"
     source: git

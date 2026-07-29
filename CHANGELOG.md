@@ -19,8 +19,9 @@
 * Raise minimum Flutter to 3.44 / Dart 3.12; update `webview_flutter`,
   `url_launcher`, and `flutter_lints`.
 * Open off-widget navigations and `target=_blank` / `window.open` in the system
-  browser (same-host stays in the WebView). `window.open` needs a forked
-  `webview_flutter` (`flutter_packages` / `webview-target-blank`).
+  browser (same-host stays in the WebView). Depends on a forked
+  `webview_flutter` (`flutter_packages` / `webview-target-blank`) as a direct
+  git dependency so hosts pick it up transitively.
 * Android WebView file inputs use `file_picker`; capture requests use
   `image_picker` (camera).
 
