@@ -21,6 +21,7 @@ dependencies:
 - Native Ramp iOS/Android SDKs and empty Flutter plugin shells are **not**
   required (no CocoaPods `Ramp` pod, no JitPack `ramp-sdk-android`).
   Platform WebView support comes from `webview_flutter` / `url_launcher`.
+- Requires Flutter 3.44+ / Dart 3.12+.
 
 ### Usage
 
