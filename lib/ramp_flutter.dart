@@ -23,8 +23,6 @@ class RampFlutter {
 
   Future<void> postHostEvent(HostEvent event) => _webView.postHostEvent(event);
 
-  Future<void> sendCrypto(String? transactionHash) => _webView.sendCrypto(transactionHash);
-
   void dispose() => _webView.dispose();
 
   @visibleForTesting

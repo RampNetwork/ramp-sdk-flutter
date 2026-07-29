@@ -6,7 +6,7 @@ sealed class HostEvent {
 
   String get type;
 
-  Object? get jsonPayload;
+  Map<String, dynamic> payloadToJson();
 
-  Map<String, dynamic> toJson() => {'type': type, 'payload': ?jsonPayload};
+  Map<String, dynamic> toJson() => {'type': type, 'payload': payloadToJson()};
 }

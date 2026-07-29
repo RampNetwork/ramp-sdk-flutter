@@ -7,10 +7,9 @@
   Android/iOS plugin shells).
 * Breaking: SDK no longer presents UI. Create `RampFlutter(configuration)`,
   embed `ramp.view` in your own route/sheet, and call `dispose` when done.
-* Widget → host events: `WidgetConfigDone` / `Failed`, `PurchaseCreated`,
-  `OfframpSaleCreated`, `SendCryptoRequested`, `RequestCryptoAccount`,
-  `WidgetClose`. Host → widget: `SendCryptoResult` (`sendCrypto` convenience)
-  and `RequestCryptoAccountResult` via `postHostEvent`.
+* Widget → host: sealed `WidgetEvent` via `onWidgetEvent`. Host → widget: sealed
+  `HostEvent` (`SendCryptoResult`, `RequestCryptoAccountResult`) via
+  `postHostEvent`.
 * Add `Configuration.offrampAsset` and build the widget URL in Dart
   (`Configuration.buildWidgetUrl`), including `sdkType` / `sdkVersion` /
   `variant`.

@@ -123,9 +123,6 @@ class RampWebView {
     return webView.runJavaScript('window.postMessage($message, "${_widgetUrl.origin}");');
   }
 
-  Future<void> sendCrypto(String? transactionHash) =>
-      postHostEvent(SendCryptoResult.txHash(transactionHash));
-
   void dispose() {
     _controller
       ?..removeJavaScriptChannel(_channelName)

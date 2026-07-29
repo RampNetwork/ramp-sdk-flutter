@@ -38,11 +38,10 @@ final ramp = RampFlutter(configuration)
       case OfframpSaleCreated(:final payload):
         break;
       case SendCryptoRequested(:final payload):
-        ramp.sendCrypto(txHash);
-        // or: ramp.postHostEvent(SendCryptoResult.txHash(txHash));
+        ramp.postHostEvent(SendCryptoResult.txHash(txHash));
       case RequestCryptoAccount(:final payload):
         ramp.postHostEvent(
-          RequestCryptoAccountResult.account(address: userAddress),
+          RequestCryptoAccountResult.account(address: userAddress, type: payload.type),
         );
       case WidgetClose():
         Navigator.of(context).pop();

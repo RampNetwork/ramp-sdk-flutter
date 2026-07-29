@@ -206,6 +206,9 @@ void main() {
         'type': 'SEND_CRYPTO_RESULT',
         'payload': {'error': 'failed'},
       });
+      expect(SendCryptoResult.txHash('0xhash').payload, isA<SendCryptoResultTxHashPayload>());
+      expect((SendCryptoResult.txHash('0xhash').payload as SendCryptoResultTxHashPayload).txHash, '0xhash');
+
       expect(RequestCryptoAccountResult.account(address: '0xabc', type: 'ETH').toJson(), {
         'type': 'REQUEST_CRYPTO_ACCOUNT_RESULT',
         'payload': {'address': '0xabc', 'type': 'ETH'},
@@ -214,6 +217,9 @@ void main() {
         'type': 'REQUEST_CRYPTO_ACCOUNT_RESULT',
         'payload': {'error': 'denied'},
       });
+      final account = RequestCryptoAccountResult.account(address: '0xabc', type: 'ETH');
+      expect(account.payload, isA<RequestCryptoAccountSuccessPayload>());
+      expect((account.payload as RequestCryptoAccountSuccessPayload).address, '0xabc');
     });
   });
 }

@@ -97,14 +97,18 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
             'amount': payload.amount,
             'asset': payload.assetInfo?.symbol,
           });
-          ramp.sendCrypto('123');
+          ramp.postHostEvent(SendCryptoResult.txHash('123'));
         case RequestCryptoAccount(:final payload):
           _addDebugEvent('REQUEST_CRYPTO_ACCOUNT', {
             'type': payload.type,
             'assetSymbol': payload.assetSymbol,
           });
           ramp.postHostEvent(
-            RequestCryptoAccountResult.account(address: '0xabc', type: payload.type, assetSymbol: payload.assetSymbol),
+            RequestCryptoAccountResult.account(
+              address: '0xabc',
+              type: payload.type,
+              assetSymbol: payload.assetSymbol,
+            ),
           );
         case WidgetClose(:final payload):
           _addDebugEvent('WIDGET_CLOSE', {'showAlert': payload.showAlert});
