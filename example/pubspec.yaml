@@ -1,10 +1,10 @@
 name: ramp_flutter_example
 description: "Demonstrates how to use the ramp_flutter package."
-version: 1.0.0+1
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
+version: 0.1.0+1
 
 environment:
-  sdk: '>=3.12.0 <4.0.0'
+  sdk: ^3.12.2
 
 dependencies:
   flutter:
@@ -13,10 +13,12 @@ dependencies:
     path: ../
 
 dev_dependencies:
+  flutter_test:
+    sdk: flutter
   flutter_lints: ^6.0.0
 
 # Overrides only apply in the *root* package. Required when running the example.
-# Same fork as ramp_flutter — https://github.com/mateusz-ramp/flutter_packages/tree/webview-target-blank
+# https://github.com/mateusz-ramp/flutter_packages/tree/webview-target-blank
 dependency_overrides:
   webview_flutter:
     git:

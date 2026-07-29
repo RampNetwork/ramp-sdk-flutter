@@ -1,8 +1,7 @@
-/// Template for local example secrets.
+/// Local secrets for the example app. Do not commit this file.
 ///
-/// Copy this file to `secrets.dart` and fill in real values:
-/// `cp lib/secrets.example.dart lib/secrets.dart`
+/// Copy [secrets.example.dart] to [secrets.dart] and fill in values.
 class ExampleSecrets {
-  /// iOS app `HOST_API_KEY_INTERNAL` — used with the dev widget host.
-  static const String hostApiKeyInternal = 'YOUR_DEV_HOST_API_KEY';
+  /// Dev/internal widget host API key.
+  static const String hostApiKeyInternal = 'YOUR_HOST_API_KEY_INTERNAL';
 }
