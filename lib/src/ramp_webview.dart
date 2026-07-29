@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/widgets.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:ramp_flutter/src/android_file_selector.dart';
+import 'package:ramp_flutter/src/external_navigation.dart';
 import 'package:ramp_flutter/src/host_event.dart';
 import 'package:ramp_flutter/src/widget_event.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
@@ -59,9 +58,9 @@ class RampWebView {
                   debugPrint('RampFlutter: block navigation — invalid URL ${request.url}');
                   return NavigationDecision.prevent;
                 }
-                if (_shouldOpenExternally(uri)) {
+                if (shouldOpenExternally(uri, _widgetUrl)) {
                   debugPrint('RampFlutter: open external (navigation) ${request.url}');
-                  _openExternal(uri);
+                  openExternalUrl(uri);
                   return NavigationDecision.prevent;
                 }
                 debugPrint('RampFlutter: allow navigation ${request.url}');
@@ -74,7 +73,7 @@ class RampWebView {
                   debugPrint('RampFlutter: create window ignored — invalid URL $url');
                   return;
                 }
-                _openExternal(uri);
+                openExternalUrl(uri);
               },
               onPageStarted: (url) {
                 _pageReady = false;
@@ -108,119 +107,11 @@ class RampWebView {
     final platform = controller.platform;
     if (platform is AndroidWebViewController) {
       platform.setMediaPlaybackRequiresUserGesture(false);
-      platform.setOnShowFileSelector(_androidFileSelector);
+      platform.setOnShowFileSelector(showAndroidFileSelector);
     }
 
     controller.loadRequest(_widgetUrl);
     return controller;
-  }
-
-  Future<List<String>> _androidFileSelector(FileSelectorParams params) async {
-    try {
-      if (params.isCaptureEnabled) {
-        final photo = await ImagePicker().pickImage(source: ImageSource.camera);
-        if (photo == null) {
-          return const [];
-        }
-        return [Uri.file(photo.path).toString()];
-      }
-
-      final fileType = _fileTypeForAcceptTypes(params.acceptTypes);
-      final result = await FilePicker.platform.pickFiles(
-        allowMultiple: params.mode == FileSelectorMode.openMultiple,
-        type: fileType,
-        allowedExtensions: fileType == FileType.custom ? _extensionsForAcceptTypes(params.acceptTypes) : null,
-      );
-      if (result == null) {
-        return const [];
-      }
-      return [
-        for (final file in result.files)
-          if (file.path != null) Uri.file(file.path!).toString(),
-      ];
-    } catch (error, stackTrace) {
-      debugPrint('RampFlutter: file selection failed: $error\n$stackTrace');
-      return const [];
-    }
-  }
-
-  static FileType _fileTypeForAcceptTypes(List<String> acceptTypes) {
-    if (acceptTypes.isEmpty) {
-      return FileType.any;
-    }
-    final normalized = acceptTypes.map((type) => type.toLowerCase().trim()).toList();
-    final onlyImages = normalized.every((type) => type.startsWith('image/'));
-    if (onlyImages) {
-      return FileType.image;
-    }
-    final onlyVideos = normalized.every((type) => type.startsWith('video/'));
-    if (onlyVideos) {
-      return FileType.video;
-    }
-    final extensions = _extensionsForAcceptTypes(acceptTypes);
-    final allMappedToExtensions = normalized.every(
-      (type) => type.startsWith('.') || type == 'application/pdf',
-    );
-    if (allMappedToExtensions && extensions != null && extensions.isNotEmpty) {
-      return FileType.custom;
-    }
-    return FileType.any;
-  }
-
-  static List<String>? _extensionsForAcceptTypes(List<String> acceptTypes) {
-    final extensions = <String>{};
-    for (final type in acceptTypes) {
-      final value = type.trim().toLowerCase();
-      if (value.startsWith('.')) {
-        extensions.add(value.substring(1));
-        continue;
-      }
-      if (value == 'application/pdf') {
-        extensions.add('pdf');
-      }
-    }
-    if (extensions.isEmpty) {
-      return null;
-    }
-    return extensions.toList();
-  }
-
-  bool _shouldOpenExternally(Uri uri) {
-    final scheme = uri.scheme.toLowerCase();
-    final isHttp = scheme == 'http' || scheme == 'https';
-    if (!isHttp) {
-      return true;
-    }
-    return uri.host.toLowerCase() != _widgetUrl.host.toLowerCase();
-  }
-
-  Future<void> _openExternal(Uri uri) async {
-    try {
-      if (uri.scheme == 'intent') {
-        final fallback = _intentFallbackUrl(uri);
-        if (fallback != null) {
-          await launchUrl(fallback, mode: LaunchMode.externalApplication);
-        } else {
-          debugPrint('RampFlutter: intent URL has no browser_fallback_url: $uri');
-        }
-        return;
-      }
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        debugPrint('RampFlutter: cannot launch URL $uri');
-      }
-    } catch (error, stackTrace) {
-      debugPrint('RampFlutter: failed to open $uri: $error\n$stackTrace');
-    }
-  }
-
-  static Uri? _intentFallbackUrl(Uri intentUri) {
-    final browserFallback = intentUri.queryParameters['browser_fallback_url'];
-    if (browserFallback != null && browserFallback.isNotEmpty) {
-      return Uri.tryParse(browserFallback);
-    }
-    return null;
   }
 
   Future<void> postHostEvent(HostEvent event) {
