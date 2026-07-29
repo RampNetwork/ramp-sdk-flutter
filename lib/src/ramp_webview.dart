@@ -34,8 +34,6 @@ class RampWebView {
       params = const PlatformWebViewControllerCreationParams();
     }
 
-    debugPrint('RampFlutter: loading $_widgetUrl');
-
     final controller =
         WebViewController.fromPlatformCreationParams(
             params,
@@ -59,15 +57,12 @@ class RampWebView {
                   return NavigationDecision.prevent;
                 }
                 if (shouldOpenExternally(uri, _widgetUrl)) {
-                  debugPrint('RampFlutter: open external (navigation) ${request.url}');
                   openExternalUrl(uri);
                   return NavigationDecision.prevent;
                 }
-                debugPrint('RampFlutter: allow navigation ${request.url}');
                 return NavigationDecision.navigate;
               },
               onCreateWindow: (url) {
-                debugPrint('RampFlutter: open external (create window) $url');
                 final uri = Uri.tryParse(url);
                 if (uri == null) {
                   debugPrint('RampFlutter: create window ignored — invalid URL $url');
@@ -75,12 +70,10 @@ class RampWebView {
                 }
                 openExternalUrl(uri);
               },
-              onPageStarted: (url) {
+              onPageStarted: (_) {
                 _pageReady = false;
-                debugPrint('RampFlutter: page started $url');
               },
-              onPageFinished: (url) {
-                debugPrint('RampFlutter: page finished $url');
+              onPageFinished: (_) {
                 _pageReady = true;
                 _flushPendingHostEvents();
               },
@@ -119,7 +112,6 @@ class RampWebView {
     if (_pageReady) {
       return _sendHostEvent(event);
     }
-    debugPrint('RampFlutter: queue postHostEvent ${event.type} until page ready');
     final done = Completer<void>();
     _pendingHostEvents.add((event: event, done: done));
     return done.future;
@@ -131,7 +123,6 @@ class RampWebView {
       return Future.value();
     }
     final message = jsonEncode(event.toJson());
-    debugPrint('RampFlutter: postHostEvent ${event.type}');
     return webView.runJavaScript('window.postMessage($message, "${_widgetUrl.origin}");');
   }
 
@@ -174,11 +165,9 @@ class RampWebView {
     try {
       decoded = jsonDecode(message);
     } on FormatException catch (error) {
-      debugPrint('RampFlutter: drop JS message — invalid JSON: $error');
       return;
     }
     if (decoded is! Map) {
-      debugPrint('RampFlutter: drop JS message — expected Map, got ${decoded.runtimeType}');
       return;
     }
     final event = WidgetEvent.tryParse(Map<String, dynamic>.from(decoded));

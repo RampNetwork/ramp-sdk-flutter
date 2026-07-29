@@ -83,7 +83,6 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   void _addDebugEvent(String label, [Map<String, Object?> data = const {}]) {
     final encoded = const JsonEncoder.withIndent('  ').convert({'event': label, ...data});
-    debugPrint('Ramp example event:\n$encoded');
     _debugEvents.value = [..._debugEvents.value, _DebugEvent(_nextDebugEventId++, encoded)];
   }
 
