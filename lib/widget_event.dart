@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:ramp_flutter/models/asset_info.dart';
 import 'package:ramp_flutter/models/json_map.dart';
 import 'package:ramp_flutter/models/purchase_details.dart';
@@ -24,6 +25,7 @@ sealed class WidgetEvent {
   static WidgetEvent? tryParse(Map<String, dynamic> json) {
     final type = json['type'];
     if (type is! String) {
+      debugPrint('RampFlutter: drop widget event — missing or non-string type ($type)');
       return null;
     }
     final payload = asStringKeyedMap(json['payload']);
@@ -48,9 +50,11 @@ sealed class WidgetEvent {
         case 'SEND_CRYPTO':
           final version = json['eventVersion'];
           if (version != null && version != 1) {
+            debugPrint('RampFlutter: drop SEND_CRYPTO — unsupported eventVersion=$version');
             return null;
           }
           if (payload == null) {
+            debugPrint('RampFlutter: drop SEND_CRYPTO — missing payload');
             return null;
           }
           return SendCryptoRequested(
@@ -59,6 +63,7 @@ sealed class WidgetEvent {
           );
         case 'REQUEST_CRYPTO_ACCOUNT':
           if (payload == null) {
+            debugPrint('RampFlutter: drop REQUEST_CRYPTO_ACCOUNT — missing payload');
             return null;
           }
           return RequestCryptoAccount(
@@ -74,9 +79,11 @@ sealed class WidgetEvent {
         case 'WIDGET_CLOSE_REQUEST':
           return WidgetCloseRequest(widgetInstanceId: widgetInstanceId);
         default:
+          debugPrint('RampFlutter: drop widget event — unknown type=$type');
           return null;
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('RampFlutter: drop widget event type=$type — parse error: $error\n$stackTrace');
       return null;
     }
   }

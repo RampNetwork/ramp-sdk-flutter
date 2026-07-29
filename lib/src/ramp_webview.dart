@@ -42,6 +42,7 @@ class RampWebView {
               if (onlyCamera) {
                 request.grant();
               } else {
+                debugPrint('RampFlutter: deny WebView permission types=${request.types}');
                 request.deny();
               }
             },
@@ -52,6 +53,7 @@ class RampWebView {
               onNavigationRequest: (request) {
                 final uri = Uri.tryParse(request.url);
                 if (uri == null) {
+                  debugPrint('RampFlutter: block navigation — invalid URL ${request.url}');
                   return NavigationDecision.prevent;
                 }
                 if (_shouldOpenExternally(uri)) {
@@ -65,9 +67,11 @@ class RampWebView {
               onCreateWindow: (url) {
                 debugPrint('RampFlutter: open external (create window) $url');
                 final uri = Uri.tryParse(url);
-                if (uri != null) {
-                  _openExternal(uri);
+                if (uri == null) {
+                  debugPrint('RampFlutter: create window ignored — invalid URL $url');
+                  return;
                 }
+                _openExternal(uri);
               },
               onPageStarted: (url) => debugPrint('RampFlutter: page started $url'),
               onPageFinished: (url) => debugPrint('RampFlutter: page finished $url'),
@@ -186,11 +190,15 @@ class RampWebView {
         final fallback = _intentFallbackUrl(uri);
         if (fallback != null) {
           await launchUrl(fallback, mode: LaunchMode.externalApplication);
+        } else {
+          debugPrint('RampFlutter: intent URL has no browser_fallback_url: $uri');
         }
         return;
       }
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        debugPrint('RampFlutter: cannot launch URL $uri');
       }
     } catch (error, stackTrace) {
       debugPrint('RampFlutter: failed to open $uri: $error\n$stackTrace');
@@ -208,6 +216,7 @@ class RampWebView {
   Future<void> postHostEvent(HostEvent event) {
     final webView = _ensureController();
     final message = jsonEncode(event.toJson());
+    debugPrint('RampFlutter: postHostEvent ${event.type}');
     return webView.runJavaScript('window.postMessage($message, "${_widgetUrl.origin}");');
   }
 
@@ -222,10 +231,12 @@ class RampWebView {
     final dynamic decoded;
     try {
       decoded = jsonDecode(message);
-    } on FormatException {
+    } on FormatException catch (error) {
+      debugPrint('RampFlutter: drop JS message — invalid JSON: $error');
       return;
     }
     if (decoded is! Map) {
+      debugPrint('RampFlutter: drop JS message — expected Map, got ${decoded.runtimeType}');
       return;
     }
     final event = WidgetEvent.tryParse(Map<String, dynamic>.from(decoded));
