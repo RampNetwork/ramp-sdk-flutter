@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
@@ -17,6 +18,8 @@ class RampWebView {
 
   final Uri _widgetUrl;
   WebViewController? _controller;
+  var _pageReady = false;
+  final _pendingHostEvents = <({HostEvent event, Completer<void> done})>[];
 
   void Function(WidgetEvent event)? onWidgetEvent;
 
@@ -73,8 +76,15 @@ class RampWebView {
                 }
                 _openExternal(uri);
               },
-              onPageStarted: (url) => debugPrint('RampFlutter: page started $url'),
-              onPageFinished: (url) => debugPrint('RampFlutter: page finished $url'),
+              onPageStarted: (url) {
+                _pageReady = false;
+                debugPrint('RampFlutter: page started $url');
+              },
+              onPageFinished: (url) {
+                debugPrint('RampFlutter: page finished $url');
+                _pageReady = true;
+                _flushPendingHostEvents();
+              },
               onWebResourceError: (error) {
                 debugPrint(
                   'RampFlutter: resource error '
@@ -214,13 +224,54 @@ class RampWebView {
   }
 
   Future<void> postHostEvent(HostEvent event) {
-    final webView = _ensureController();
+    _ensureController();
+    if (_pageReady) {
+      return _sendHostEvent(event);
+    }
+    debugPrint('RampFlutter: queue postHostEvent ${event.type} until page ready');
+    final done = Completer<void>();
+    _pendingHostEvents.add((event: event, done: done));
+    return done.future;
+  }
+
+  Future<void> _sendHostEvent(HostEvent event) {
+    final webView = _controller;
+    if (webView == null) {
+      return Future.value();
+    }
     final message = jsonEncode(event.toJson());
     debugPrint('RampFlutter: postHostEvent ${event.type}');
     return webView.runJavaScript('window.postMessage($message, "${_widgetUrl.origin}");');
   }
 
+  Future<void> _flushPendingHostEvents() async {
+    if (_pendingHostEvents.isEmpty) {
+      return;
+    }
+    final pending = List.of(_pendingHostEvents);
+    _pendingHostEvents.clear();
+    for (final item in pending) {
+      try {
+        await _sendHostEvent(item.event);
+        if (!item.done.isCompleted) {
+          item.done.complete();
+        }
+      } catch (error, stackTrace) {
+        if (!item.done.isCompleted) {
+          item.done.completeError(error, stackTrace);
+        }
+      }
+    }
+  }
+
   void dispose() {
+    for (final item in _pendingHostEvents) {
+      if (!item.done.isCompleted) {
+        item.done.complete();
+      }
+    }
+    _pendingHostEvents.clear();
+    _pageReady = false;
     _controller
       ?..removeJavaScriptChannel(_channelName)
       ..loadRequest(Uri.parse('about:blank'));

@@ -29,6 +29,8 @@ The SDK provides the Ramp WebView; your app owns presentation (route, bottom
 sheet, dialog, etc.) and must call `dispose` when it is dismissed.
 
 ```dart
+import 'package:ramp_flutter/ramp_flutter.dart';
+
 final widgetUrl = Configuration(
   hostApiKey: 'YOUR_API_KEY',
   hostAppName: 'My App',

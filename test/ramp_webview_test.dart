@@ -1,10 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ramp_flutter/configuration.dart';
-import 'package:ramp_flutter/host_event.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
-import 'package:ramp_flutter/widget_event.dart';
 
 void main() {
   group('Configuration.buildWidgetUrl', () {

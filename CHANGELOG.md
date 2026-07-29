@@ -24,6 +24,8 @@
   git dependency so hosts pick it up transitively.
 * Android WebView file inputs use `file_picker`; capture requests use
   `image_picker` (camera).
+* Queue `postHostEvent` until the widget page has finished loading.
+* Export configuration / events from `package:ramp_flutter/ramp_flutter.dart`.
 
 ## 4.0.1
 
