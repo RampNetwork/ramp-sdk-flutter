@@ -1,21 +1,21 @@
 import 'package:flutter/foundation.dart';
-import 'package:ramp_flutter/models/asset_info.dart';
-import 'package:ramp_flutter/models/json_map.dart';
-import 'package:ramp_flutter/models/purchase_details.dart';
-import 'package:ramp_flutter/models/sale_details.dart';
+import 'package:ramp_flutter/src/models/asset_info.dart';
+import 'package:ramp_flutter/src/models/json_map.dart';
+import 'package:ramp_flutter/src/models/purchase_details.dart';
+import 'package:ramp_flutter/src/models/sale_details.dart';
 
-export 'package:ramp_flutter/models/asset_info.dart';
-export 'package:ramp_flutter/models/purchase_details.dart';
-export 'package:ramp_flutter/models/sale_details.dart';
+export 'package:ramp_flutter/src/models/asset_info.dart';
+export 'package:ramp_flutter/src/models/purchase_details.dart';
+export 'package:ramp_flutter/src/models/sale_details.dart';
 
-part 'events/offramp_sale_created.dart';
-part 'events/purchase_created.dart';
-part 'events/request_crypto_account.dart';
-part 'events/send_crypto_requested.dart';
-part 'events/widget_close.dart';
-part 'events/widget_close_request.dart';
-part 'events/widget_config_done.dart';
-part 'events/widget_config_failed.dart';
+part 'widget_events/offramp_sale_created.dart';
+part 'widget_events/purchase_created.dart';
+part 'widget_events/request_crypto_account.dart';
+part 'widget_events/send_crypto_requested.dart';
+part 'widget_events/widget_close.dart';
+part 'widget_events/widget_close_request.dart';
+part 'widget_events/widget_config_done.dart';
+part 'widget_events/widget_config_failed.dart';
 
 sealed class WidgetEvent {
   const WidgetEvent({this.widgetInstanceId});

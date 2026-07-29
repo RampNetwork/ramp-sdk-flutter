@@ -1,5 +1,5 @@
-import 'package:ramp_flutter/models/asset_info.dart';
-import 'package:ramp_flutter/models/json_map.dart';
+import 'package:ramp_flutter/src/models/asset_info.dart';
+import 'package:ramp_flutter/src/models/json_map.dart';
 
 class SaleDetails {
   const SaleDetails({this.id, this.createdAt, this.updatedAt, this.crypto, this.fiat, this.fees, this.exchangeRate});

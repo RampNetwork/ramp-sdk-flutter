@@ -1,4 +1,4 @@
-import 'package:ramp_flutter/models/json_map.dart';
+import 'package:ramp_flutter/src/models/json_map.dart';
 
 class AssetInfo {
   const AssetInfo({
