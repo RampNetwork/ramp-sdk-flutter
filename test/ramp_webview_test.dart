@@ -141,6 +141,7 @@ void main() {
         }),
       );
       ramp.handleJavaScriptMessage(jsonEncode({'type': 'CLOSE'}));
+      ramp.handleJavaScriptMessage(jsonEncode({'type': 'WIDGET_CLOSE_REQUEST', 'payload': null}));
 
       expect(events, [
         isA<WidgetConfigDone>(),
@@ -151,6 +152,7 @@ void main() {
         isA<RequestCryptoAccount>(),
         isA<WidgetClose>(),
         isA<WidgetClose>(),
+        isA<WidgetCloseRequest>(),
       ]);
 
       expect(events[0].widgetInstanceId, 'w1');

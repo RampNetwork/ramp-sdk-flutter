@@ -112,6 +112,8 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
           );
         case WidgetClose(:final payload):
           _addDebugEvent('WIDGET_CLOSE', {'showAlert': payload.showAlert});
+        case WidgetCloseRequest():
+          _addDebugEvent('WIDGET_CLOSE_REQUEST');
       }
     };
 

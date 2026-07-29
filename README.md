@@ -45,6 +45,9 @@ final ramp = RampFlutter(configuration)
         );
       case WidgetClose():
         Navigator.of(context).pop();
+      case WidgetCloseRequest():
+        // User tried to dismiss while widget is not closeable — confirm or ignore.
+        break;
       case WidgetConfigDone():
       case WidgetConfigFailed():
         break;

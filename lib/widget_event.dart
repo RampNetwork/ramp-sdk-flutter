@@ -12,6 +12,7 @@ part 'events/purchase_created.dart';
 part 'events/request_crypto_account.dart';
 part 'events/send_crypto_requested.dart';
 part 'events/widget_close.dart';
+part 'events/widget_close_request.dart';
 part 'events/widget_config_done.dart';
 part 'events/widget_config_failed.dart';
 
@@ -70,6 +71,8 @@ sealed class WidgetEvent {
             payload: WidgetClosePayload.fromJson(payload),
             widgetInstanceId: widgetInstanceId,
           );
+        case 'WIDGET_CLOSE_REQUEST':
+          return WidgetCloseRequest(widgetInstanceId: widgetInstanceId);
         default:
           return null;
       }
