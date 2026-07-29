@@ -110,6 +110,9 @@ dependency_overrides:
       path: packages/webview_flutter/webview_flutter_platform_interface
 ```
 
-- Android document file upload from the WebView is not wired in this SDK yet.
+- Android WebView `<input type="file">` uses `file_picker` (and the camera via
+  `image_picker` when capture is requested). Host apps need camera / photo
+  library usage descriptions (see Getting Started). iOS WKWebView handles file
+  inputs natively.
 - Server-signed widget URLs are not supported in this release; use
   `Configuration` fields so the SDK can build the widget URL.

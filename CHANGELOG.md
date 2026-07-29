@@ -20,6 +20,8 @@
 * Open `target=_blank` / `window.open` in the system browser via a forked
   `webview_flutter` platform package (`flutter_packages` /
   `webview-target-blank`).
+* Android WebView file inputs use `file_picker`; capture requests use
+  `image_picker` (camera).
 
 ## 4.0.1
 
