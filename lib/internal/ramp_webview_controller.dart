@@ -160,21 +160,17 @@ class RampWebViewController {
 
   @visibleForTesting
   void handleJavaScriptMessage(String message) {
+    // The widget posts to both Android (`RampInstantMobile` + JSON.stringify)
+    // and iOS (`webkit.messageHandlers` + JS object). Flutter's channel
+    // receives both; the object path arrives as a non-JSON Map-style string.
+    // Prefer valid JSON event maps and ignore the rest.
     final dynamic event;
     try {
       event = jsonDecode(message);
     } on FormatException {
-      onWidgetEvent?.call({
-        'type': 'RAW',
-        'payload': message,
-      });
       return;
     }
     if (event is! Map) {
-      onWidgetEvent?.call({
-        'type': 'RAW',
-        'payload': event,
-      });
       return;
     }
     onWidgetEvent?.call(Map<String, dynamic>.from(event));

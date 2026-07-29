@@ -58,16 +58,20 @@ void main() {
   group('RampWebViewController events', () {
     final widgetUrl = Uri.parse('https://app.rampnetwork.com/');
 
-    test('forwards every widget event on onWidgetEvent', () {
+    test('forwards JSON event maps and ignores non-JSON twins', () {
       final events = <Map<String, dynamic>>[];
       final controller = RampWebViewController(widgetUrl)
         ..onWidgetEvent = events.add;
 
       controller.handleJavaScriptMessage('not json');
       controller.handleJavaScriptMessage('42');
+      controller.handleJavaScriptMessage(
+        '{widgetInstanceId: abc, type: WIDGET_CONFIG_DONE, payload: null}',
+      );
       controller.handleJavaScriptMessage(jsonEncode({
         'type': 'WIDGET_CONFIG_DONE',
-        'payload': {'ok': true},
+        'payload': null,
+        'widgetInstanceId': 'abc',
       }));
       controller.handleJavaScriptMessage(jsonEncode({
         'type': 'PURCHASE_CREATED',
@@ -76,11 +80,10 @@ void main() {
       controller.handleJavaScriptMessage(jsonEncode({'type': 'CLOSE'}));
 
       expect(events, [
-        {'type': 'RAW', 'payload': 'not json'},
-        {'type': 'RAW', 'payload': 42},
         {
           'type': 'WIDGET_CONFIG_DONE',
-          'payload': {'ok': true},
+          'payload': null,
+          'widgetInstanceId': 'abc',
         },
         {
           'type': 'PURCHASE_CREATED',
