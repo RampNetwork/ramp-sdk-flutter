@@ -65,6 +65,37 @@ For more configuration parameters see
 
 ### Notes
 
+- `target=_blank` / `window.open` use `NavigationDelegate.onCreateWindow`
+  via a fork of `webview_flutter`
+  ([mateusz-ramp/flutter_packages](https://github.com/mateusz-ramp/flutter_packages/tree/webview-target-blank)
+  branch `webview-target-blank`), matching native `createWebView` /
+  `onCreateWindow`. The SDK opens those URLs in the system browser. Host apps
+  (and `example/`) must declare matching `dependency_overrides`:
+
+```yaml
+dependency_overrides:
+  webview_flutter:
+    git:
+      url: https://github.com/mateusz-ramp/flutter_packages.git
+      ref: webview-target-blank
+      path: packages/webview_flutter/webview_flutter
+  webview_flutter_android:
+    git:
+      url: https://github.com/mateusz-ramp/flutter_packages.git
+      ref: webview-target-blank
+      path: packages/webview_flutter/webview_flutter_android
+  webview_flutter_wkwebview:
+    git:
+      url: https://github.com/mateusz-ramp/flutter_packages.git
+      ref: webview-target-blank
+      path: packages/webview_flutter/webview_flutter_wkwebview
+  webview_flutter_platform_interface:
+    git:
+      url: https://github.com/mateusz-ramp/flutter_packages.git
+      ref: webview-target-blank
+      path: packages/webview_flutter/webview_flutter_platform_interface
+```
+
 - Android document file upload from the WebView is not wired in this SDK yet.
 - Server-signed widget URLs are not supported in this release; use
   `Configuration` fields so the SDK can build the widget URL.

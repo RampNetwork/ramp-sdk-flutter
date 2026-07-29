@@ -16,6 +16,9 @@
   `url_launcher`, and `flutter_lints`.
 * Breaking: expose a single `onWidgetEvent` callback for all widget JS events;
   remove specialized purchase/sale/send-crypto/close callbacks and related DTOs.
+* Open `target=_blank` / `window.open` in the system browser via a forked
+  `webview_flutter` platform package (`flutter_packages` /
+  `webview-target-blank`).
 
 ## 4.0.1
 

@@ -50,7 +50,20 @@ class RampWebViewController {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onNavigationRequest: (request) => _onNavigationRequest(request),
+          // In-WebView navigations stay in the WebView.
+          onNavigationRequest: (request) {
+            debugPrint('RampFlutter: allow navigation ${request.url}');
+            return NavigationDecision.navigate;
+          },
+          // New windows (`target=_blank` / `window.open`) open externally —
+          // same idea as native createWebView / onCreateWindow handlers.
+          onCreateWindow: (url) {
+            debugPrint('RampFlutter: open external (create window) $url');
+            final uri = Uri.tryParse(url);
+            if (uri != null) {
+              _openExternal(uri);
+            }
+          },
           onPageStarted: (url) => debugPrint('RampFlutter: page started $url'),
           onPageFinished: (url) => debugPrint('RampFlutter: page finished $url'),
           onWebResourceError: (error) {
@@ -82,32 +95,6 @@ class RampWebViewController {
 
     controller.loadRequest(_widgetUrl);
     return controller;
-  }
-
-  Future<NavigationDecision> _onNavigationRequest(
-    NavigationRequest request,
-  ) async {
-    final uri = Uri.tryParse(request.url);
-    if (uri == null) {
-      debugPrint('RampFlutter: blocking invalid navigation ${request.url}');
-      return NavigationDecision.prevent;
-    }
-
-    if (_isWidgetNavigation(uri)) {
-      debugPrint('RampFlutter: allow navigation $uri');
-      return NavigationDecision.navigate;
-    }
-
-    debugPrint('RampFlutter: open external $uri');
-    await _openExternal(uri);
-    return NavigationDecision.prevent;
-  }
-
-  bool _isWidgetNavigation(Uri uri) {
-    if (uri.scheme == 'about') return true;
-    if (uri.host.isEmpty) return true;
-    if (uri.host == _widgetUrl.host) return true;
-    return _trustedRampHost.hasMatch(uri.host);
   }
 
   Future<void> _openExternal(Uri uri) async {
@@ -176,7 +163,3 @@ class RampWebViewController {
     onWidgetEvent?.call(Map<String, dynamic>.from(event));
   }
 }
-
-final _trustedRampHost = RegExp(
-  r'^([a-z0-9-]+\.)*(ramp\.network|rampnetwork\.com|ramp-network\.org)$',
-);
