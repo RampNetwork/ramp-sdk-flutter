@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:ramp_flutter/configuration.dart';
+import 'package:ramp_flutter/host_event.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
 import 'package:ramp_flutter/widget_event.dart';
 
@@ -79,10 +80,17 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
     ramp.onWidgetEvent = (event) {
       switch (event) {
-        case PurchaseCreated():
-          _addDebugEvent('PURCHASE_CREATED');
-        case OfframpSaleCreated():
-          _addDebugEvent('OFFRAMP_SALE_CREATED');
+        case WidgetConfigDone():
+          _addDebugEvent('WIDGET_CONFIG_DONE');
+        case WidgetConfigFailed():
+          _addDebugEvent('WIDGET_CONFIG_FAILED');
+        case PurchaseCreated(:final payload):
+          _addDebugEvent('PURCHASE_CREATED', {
+            'id': payload.purchase?.id,
+            'asset': payload.purchase?.asset?.symbol,
+          });
+        case OfframpSaleCreated(:final payload):
+          _addDebugEvent('OFFRAMP_SALE_CREATED', {'id': payload.sale?.id});
         case SendCryptoRequested(:final payload):
           _addDebugEvent('SEND_CRYPTO', {
             'address': payload.address,
@@ -90,8 +98,16 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
             'asset': payload.assetInfo?.symbol,
           });
           ramp.sendCrypto('123');
-        case RampClosed():
-          _addDebugEvent('CLOSE');
+        case RequestCryptoAccount(:final payload):
+          _addDebugEvent('REQUEST_CRYPTO_ACCOUNT', {
+            'type': payload.type,
+            'assetSymbol': payload.assetSymbol,
+          });
+          ramp.postHostEvent(
+            RequestCryptoAccountResult.account(address: '0xabc', type: payload.type, assetSymbol: payload.assetSymbol),
+          );
+        case WidgetClose(:final payload):
+          _addDebugEvent('WIDGET_CLOSE', {'showAlert': payload.showAlert});
       }
     };
 

@@ -7,9 +7,10 @@
   Android/iOS plugin shells).
 * Breaking: SDK no longer presents UI. Create `RampFlutter(configuration)`,
   embed `ramp.view` in your own route/sheet, and call `dispose` when done.
-* Widget JS events match the original Flutter SDK surface: `PurchaseCreated`,
-  `OfframpSaleCreated`, `SendCryptoRequested`, and `RampClosed`
-  (`WIDGET_CLOSE` / `CLOSE`). Purchase and sale are signals only.
+* Widget → host events: `WidgetConfigDone` / `Failed`, `PurchaseCreated`,
+  `OfframpSaleCreated`, `SendCryptoRequested`, `RequestCryptoAccount`,
+  `WidgetClose`. Host → widget: `SendCryptoResult` (`sendCrypto` convenience)
+  and `RequestCryptoAccountResult` via `postHostEvent`.
 * Add `Configuration.offrampAsset` and build the widget URL in Dart
   (`Configuration.buildWidgetUrl`), including `sdkType` / `sdkVersion` /
   `variant`.

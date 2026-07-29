@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/widgets.dart';
+import 'package:ramp_flutter/host_event.dart';
 import 'package:ramp_flutter/widget_event.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -114,18 +115,17 @@ class RampWebView {
     return null;
   }
 
-  Future<void> sendCrypto(String? transactionHash) {
+  Future<void> postHostEvent(HostEvent event) {
     final webView = _controller;
     if (webView == null) {
       return Future.value();
     }
-    final message = jsonEncode({
-      'type': 'SEND_CRYPTO_RESULT',
-      'eventVersion': 1,
-      'payload': {'txHash': transactionHash},
-    });
+    final message = jsonEncode(event.toJson());
     return webView.runJavaScript('window.postMessage($message, "${_widgetUrl.origin}");');
   }
+
+  Future<void> sendCrypto(String? transactionHash) =>
+      postHostEvent(SendCryptoResult.txHash(transactionHash));
 
   void dispose() {
     _controller

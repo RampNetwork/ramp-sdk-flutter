@@ -32,14 +32,23 @@ sheet, dialog, etc.) and must call `dispose` when it is dismissed.
 final ramp = RampFlutter(configuration)
   ..onWidgetEvent = (event) {
     switch (event) {
-      case PurchaseCreated():
+      case PurchaseCreated(:final payload):
+        // payload.purchase, purchaseViewToken, apiUrl
         break;
-      case OfframpSaleCreated():
+      case OfframpSaleCreated(:final payload):
         break;
       case SendCryptoRequested(:final payload):
         ramp.sendCrypto(txHash);
-      case RampClosed():
+        // or: ramp.postHostEvent(SendCryptoResult.txHash(txHash));
+      case RequestCryptoAccount(:final payload):
+        ramp.postHostEvent(
+          RequestCryptoAccountResult.account(address: userAddress),
+        );
+      case WidgetClose():
         Navigator.of(context).pop();
+      case WidgetConfigDone():
+      case WidgetConfigFailed():
+        break;
     }
   };
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ramp_flutter/configuration.dart';
+import 'package:ramp_flutter/host_event.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
 import 'package:ramp_flutter/widget_event.dart';
 
@@ -61,20 +62,30 @@ void main() {
       ramp.handleJavaScriptMessage('not json');
       ramp.handleJavaScriptMessage('42');
       ramp.handleJavaScriptMessage(jsonEncode({'type': 'SHARE_LINK'}));
-      ramp.handleJavaScriptMessage(jsonEncode({'type': 'WIDGET_CONFIG_DONE'}));
 
       expect(events, isEmpty);
     });
 
-    test('parses original SDK events', () {
+    test('parses supported widget events', () {
       final events = <WidgetEvent>[];
       final ramp = RampFlutter.withWidgetUrl(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage(
+        jsonEncode({'type': 'WIDGET_CONFIG_DONE', 'payload': null, 'widgetInstanceId': 'w1'}),
+      );
+      ramp.handleJavaScriptMessage(jsonEncode({'type': 'WIDGET_CONFIG_FAILED', 'payload': null}));
+      ramp.handleJavaScriptMessage(
         jsonEncode({
           'type': 'PURCHASE_CREATED',
           'payload': {
-            'purchase': {'id': 'ignored'},
+            'purchase': {
+              'id': 'p1',
+              'asset': {'symbol': 'ETH', 'chain': 'ETH', 'type': 'NATIVE', 'name': 'Ether', 'decimals': 18},
+              'cryptoAmount': '100',
+              'fiatValue': 50.5,
+            },
+            'purchaseViewToken': 'token',
+            'apiUrl': 'https://api.example.com',
           },
         }),
       );
@@ -82,7 +93,19 @@ void main() {
         jsonEncode({
           'type': 'OFFRAMP_SALE_CREATED',
           'payload': {
-            'sale': {'id': 'ignored'},
+            'sale': {
+              'id': 's1',
+              'crypto': {
+                'amount': '1',
+                'status': 'RECEIVED',
+                'assetInfo': {'symbol': 'ETH'},
+              },
+              'fiat': {'amount': '10', 'currencySymbol': 'EUR', 'status': 'initiated'},
+              'fees': {'amount': '1', 'currencySymbol': 978},
+              'exchangeRate': '10',
+            },
+            'saleViewToken': 'sale-token',
+            'apiUrl': 'https://api.example.com',
           },
         }),
       );
@@ -93,23 +116,68 @@ void main() {
           'payload': {
             'address': '0xabc',
             'amount': '1',
-            'assetInfo': {'chain': 'ETH', 'symbol': 'ETH', 'type': 'ETH'},
+            'assetInfo': {
+              'uai': 'eip155:1/slip44:60',
+              'address': null,
+              'chain': 'ETH',
+              'symbol': 'ETH',
+              'type': 'NATIVE',
+              'name': 'Ether',
+              'decimals': 18,
+            },
           },
         }),
       );
+      ramp.handleJavaScriptMessage(
+        jsonEncode({
+          'type': 'REQUEST_CRYPTO_ACCOUNT',
+          'payload': {'type': 'ETH', 'assetSymbol': 'ETH'},
+        }),
+      );
+      ramp.handleJavaScriptMessage(
+        jsonEncode({
+          'type': 'WIDGET_CLOSE',
+          'payload': {'showAlert': true, 'descriptionText': 'Leave?'},
+        }),
+      );
       ramp.handleJavaScriptMessage(jsonEncode({'type': 'CLOSE'}));
-      ramp.handleJavaScriptMessage(jsonEncode({'type': 'WIDGET_CLOSE'}));
 
       expect(events, [
+        isA<WidgetConfigDone>(),
+        isA<WidgetConfigFailed>(),
         isA<PurchaseCreated>(),
         isA<OfframpSaleCreated>(),
         isA<SendCryptoRequested>(),
-        isA<RampClosed>(),
-        isA<RampClosed>(),
+        isA<RequestCryptoAccount>(),
+        isA<WidgetClose>(),
+        isA<WidgetClose>(),
       ]);
-      final send = events[2] as SendCryptoRequested;
+
+      expect(events[0].widgetInstanceId, 'w1');
+
+      final purchase = events[2] as PurchaseCreated;
+      expect(purchase.payload.purchase?.id, 'p1');
+      expect(purchase.payload.purchase?.asset?.symbol, 'ETH');
+      expect(purchase.payload.purchase?.fiatValue, 50.5);
+      expect(purchase.payload.purchaseViewToken, 'token');
+
+      final sale = events[3] as OfframpSaleCreated;
+      expect(sale.payload.sale?.id, 's1');
+      expect(sale.payload.sale?.fees?.currencySymbol, '978');
+      expect(sale.payload.saleViewToken, 'sale-token');
+
+      final send = events[4] as SendCryptoRequested;
       expect(send.payload.address, '0xabc');
+      expect(send.payload.assetInfo?.uai, 'eip155:1/slip44:60');
       expect(send.payload.assetInfo?.symbol, 'ETH');
+
+      final account = events[5] as RequestCryptoAccount;
+      expect(account.payload.type, 'ETH');
+      expect(account.payload.assetSymbol, 'ETH');
+
+      final close = events[6] as WidgetClose;
+      expect(close.payload.showAlert, isTrue);
+      expect(close.payload.descriptionText, 'Leave?');
     });
 
     test('rejects unsupported SEND_CRYPTO eventVersion', () {
@@ -125,6 +193,27 @@ void main() {
       );
 
       expect(events, isEmpty);
+    });
+  });
+
+  group('HostEvent serialization', () {
+    test('encodes SendCryptoResult and RequestCryptoAccountResult', () {
+      expect(SendCryptoResult.txHash('0xhash').toJson(), {
+        'type': 'SEND_CRYPTO_RESULT',
+        'payload': {'txHash': '0xhash'},
+      });
+      expect(SendCryptoResult.error('failed').toJson(), {
+        'type': 'SEND_CRYPTO_RESULT',
+        'payload': {'error': 'failed'},
+      });
+      expect(RequestCryptoAccountResult.account(address: '0xabc', type: 'ETH').toJson(), {
+        'type': 'REQUEST_CRYPTO_ACCOUNT_RESULT',
+        'payload': {'address': '0xabc', 'type': 'ETH'},
+      });
+      expect(RequestCryptoAccountResult.error('denied').toJson(), {
+        'type': 'REQUEST_CRYPTO_ACCOUNT_RESULT',
+        'payload': {'error': 'denied'},
+      });
     });
   });
 }
