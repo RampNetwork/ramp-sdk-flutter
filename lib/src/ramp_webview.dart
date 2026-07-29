@@ -50,6 +50,15 @@ class RampWebView {
           ..setNavigationDelegate(
             NavigationDelegate(
               onNavigationRequest: (request) {
+                final uri = Uri.tryParse(request.url);
+                if (uri == null) {
+                  return NavigationDecision.prevent;
+                }
+                if (_shouldOpenExternally(uri)) {
+                  debugPrint('RampFlutter: open external (navigation) ${request.url}');
+                  _openExternal(uri);
+                  return NavigationDecision.prevent;
+                }
                 debugPrint('RampFlutter: allow navigation ${request.url}');
                 return NavigationDecision.navigate;
               },
@@ -160,6 +169,15 @@ class RampWebView {
       return null;
     }
     return extensions.toList();
+  }
+
+  bool _shouldOpenExternally(Uri uri) {
+    final scheme = uri.scheme.toLowerCase();
+    final isHttp = scheme == 'http' || scheme == 'https';
+    if (!isHttp) {
+      return true;
+    }
+    return uri.host.toLowerCase() != _widgetUrl.host.toLowerCase();
   }
 
   Future<void> _openExternal(Uri uri) async {

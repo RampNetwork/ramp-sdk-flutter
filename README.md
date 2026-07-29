@@ -79,12 +79,12 @@ For more configuration parameters see
 
 ### Notes
 
-- `target=_blank` / `window.open` use `NavigationDelegate.onCreateWindow`
-  via a fork of `webview_flutter`
+- Off-widget navigations (other https hosts, custom schemes, `intent:`) and
+  `target=_blank` / `window.open` open in the system browser via
+  `NavigationDelegate` + a fork of `webview_flutter`
   ([mateusz-ramp/flutter_packages](https://github.com/mateusz-ramp/flutter_packages/tree/webview-target-blank)
-  branch `webview-target-blank`), matching native `createWebView` /
-  `onCreateWindow`. The SDK opens those URLs in the system browser. Host apps
-  (and `example/`) must declare matching `dependency_overrides`:
+  branch `webview-target-blank`). Host apps (and `example/`) must declare
+  matching `dependency_overrides`:
 
 ```yaml
 dependency_overrides:
