@@ -22,8 +22,8 @@ class RampFlutterApp extends StatefulWidget {
 
 class _RampFlutterAppState extends State<RampFlutterApp> {
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
-  final ramp = RampFlutter();
   final Configuration _configuration = Configuration();
+  RampFlutter? _ramp;
 
   final List<String> _predefinedEnvironments = [
     "https://app.dev.ramp-network.org",
@@ -45,8 +45,6 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     _configuration.deepLinkScheme = "rampflutterdemo";
     _applyEnvironment(_selectedEnvironment);
 
-    ramp.onWidgetEvent = onWidgetEvent;
-
     super.initState();
   }
 
@@ -63,7 +61,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
   }
 
-  void onWidgetEvent(Map<String, dynamic> event) {
+  void _onWidgetEvent(BuildContext context, Map<String, dynamic> event) {
     final encoded = const JsonEncoder.withIndent('  ').convert(event);
     debugPrint('Ramp example event:\n$encoded');
     _messengerKey.currentState
@@ -75,8 +73,57 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         ),
       );
 
-    if (event['type'] == 'SEND_CRYPTO') {
-      ramp.sendCrypto('123');
+    final type = event['type'];
+    if (type == 'SEND_CRYPTO') {
+      _ramp?.sendCrypto('123');
+    }
+    if (type == 'CLOSE' || type == 'WIDGET_CLOSE') {
+      final navigator = Navigator.of(context, rootNavigator: true);
+      if (navigator.canPop()) {
+        navigator.pop();
+      }
+    }
+  }
+
+  Future<void> _showRamp(BuildContext context) async {
+    final ramp = RampFlutter(_configuration)
+      ..onWidgetEvent = (event) => _onWidgetEvent(context, event);
+    _ramp = ramp;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      enableDrag: true,
+      isDismissible: true,
+      useSafeArea: true,
+      builder: (sheetContext) {
+        return SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.92,
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 28,
+                child: Center(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.all(Radius.circular(2)),
+                    ),
+                    child: SizedBox(width: 36, height: 4),
+                  ),
+                ),
+              ),
+              Expanded(child: ramp.view),
+            ],
+          ),
+        );
+      },
+    );
+
+    ramp.dispose();
+    if (identical(_ramp, ramp)) {
+      _ramp = null;
     }
   }
 
@@ -233,7 +280,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   Widget _showRampButton(BuildContext context) {
     return PlatformTextButton(
-      onPressed: () => ramp.showRamp(context, _configuration),
+      onPressed: () => _showRamp(context),
       child: PlatformText("Show Ramp"),
     );
   }

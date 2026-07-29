@@ -5,8 +5,8 @@
 * Rewrite the SDK to load the Ramp widget in a Flutter WebView instead of the
   native iOS/Android Ramp SDKs. Published as a Dart Flutter package (no
   Android/iOS plugin shells).
-* Breaking: `showRamp` now requires a `BuildContext` and pushes a fullscreen
-  route (`showRamp(context, configuration)`).
+* Breaking: SDK no longer presents UI. Create `RampFlutter(configuration)`,
+  embed `ramp.view` in your own route/sheet, and call `dispose` when done.
 * Add `Configuration.offrampAsset` and build the widget URL in Dart
   (`Configuration.buildWidgetUrl`), including `sdkType` / `sdkVersion` /
   `variant`.

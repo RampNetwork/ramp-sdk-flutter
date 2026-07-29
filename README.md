@@ -24,28 +24,40 @@ dependencies:
 
 ### Usage
 
-```dart
-final ramp = RampFlutter();
-ramp.onWidgetEvent = (event) {
-  // Every widget JS event, e.g. PURCHASE_CREATED, SEND_CRYPTO, CLOSE, ...
-  if (event['type'] == 'SEND_CRYPTO') {
-    ramp.sendCrypto(txHash);
-  }
-};
+The SDK provides the Ramp WebView; your app owns presentation (route, bottom
+sheet, dialog, etc.) and must call `dispose` when it is dismissed.
 
+```dart
+final ramp = RampFlutter(configuration)
+  ..onWidgetEvent = (event) {
+    // Every widget JS event, e.g. PURCHASE_CREATED, SEND_CRYPTO, CLOSE, ...
+    if (event['type'] == 'SEND_CRYPTO') {
+      ramp.sendCrypto(txHash);
+    }
+    if (event['type'] == 'CLOSE' || event['type'] == 'WIDGET_CLOSE') {
+      Navigator.of(context).pop();
+    }
+  };
+
+await showModalBottomSheet<void>(
+  context: context,
+  isScrollControlled: true,
+  builder: (_) => SizedBox(
+    height: MediaQuery.sizeOf(context).height * 0.92,
+    child: ramp.view,
+  ),
+);
+
+ramp.dispose();
+```
+
+```dart
 final configuration = Configuration()
   ..hostApiKey = 'YOUR_API_KEY'
   ..hostAppName = 'My App'
   ..hostLogoUrl = 'https://example.com/logo.png'
   ..enabledFlows = ['ONRAMP', 'OFFRAMP'];
-
-await ramp.showRamp(context, configuration);
 ```
-
-`showRamp` uses Flutter's [showModalBottomSheet](https://api.flutter.dev/flutter/material/showModalBottomSheet.html).
-The host app must provide a `MaterialApp` (or equivalent `MaterialLocalizations`)
-above the `BuildContext` you pass in. Swipe down from the drag handle to dismiss.
-`CLOSE` / `WIDGET_CLOSE` also dismiss the sheet.
 
 For more configuration parameters see
 [Ramp Network Flutter documentation](https://docs.ramp.network/mobile/flutter-sdk/).

@@ -150,7 +150,7 @@ class RampWebViewController {
     );
   }
 
-  /// Stops the page and releases capture. Call when the route is dismissed.
+  /// Stops the page and releases capture. Call when the host dismisses the view.
   void dispose() {
     _webView
       ?..removeJavaScriptChannel(_channelName)
