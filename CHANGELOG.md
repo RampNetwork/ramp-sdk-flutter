@@ -15,7 +15,8 @@
 * `Configuration` builds widget URLs with widget-2 params (`inAsset` /
   `outAsset` / `inAssetValue` / `outAssetValue` / `enabledCryptoAssets` /
   `paymentMethodType`, plus `sdkType` / `sdkVersion`). `defaultFlow` /
-  `enabledFlows` use `Flow`; `paymentMethodType` uses `PaymentMethodType`.
+  `enabledFlows` use `TransactionFlow`; `paymentMethodType` uses
+  `PaymentMethodType`.
   Legacy params (`defaultAsset`, `fiatCurrency`, `fiatValue`, `swapAsset`,
   `offrampAsset`, `swapAmount`, `hostLogoUrl`, `containerNode`,
   `deepLinkScheme`, `variant`) are removed.

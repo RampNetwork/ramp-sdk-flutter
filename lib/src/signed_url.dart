@@ -1,6 +1,4 @@
-final _trustedRampHost = RegExp(
-  r'^([a-z0-9-]+\.)*(ramp\.network|rampnetwork\.com|ramp-network\.org)$',
-);
+final _trustedRampHost = RegExp(r'^([a-z0-9-]+\.)*(ramp\.network|rampnetwork\.com|ramp-network\.org)$');
 
 bool isTrustedRampWidgetUrl(Uri url) {
   return url.scheme == 'https' && _trustedRampHost.hasMatch(url.host.toLowerCase());

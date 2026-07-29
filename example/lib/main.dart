@@ -36,8 +36,8 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   String? _userAddress;
   String? _hostAppName = 'Ramp Network Flutter';
   String? _hostApiKey;
-  Flow? _defaultFlow = Flow.ONRAMP;
-  List<Flow> _enabledFlows = [Flow.ONRAMP, Flow.OFFRAMP, Flow.SWAP];
+  TransactionFlow? _defaultFlow = TransactionFlow.ONRAMP;
+  List<TransactionFlow> _enabledFlows = [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP, TransactionFlow.SWAP];
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       url: _predefinedEnvironments[_selectedEnvironment],
       hostAppName: _hostAppName,
       defaultFlow: _defaultFlow,
-      enabledFlows: List<Flow>.from(_enabledFlows),
+      enabledFlows: List<TransactionFlow>.from(_enabledFlows),
       enabledCryptoAssets: enabledCryptoAssets,
       inAsset: _inAsset,
       inAssetValue: _inAssetValue,
@@ -230,10 +230,10 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       _textField('Host API key', (text) => _hostApiKey = text, _hostApiKey),
       _segmentedControl('Default flow:', ['ONRAMP', 'OFFRAMP'], (index) {
         if (index == 0) {
-          _defaultFlow = Flow.ONRAMP;
+          _defaultFlow = TransactionFlow.ONRAMP;
         }
         if (index == 1) {
-          _defaultFlow = Flow.OFFRAMP;
+          _defaultFlow = TransactionFlow.OFFRAMP;
         }
         setState(() {});
       }),
@@ -242,7 +242,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Widget _enabledFlowsSection() {
-    Widget flowSwitch(Flow flow) {
+    Widget flowSwitch(TransactionFlow flow) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -267,7 +267,13 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Enabled flows:'),
-        Row(children: [flowSwitch(Flow.ONRAMP), flowSwitch(Flow.OFFRAMP), flowSwitch(Flow.SWAP)]),
+        Row(
+          children: [
+            flowSwitch(TransactionFlow.ONRAMP),
+            flowSwitch(TransactionFlow.OFFRAMP),
+            flowSwitch(TransactionFlow.SWAP),
+          ],
+        ),
       ],
     );
   }

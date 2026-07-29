@@ -1,9 +1,7 @@
-import 'package:ramp_flutter/src/flow.dart';
-import 'package:ramp_flutter/src/payment_method_type.dart';
+import 'package:ramp_flutter/src/enums.dart';
 import 'package:ramp_flutter/src/signed_url.dart';
 
-export 'package:ramp_flutter/src/flow.dart';
-export 'package:ramp_flutter/src/payment_method_type.dart';
+export 'package:ramp_flutter/src/enums.dart';
 
 class Configuration {
   const Configuration({
@@ -32,8 +30,8 @@ class Configuration {
   static const String sdkVersion = '5.0.0';
 
   final String? url;
-  final Flow? defaultFlow;
-  final List<Flow>? enabledFlows;
+  final TransactionFlow? defaultFlow;
+  final List<TransactionFlow>? enabledFlows;
   final List<String>? enabledCryptoAssets;
   final String? inAsset;
   final String? inAssetValue;

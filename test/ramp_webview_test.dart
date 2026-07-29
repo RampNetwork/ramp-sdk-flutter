@@ -25,8 +25,8 @@ void main() {
         outAsset: 'ETH_ETH',
         inAssetValue: '10000',
         offrampWebhookV3Url: 'https://example.com/hook',
-        enabledFlows: [Flow.ONRAMP, Flow.OFFRAMP],
-        defaultFlow: Flow.OFFRAMP,
+        enabledFlows: [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP],
+        defaultFlow: TransactionFlow.OFFRAMP,
         paymentMethodType: PaymentMethodType.CARD_PAYMENT,
         useSendCryptoCallback: true,
       ).buildWidgetUrl();
@@ -52,14 +52,8 @@ void main() {
     });
 
     test('rejects an untrusted base URL', () {
-      expect(
-        () => const Configuration(url: 'https://evil.example/').buildWidgetUrl(),
-        throwsArgumentError,
-      );
-      expect(
-        () => const Configuration(url: 'http://app.rampnetwork.com/').buildWidgetUrl(),
-        throwsArgumentError,
-      );
+      expect(() => const Configuration(url: 'https://evil.example/').buildWidgetUrl(), throwsArgumentError);
+      expect(() => const Configuration(url: 'http://app.rampnetwork.com/').buildWidgetUrl(), throwsArgumentError);
     });
   });
 
