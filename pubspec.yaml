@@ -19,12 +19,3 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
-
-flutter:
-  plugin:
-    platforms:
-      android:
-        package: network.ramp.ramp_flutter
-        pluginClass: RampFlutterPlugin
-      ios:
-        pluginClass: RampFlutterPlugin

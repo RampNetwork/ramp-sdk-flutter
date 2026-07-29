@@ -1,7 +1,7 @@
 # Ramp Network Flutter
 
-Official Flutter SDK for Ramp Network. Loads the Ramp widget in a Flutter
-WebView on iOS and Android.
+Official Flutter package for Ramp Network. Loads the Ramp widget in a Flutter
+WebView on iOS and Android (no native Ramp SDK or Flutter plugin shells).
 
 ## Getting Started
 
@@ -18,8 +18,9 @@ dependencies:
   need KYC camera capture.
 - **iOS:** deployment target 13+. Add `NSCameraUsageDescription` (and photo
   library usage if you rely on document upload).
-- Native Ramp iOS/Android SDKs are **not** required (no CocoaPods `Ramp` pod,
-  no JitPack `ramp-sdk-android`).
+- Native Ramp iOS/Android SDKs and empty Flutter plugin shells are **not**
+  required (no CocoaPods `Ramp` pod, no JitPack `ramp-sdk-android`).
+  Platform WebView support comes from `webview_flutter` / `url_launcher`.
 
 ### Usage
 
