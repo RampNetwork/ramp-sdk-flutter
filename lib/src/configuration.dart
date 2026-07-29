@@ -1,5 +1,6 @@
 import 'package:ramp_flutter/src/flow.dart';
 import 'package:ramp_flutter/src/payment_method_type.dart';
+import 'package:ramp_flutter/src/signed_url.dart';
 
 export 'package:ramp_flutter/src/flow.dart';
 export 'package:ramp_flutter/src/payment_method_type.dart';
@@ -50,46 +51,44 @@ class Configuration {
   final String? webhookStatusUrl;
 
   Uri buildWidgetUrl() {
-    final base = Uri.parse((url != null && url!.trim().isNotEmpty) ? url!.trim() : defaultUrl);
+    final trimmedUrl = url?.trim();
+    final base = Uri.parse(_nonEmpty(trimmedUrl) ? trimmedUrl! : defaultUrl);
     if (base.queryParameters['signature']?.isNotEmpty == true) {
       throw StateError(
         'Configuration.buildWidgetUrl() cannot be used with a signed URL. '
         'Use RampFlutter.signed(...) instead.',
       );
     }
-
-    final queryParameters = <String, String>{
-      ...base.queryParameters,
-      if (defaultFlow != null) 'defaultFlow': defaultFlow!.name,
-      if (enabledFlows != null && enabledFlows!.isNotEmpty)
-        'enabledFlows': enabledFlows!.map((flow) => flow.name).join(','),
-      if (enabledCryptoAssets != null && enabledCryptoAssets!.isNotEmpty)
-        'enabledCryptoAssets': enabledCryptoAssets!.join(','),
-      if (_nonEmpty(inAsset)) 'inAsset': inAsset!,
-      if (_nonEmpty(inAssetValue)) 'inAssetValue': inAssetValue!,
-      if (_nonEmpty(outAsset)) 'outAsset': outAsset!,
-      if (_nonEmpty(outAssetValue)) 'outAssetValue': outAssetValue!,
-      if (_nonEmpty(finalUrl)) 'finalUrl': finalUrl!,
-      if (_nonEmpty(hostApiKey)) 'hostApiKey': hostApiKey!,
-      if (_nonEmpty(hostAppName)) 'hostAppName': hostAppName!,
-      if (_nonEmpty(offrampWebhookV3Url)) 'offrampWebhookV3Url': offrampWebhookV3Url!,
-      if (paymentMethodType != null) 'paymentMethodType': paymentMethodType!.name,
-      if (_nonEmpty(selectedCountryCode)) 'selectedCountryCode': selectedCountryCode!,
-      if (_nonEmpty(userAddress)) 'userAddress': userAddress!,
-      if (_nonEmpty(userEmailAddress)) 'userEmailAddress': userEmailAddress!,
-      if (_nonEmpty(webhookStatusUrl)) 'webhookStatusUrl': webhookStatusUrl!,
-      'sdkType': sdkType,
-      'sdkVersion': sdkVersion,
-    };
-
-    if (useSendCryptoCallback == true) {
-      queryParameters['useSendCryptoCallbackVersion'] = '1';
+    if (!isTrustedRampWidgetUrl(base)) {
+      throw ArgumentError.value(base.toString(), 'url', 'Untrusted Ramp Network URL');
     }
 
     return base.replace(
-      scheme: base.scheme.isEmpty ? 'https' : base.scheme,
       path: base.path.isEmpty ? '/' : base.path,
-      queryParameters: queryParameters,
+      queryParameters: {
+        ...base.queryParameters,
+        if (defaultFlow != null) 'defaultFlow': defaultFlow!.name,
+        if (enabledFlows != null && enabledFlows!.isNotEmpty)
+          'enabledFlows': enabledFlows!.map((flow) => flow.name).join(','),
+        if (enabledCryptoAssets != null && enabledCryptoAssets!.isNotEmpty)
+          'enabledCryptoAssets': enabledCryptoAssets!.join(','),
+        if (_nonEmpty(inAsset)) 'inAsset': inAsset!,
+        if (_nonEmpty(inAssetValue)) 'inAssetValue': inAssetValue!,
+        if (_nonEmpty(outAsset)) 'outAsset': outAsset!,
+        if (_nonEmpty(outAssetValue)) 'outAssetValue': outAssetValue!,
+        if (_nonEmpty(finalUrl)) 'finalUrl': finalUrl!,
+        if (_nonEmpty(hostApiKey)) 'hostApiKey': hostApiKey!,
+        if (_nonEmpty(hostAppName)) 'hostAppName': hostAppName!,
+        if (_nonEmpty(offrampWebhookV3Url)) 'offrampWebhookV3Url': offrampWebhookV3Url!,
+        if (paymentMethodType != null) 'paymentMethodType': paymentMethodType!.name,
+        if (_nonEmpty(selectedCountryCode)) 'selectedCountryCode': selectedCountryCode!,
+        if (_nonEmpty(userAddress)) 'userAddress': userAddress!,
+        if (_nonEmpty(userEmailAddress)) 'userEmailAddress': userEmailAddress!,
+        if (_nonEmpty(webhookStatusUrl)) 'webhookStatusUrl': webhookStatusUrl!,
+        if (useSendCryptoCallback == true) 'useSendCryptoCallbackVersion': '1',
+        'sdkType': sdkType,
+        'sdkVersion': sdkVersion,
+      },
     );
   }
 

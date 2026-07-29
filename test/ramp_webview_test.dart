@@ -50,6 +50,17 @@ void main() {
       expect(url.queryParameters.containsKey('hostApiKey'), isFalse);
       expect(url.queryParameters.containsKey('inAssetValue'), isFalse);
     });
+
+    test('rejects an untrusted base URL', () {
+      expect(
+        () => const Configuration(url: 'https://evil.example/').buildWidgetUrl(),
+        throwsArgumentError,
+      );
+      expect(
+        () => const Configuration(url: 'http://app.rampnetwork.com/').buildWidgetUrl(),
+        throwsArgumentError,
+      );
+    });
   });
 
   group('RampFlutter event parsing', () {

@@ -19,6 +19,9 @@
   Legacy params (`defaultAsset`, `fiatCurrency`, `fiatValue`, `swapAsset`,
   `offrampAsset`, `swapAmount`, `hostLogoUrl`, `containerNode`,
   `deepLinkScheme`, `variant`) are removed.
+* `Configuration.buildWidgetUrl()` and `RampFlutter.signed` both require an
+  `https` Ramp Network host (`*.ramp.network`, `*.rampnetwork.com`,
+  `*.ramp-network.org`).
 * Default base URL is now `https://app.rampnetwork.com`.
 * Raise minimum platforms to Android 7.0 (API 24) and iOS 13.
 * Raise minimum Flutter to 3.44 / Dart 3.12; update `webview_flutter`,
