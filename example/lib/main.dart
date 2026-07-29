@@ -24,6 +24,8 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   final _messengerKey = GlobalKey<ScaffoldMessengerState>();
   final Configuration _configuration = Configuration();
   RampFlutter? _ramp;
+  /// Messenger for the open sheet so snackbars appear above the WebView.
+  GlobalKey<ScaffoldMessengerState>? _sheetMessengerKey;
 
   final List<String> _predefinedEnvironments = [
     "https://app.dev.ramp-network.org",
@@ -61,17 +63,24 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         id == 0 ? ExampleSecrets.hostApiKeyInternal : null;
   }
 
-  void _onWidgetEvent(BuildContext context, Map<String, dynamic> event) {
-    final encoded = const JsonEncoder.withIndent('  ').convert(event);
-    debugPrint('Ramp example event:\n$encoded');
-    _messengerKey.currentState
+  void _showEventToast(String message) {
+    final messenger =
+        _sheetMessengerKey?.currentState ?? _messengerKey.currentState;
+    messenger
       ?..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text(encoded),
+          content: Text(message),
           duration: const Duration(seconds: 4),
+          behavior: SnackBarBehavior.floating,
         ),
       );
+  }
+
+  void _onWidgetEvent(BuildContext context, Map<String, dynamic> event) {
+    final encoded = const JsonEncoder.withIndent('  ').convert(event);
+    debugPrint('Ramp example event:\n$encoded');
+    _showEventToast(encoded);
 
     final type = event['type'];
     if (type == 'SEND_CRYPTO') {
@@ -88,7 +97,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   Future<void> _showRamp(BuildContext context) async {
     final ramp = RampFlutter(_configuration)
       ..onWidgetEvent = (event) => _onWidgetEvent(context, event);
+    final sheetMessengerKey = GlobalKey<ScaffoldMessengerState>();
     _ramp = ramp;
+    _sheetMessengerKey = sheetMessengerKey;
 
     await showModalBottomSheet<void>(
       context: context,
@@ -100,22 +111,28 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       builder: (sheetContext) {
         return SizedBox(
           height: MediaQuery.sizeOf(sheetContext).height * 0.92,
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 28,
-                child: Center(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.all(Radius.circular(2)),
+          child: ScaffoldMessenger(
+            key: sheetMessengerKey,
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              body: Column(
+                children: [
+                  const SizedBox(
+                    height: 28,
+                    child: Center(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.black26,
+                          borderRadius: BorderRadius.all(Radius.circular(2)),
+                        ),
+                        child: SizedBox(width: 36, height: 4),
+                      ),
                     ),
-                    child: SizedBox(width: 36, height: 4),
                   ),
-                ),
+                  Expanded(child: ramp.view),
+                ],
               ),
-              Expanded(child: ramp.view),
-            ],
+            ),
           ),
         );
       },
@@ -124,6 +141,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     ramp.dispose();
     if (identical(_ramp, ramp)) {
       _ramp = null;
+    }
+    if (identical(_sheetMessengerKey, sheetMessengerKey)) {
+      _sheetMessengerKey = null;
     }
   }
 
