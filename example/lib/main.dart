@@ -7,29 +7,11 @@ import 'package:ramp_flutter/onramp_purchase.dart';
 import 'package:ramp_flutter/ramp_flutter.dart';
 import 'package:ramp_flutter/send_crypto_payload.dart';
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import 'secrets.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  _setupNotifications();
   runApp(const RampFlutterApp());
-}
-
-final _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-Future<void> _setupNotifications() async {
-  const InitializationSettings settings = InitializationSettings(
-    android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-    iOS: DarwinInitializationSettings(),
-  );
-
-  await _localNotificationsPlugin.initialize(settings).then((_) {
-    debugPrint('Local Notifications setup success');
-  }).catchError((Object error) {
-    debugPrint('Local Notifications setup error: $error');
-  });
 }
 
 class RampFlutterApp extends StatefulWidget {
@@ -40,6 +22,7 @@ class RampFlutterApp extends StatefulWidget {
 }
 
 class _RampFlutterAppState extends State<RampFlutterApp> {
+  final _messengerKey = GlobalKey<ScaffoldMessengerState>();
   final ramp = RampFlutter();
   final Configuration _configuration = Configuration();
 
@@ -89,11 +72,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     String purchaseViewToken,
     String apiUrl,
   ) {
-    _showNotification("Ramp Network Notification", "onramp purchase created");
+    _showEvent("onramp purchase created");
   }
 
   void onSendCryptoRequested(SendCryptoPayload payload) {
-    _showNotification("Ramp Network Notification", "send crypto requested");
+    _showEvent("send crypto requested");
     ramp.sendCrypto("123");
   }
 
@@ -102,16 +85,24 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
     String saleViewToken,
     String apiUrl,
   ) {
-    _showNotification("Ramp Network Notification", "offramp sale created");
+    _showEvent("offramp sale created");
   }
 
   void onRampClosed() {
-    _showNotification("Ramp Network Notification", "ramp closed");
+    _showEvent("ramp closed");
+  }
+
+  void _showEvent(String message) {
+    debugPrint('Ramp example: $message');
+    _messengerKey.currentState
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: _messengerKey,
       home: Builder(
         builder: (context) => Scaffold(
           appBar: AppBar(
@@ -288,18 +279,6 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       hintText: placeholder,
       onChanged: onChanged,
       controller: TextEditingController(text: defaultValue),
-    );
-  }
-
-  Future<void> _showNotification(String title, String message) async {
-    const AndroidNotificationDetails android =
-        AndroidNotificationDetails("channelId", "channelName");
-    const NotificationDetails details = NotificationDetails(android: android);
-    await _localNotificationsPlugin.show(
-      1,
-      title,
-      message,
-      details,
     );
   }
 }
