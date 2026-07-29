@@ -9,12 +9,7 @@ final class RequestCryptoAccountResult extends HostEvent {
     String? name,
     String? assetSymbol,
   }) => RequestCryptoAccountResult(
-    RequestCryptoAccountSuccessPayload(
-      address: address,
-      type: type,
-      name: name,
-      assetSymbol: assetSymbol,
-    ),
+    RequestCryptoAccountSuccessPayload(address: address, type: type, name: name, assetSymbol: assetSymbol),
   );
 
   factory RequestCryptoAccountResult.error([String? error]) =>
@@ -36,12 +31,7 @@ sealed class RequestCryptoAccountResultPayload {
 }
 
 final class RequestCryptoAccountSuccessPayload extends RequestCryptoAccountResultPayload {
-  const RequestCryptoAccountSuccessPayload({
-    required this.address,
-    this.type,
-    this.name,
-    this.assetSymbol,
-  });
+  const RequestCryptoAccountSuccessPayload({required this.address, this.type, this.name, this.assetSymbol});
 
   final String address;
   final String? type;
@@ -49,12 +39,7 @@ final class RequestCryptoAccountSuccessPayload extends RequestCryptoAccountResul
   final String? assetSymbol;
 
   @override
-  Map<String, dynamic> toJson() => {
-    'address': address,
-    'type': ?type,
-    'name': ?name,
-    'assetSymbol': ?assetSymbol,
-  };
+  Map<String, dynamic> toJson() => {'address': address, 'type': ?type, 'name': ?name, 'assetSymbol': ?assetSymbol};
 }
 
 final class RequestCryptoAccountErrorPayload extends RequestCryptoAccountResultPayload {

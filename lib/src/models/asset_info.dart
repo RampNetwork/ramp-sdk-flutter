@@ -1,15 +1,7 @@
 import 'package:ramp_flutter/src/models/json_map.dart';
 
 class AssetInfo {
-  const AssetInfo({
-    this.uai,
-    this.address,
-    this.symbol,
-    this.chain,
-    this.type,
-    this.name,
-    this.decimals,
-  });
+  const AssetInfo({this.uai, this.address, this.symbol, this.chain, this.type, this.name, this.decimals});
 
   final String? uai;
   final String? address;

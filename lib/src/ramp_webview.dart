@@ -27,16 +27,14 @@ class RampWebView {
   WebViewController _ensureController() => _controller ??= _createController();
 
   WebViewController _createController() {
-    final controller = WebViewController.fromPlatformCreationParams(
-      _platformParams(),
-      onPermissionRequest: _onPermissionRequest,
-    )
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(_navigationDelegate())
-      ..addJavaScriptChannel(
-        _channelName,
-        onMessageReceived: (message) => handleJavaScriptMessage(message.message),
-      );
+    final controller =
+        WebViewController.fromPlatformCreationParams(_platformParams(), onPermissionRequest: _onPermissionRequest)
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setNavigationDelegate(_navigationDelegate())
+          ..addJavaScriptChannel(
+            _channelName,
+            onMessageReceived: (message) => handleJavaScriptMessage(message.message),
+          );
 
     _configureAndroid(controller);
     controller.loadRequest(_widgetUrl);

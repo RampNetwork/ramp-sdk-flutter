@@ -100,10 +100,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         case WidgetConfigFailed():
           _addDebugEvent('WIDGET_CONFIG_FAILED');
         case PurchaseCreated(:final payload):
-          _addDebugEvent('PURCHASE_CREATED', {
-            'id': payload.purchase?.id,
-            'asset': payload.purchase?.asset?.symbol,
-          });
+          _addDebugEvent('PURCHASE_CREATED', {'id': payload.purchase?.id, 'asset': payload.purchase?.asset?.symbol});
         case OfframpSaleCreated(:final payload):
           _addDebugEvent('OFFRAMP_SALE_CREATED', {'id': payload.sale?.id});
         case SendCryptoRequested(:final payload):
@@ -114,16 +111,9 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
           });
           ramp.postHostEvent(SendCryptoResult.txHash('123'));
         case RequestCryptoAccount(:final payload):
-          _addDebugEvent('REQUEST_CRYPTO_ACCOUNT', {
-            'type': payload.type,
-            'assetSymbol': payload.assetSymbol,
-          });
+          _addDebugEvent('REQUEST_CRYPTO_ACCOUNT', {'type': payload.type, 'assetSymbol': payload.assetSymbol});
           ramp.postHostEvent(
-            RequestCryptoAccountResult.account(
-              address: '0xabc',
-              type: payload.type,
-              assetSymbol: payload.assetSymbol,
-            ),
+            RequestCryptoAccountResult.account(address: '0xabc', type: payload.type, assetSymbol: payload.assetSymbol),
           );
         case WidgetClose(:final payload):
           _addDebugEvent('WIDGET_CLOSE', {'showAlert': payload.showAlert});

@@ -3,20 +3,14 @@ import 'package:ramp_flutter/ramp_flutter.dart';
 import 'package:ramp_flutter/src/signed_url.dart';
 
 void main() {
-  const signedUrl =
-      'https://app.ramp.network/?hostApiKey=key&timestamp=123&signature=a%2Bb%3D%3D';
+  const signedUrl = 'https://app.ramp.network/?hostApiKey=key&timestamp=123&signature=a%2Bb%3D%3D';
 
   test('preserves the signed URL', () {
     expect(validateRampSignedUrl(signedUrl).toString(), signedUrl);
   });
 
   test('rejects an incomplete signed URL', () {
-    expect(
-      () => validateRampSignedUrl(
-        'https://app.ramp.network/?hostApiKey=key&timestamp=123',
-      ),
-      throwsArgumentError,
-    );
+    expect(() => validateRampSignedUrl('https://app.ramp.network/?hostApiKey=key&timestamp=123'), throwsArgumentError);
   });
 
   test('rejects an untrusted origin', () {
@@ -31,15 +25,11 @@ void main() {
 
   test('accepts trusted Ramp hosts', () {
     expect(
-      validateRampSignedUrl(
-        'https://app.dev.ramp-network.org/?hostApiKey=key&timestamp=123&signature=sig',
-      ).host,
+      validateRampSignedUrl('https://app.dev.ramp-network.org/?hostApiKey=key&timestamp=123&signature=sig').host,
       'app.dev.ramp-network.org',
     );
     expect(
-      validateRampSignedUrl(
-        'https://app.rampnetwork.com/?hostApiKey=key&timestamp=123&signature=sig',
-      ).host,
+      validateRampSignedUrl('https://app.rampnetwork.com/?hostApiKey=key&timestamp=123&signature=sig').host,
       'app.rampnetwork.com',
     );
   });
@@ -51,9 +41,6 @@ void main() {
   });
 
   test('buildWidgetUrl rejects signed base URLs', () {
-    expect(
-      () => Configuration(url: signedUrl).buildWidgetUrl(),
-      throwsStateError,
-    );
+    expect(() => Configuration(url: signedUrl).buildWidgetUrl(), throwsStateError);
   });
 }

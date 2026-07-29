@@ -3,11 +3,9 @@ part of '../host_event.dart';
 final class SendCryptoResult extends HostEvent {
   const SendCryptoResult(this.payload);
 
-  factory SendCryptoResult.txHash(String? txHash) =>
-      SendCryptoResult(SendCryptoResultTxHashPayload(txHash));
+  factory SendCryptoResult.txHash(String? txHash) => SendCryptoResult(SendCryptoResultTxHashPayload(txHash));
 
-  factory SendCryptoResult.error([String? error]) =>
-      SendCryptoResult(SendCryptoResultErrorPayload(error));
+  factory SendCryptoResult.error([String? error]) => SendCryptoResult(SendCryptoResultErrorPayload(error));
 
   final SendCryptoResultPayload payload;
 

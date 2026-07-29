@@ -38,15 +38,9 @@ sealed class WidgetEvent {
         case 'WIDGET_CONFIG_FAILED':
           return WidgetConfigFailed(widgetInstanceId: widgetInstanceId);
         case 'PURCHASE_CREATED':
-          return PurchaseCreated(
-            PurchaseCreatedPayload.fromJson(payload),
-            widgetInstanceId: widgetInstanceId,
-          );
+          return PurchaseCreated(PurchaseCreatedPayload.fromJson(payload), widgetInstanceId: widgetInstanceId);
         case 'OFFRAMP_SALE_CREATED':
-          return OfframpSaleCreated(
-            OfframpSaleCreatedPayload.fromJson(payload),
-            widgetInstanceId: widgetInstanceId,
-          );
+          return OfframpSaleCreated(OfframpSaleCreatedPayload.fromJson(payload), widgetInstanceId: widgetInstanceId);
         case 'SEND_CRYPTO':
           final version = json['eventVersion'];
           if (version != null && version != 1) {
@@ -57,10 +51,7 @@ sealed class WidgetEvent {
             debugPrint('RampFlutter: drop SEND_CRYPTO — missing payload');
             return null;
           }
-          return SendCryptoRequested(
-            SendCryptoPayload.fromJson(payload),
-            widgetInstanceId: widgetInstanceId,
-          );
+          return SendCryptoRequested(SendCryptoPayload.fromJson(payload), widgetInstanceId: widgetInstanceId);
         case 'REQUEST_CRYPTO_ACCOUNT':
           if (payload == null) {
             debugPrint('RampFlutter: drop REQUEST_CRYPTO_ACCOUNT — missing payload');
@@ -72,10 +63,7 @@ sealed class WidgetEvent {
           );
         case 'WIDGET_CLOSE':
         case 'CLOSE':
-          return WidgetClose(
-            payload: WidgetClosePayload.fromJson(payload),
-            widgetInstanceId: widgetInstanceId,
-          );
+          return WidgetClose(payload: WidgetClosePayload.fromJson(payload), widgetInstanceId: widgetInstanceId);
         case 'WIDGET_CLOSE_REQUEST':
           return WidgetCloseRequest(widgetInstanceId: widgetInstanceId);
         default:

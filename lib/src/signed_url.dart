@@ -1,6 +1,4 @@
-final _trustedRampHost = RegExp(
-  r'^([a-z0-9-]+\.)*(ramp\.network|rampnetwork\.com|ramp-network\.org)$',
-);
+final _trustedRampHost = RegExp(r'^([a-z0-9-]+\.)*(ramp\.network|rampnetwork\.com|ramp-network\.org)$');
 
 Uri validateRampSignedUrl(String value) {
   final url = Uri.tryParse(value);

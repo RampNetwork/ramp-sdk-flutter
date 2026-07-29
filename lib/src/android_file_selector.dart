@@ -47,9 +47,7 @@ FileType fileTypeForAcceptTypes(List<String> acceptTypes) {
     return FileType.video;
   }
   final extensions = extensionsForAcceptTypes(acceptTypes);
-  final allMappedToExtensions = normalized.every(
-    (type) => type.startsWith('.') || type == 'application/pdf',
-  );
+  final allMappedToExtensions = normalized.every((type) => type.startsWith('.') || type == 'application/pdf');
   if (allMappedToExtensions && extensions != null && extensions.isNotEmpty) {
     return FileType.custom;
   }

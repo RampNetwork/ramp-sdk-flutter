@@ -16,9 +16,6 @@ class RequestCryptoAccountPayload {
     if (json == null) {
       return const RequestCryptoAccountPayload();
     }
-    return RequestCryptoAccountPayload(
-      type: json['type'] as String?,
-      assetSymbol: json['assetSymbol'] as String?,
-    );
+    return RequestCryptoAccountPayload(type: json['type'] as String?, assetSymbol: json['assetSymbol'] as String?);
   }
 }
