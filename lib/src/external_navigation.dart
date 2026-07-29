@@ -3,11 +3,28 @@ import 'package:url_launcher/url_launcher.dart';
 
 bool shouldOpenExternally(Uri uri, Uri widgetUrl) {
   final scheme = uri.scheme.toLowerCase();
-  final isHttp = scheme == 'http' || scheme == 'https';
-  if (!isHttp) {
+  if (scheme == 'about' || scheme.isEmpty) {
+    return false;
+  }
+  if (scheme != 'http' && scheme != 'https') {
     return true;
   }
-  return uri.host.toLowerCase() != widgetUrl.host.toLowerCase();
+  if (uri.host.toLowerCase() == widgetUrl.host.toLowerCase()) {
+    return false;
+  }
+  return !staysInWebView(uri);
+}
+
+@visibleForTesting
+bool staysInWebView(Uri uri) {
+  final host = uri.host.toLowerCase();
+  if (host == 'recaptcha.net' || host.endsWith('.recaptcha.net')) {
+    return true;
+  }
+  if (host == 'www.google.com' || host == 'www.gstatic.com') {
+    return uri.path.toLowerCase().contains('/recaptcha');
+  }
+  return false;
 }
 
 Future<void> openExternalUrl(Uri uri) async {
