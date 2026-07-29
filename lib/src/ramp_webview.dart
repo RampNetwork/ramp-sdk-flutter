@@ -206,10 +206,7 @@ class RampWebView {
   }
 
   Future<void> postHostEvent(HostEvent event) {
-    final webView = _controller;
-    if (webView == null) {
-      return Future.value();
-    }
+    final webView = _ensureController();
     final message = jsonEncode(event.toJson());
     return webView.runJavaScript('window.postMessage($message, "${_widgetUrl.origin}");');
   }
