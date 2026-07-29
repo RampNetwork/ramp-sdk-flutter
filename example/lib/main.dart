@@ -91,7 +91,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Future<void> _showRamp(BuildContext context) async {
-    final ramp = RampFlutter.fromConfiguration(_buildConfiguration());
+    final ramp = RampFlutter(_buildConfiguration());
 
     ramp.onWidgetEvent = (event) {
       switch (event) {

@@ -1,5 +1,3 @@
-/// Builds a Ramp widget [Uri]. Not held by [RampFlutter] after construction —
-/// call [buildWidgetUrl] and pass the result into [RampFlutter].
 class Configuration {
   const Configuration({
     this.url,
@@ -54,6 +52,12 @@ class Configuration {
 
   Uri buildWidgetUrl() {
     final base = Uri.parse((url != null && url!.trim().isNotEmpty) ? url!.trim() : defaultUrl);
+    if (base.queryParameters['signature']?.isNotEmpty == true) {
+      throw StateError(
+        'Configuration.buildWidgetUrl() cannot be used with a signed URL. '
+        'Use RampFlutter.signed(...) instead.',
+      );
+    }
 
     final queryParameters = <String, String>{
       ...base.queryParameters,

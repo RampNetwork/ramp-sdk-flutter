@@ -28,17 +28,20 @@ dependencies:
 The SDK provides the Ramp WebView; your app owns presentation (route, bottom
 sheet, dialog, etc.) and must call `dispose` when it is dismissed.
 
+**Configuration** (SDK builds the widget URL, including `sdkType` / `sdkVersion` /
+`variant`):
+
 ```dart
 import 'package:ramp_flutter/ramp_flutter.dart';
 
-final widgetUrl = Configuration(
-  hostApiKey: 'YOUR_API_KEY',
-  hostAppName: 'My App',
-  hostLogoUrl: 'https://example.com/logo.png',
-  enabledFlows: ['ONRAMP', 'OFFRAMP'],
-).buildWidgetUrl();
-
-final ramp = RampFlutter(widgetUrl)
+final ramp = RampFlutter(
+  Configuration(
+    hostApiKey: 'YOUR_API_KEY',
+    hostAppName: 'My App',
+    hostLogoUrl: 'https://example.com/logo.png',
+    enabledFlows: ['ONRAMP', 'OFFRAMP'],
+  ),
+)
   ..onWidgetEvent = (event) {
     switch (event) {
       case PurchaseCreated(:final payload):
@@ -75,8 +78,15 @@ await showModalBottomSheet<void>(
 ramp.dispose();
 ```
 
-`Configuration` only builds the widget [Uri]; `RampFlutter` takes that URL (or use
-`RampFlutter.fromConfiguration(...)`).
+**Server-signed URL** (loaded verbatim — do not put this in `Configuration.url`):
+
+```dart
+final ramp = RampFlutter.signed(signedWidgetUrlFromYourBackend)
+  ..onWidgetEvent = (event) { /* same switch as above */ };
+```
+
+Generate the signed URL on your backend (`hostApiKey`, `timestamp`, `signature`).
+Keep signing keys out of the app.
 
 For more configuration parameters see
 [Ramp Network Flutter documentation](https://docs.ramp.network/mobile/flutter-sdk/).
@@ -94,5 +104,3 @@ For more configuration parameters see
   `image_picker` when capture is requested). Host apps need camera / photo
   library usage descriptions (see Getting Started). iOS WKWebView handles file
   inputs natively.
-- Server-signed widget URLs are not supported in this release; use
-  `Configuration` fields so the SDK can build the widget URL.

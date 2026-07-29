@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:ramp_flutter/src/configuration.dart';
 import 'package:ramp_flutter/src/host_event.dart';
 import 'package:ramp_flutter/src/ramp_webview.dart';
+import 'package:ramp_flutter/src/signed_url.dart';
 import 'package:ramp_flutter/src/widget_event.dart';
 
 export 'package:ramp_flutter/src/configuration.dart';
@@ -9,10 +10,14 @@ export 'package:ramp_flutter/src/host_event.dart';
 export 'package:ramp_flutter/src/widget_event.dart';
 
 class RampFlutter {
-  RampFlutter(Uri widgetUrl) : _webView = RampWebView(widgetUrl);
+  RampFlutter(Configuration configuration) : this._(configuration.buildWidgetUrl());
 
-  factory RampFlutter.fromConfiguration(Configuration configuration) =>
-      RampFlutter(configuration.buildWidgetUrl());
+  factory RampFlutter.signed(String url) => RampFlutter._(validateRampSignedUrl(url));
+
+  @visibleForTesting
+  factory RampFlutter.uri(Uri widgetUrl) => RampFlutter._(widgetUrl);
+
+  RampFlutter._(Uri widgetUrl) : _webView = RampWebView(widgetUrl);
 
   final RampWebView _webView;
 

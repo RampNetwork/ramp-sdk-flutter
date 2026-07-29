@@ -164,7 +164,7 @@ class RampWebView {
     final dynamic decoded;
     try {
       decoded = jsonDecode(message);
-    } on FormatException catch (error) {
+    } on FormatException {
       return;
     }
     if (decoded is! Map) {

@@ -48,7 +48,7 @@ void main() {
 
     test('ignores non-JSON and unknown types', () {
       final events = <WidgetEvent>[];
-      final ramp = RampFlutter(widgetUrl)..onWidgetEvent = events.add;
+      final ramp = RampFlutter.uri(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage('not json');
       ramp.handleJavaScriptMessage('42');
@@ -59,7 +59,7 @@ void main() {
 
     test('parses supported widget events', () {
       final events = <WidgetEvent>[];
-      final ramp = RampFlutter(widgetUrl)..onWidgetEvent = events.add;
+      final ramp = RampFlutter.uri(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage(
         jsonEncode({'type': 'WIDGET_CONFIG_DONE', 'payload': null, 'widgetInstanceId': 'w1'}),
@@ -175,7 +175,7 @@ void main() {
 
     test('rejects unsupported SEND_CRYPTO eventVersion', () {
       final events = <WidgetEvent>[];
-      final ramp = RampFlutter(widgetUrl)..onWidgetEvent = events.add;
+      final ramp = RampFlutter.uri(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage(
         jsonEncode({
