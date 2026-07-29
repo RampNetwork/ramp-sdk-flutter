@@ -28,10 +28,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
 
   int _selectedEnvironment = 0;
   String? _userEmailAddress;
-  String? _fiatValue;
-  String? _fiatCurrency;
-  String? _defaultAsset = 'BTC_BTC';
-  String? _offrampAsset;
+  String? _inAsset;
+  String? _inAssetValue;
+  String? _outAsset = 'BTC_BTC';
+  String? _outAssetValue;
+  String? _enabledCryptoAssets;
   String? _userAddress;
   String? _hostAppName = 'Ramp Network Flutter';
   String? _hostApiKey;
@@ -60,20 +61,24 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
   }
 
   Configuration _buildConfiguration() {
+    final enabledCryptoAssets = _enabledCryptoAssets
+        ?.split(',')
+        .map((asset) => asset.trim())
+        .where((asset) => asset.isNotEmpty)
+        .toList();
     return Configuration(
       url: _predefinedEnvironments[_selectedEnvironment],
       hostAppName: _hostAppName,
-      hostLogoUrl: 'https://assets.rampnetwork.com/misc/ramp-network-logo.svg',
       defaultFlow: _defaultFlow,
       enabledFlows: List<String>.from(_enabledFlows),
-      defaultAsset: _defaultAsset,
-      offrampAsset: _offrampAsset,
+      enabledCryptoAssets: enabledCryptoAssets,
+      inAsset: _inAsset,
+      inAssetValue: _inAssetValue,
+      outAsset: _outAsset,
+      outAssetValue: _outAssetValue,
       useSendCryptoCallback: true,
-      deepLinkScheme: 'rampflutterdemo',
       hostApiKey: _hostApiKey,
       userEmailAddress: _userEmailAddress,
-      fiatValue: _fiatValue,
-      fiatCurrency: _fiatCurrency,
       userAddress: _userAddress,
     );
   }
@@ -215,10 +220,11 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         style: const TextStyle(color: Color.fromRGBO(46, 190, 117, 1)),
       ),
       _textField('User email address', (text) => _userEmailAddress = text, _userEmailAddress),
-      _textField('Fiat value', (text) => _fiatValue = text, _fiatValue),
-      _textField('Fiat currency', (text) => _fiatCurrency = text, _fiatCurrency),
-      _textField('Default asset', (text) => _defaultAsset = text, _defaultAsset),
-      _textField('Offramp asset', (text) => _offrampAsset = text, _offrampAsset),
+      _textField('In asset', (text) => _inAsset = text, _inAsset),
+      _textField('In asset value', (text) => _inAssetValue = text, _inAssetValue),
+      _textField('Out asset', (text) => _outAsset = text, _outAsset),
+      _textField('Out asset value', (text) => _outAssetValue = text, _outAssetValue),
+      _textField('Enabled crypto assets', (text) => _enabledCryptoAssets = text, _enabledCryptoAssets),
       _textField('User address', (text) => _userAddress = text, _userAddress),
       _textField('Host app name', (text) => _hostAppName = text, _hostAppName),
       _textField('Host API key', (text) => _hostApiKey = text, _hostApiKey),

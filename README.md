@@ -28,8 +28,7 @@ dependencies:
 The SDK provides the Ramp WebView; your app owns presentation (route, bottom
 sheet, dialog, etc.) and must call `dispose` when it is dismissed.
 
-**Configuration** (SDK builds the widget URL, including `sdkType` / `sdkVersion` /
-`variant`):
+**Configuration** (SDK builds the widget URL, including `sdkType` / `sdkVersion`):
 
 ```dart
 import 'package:ramp_flutter/ramp_flutter.dart';
@@ -38,8 +37,8 @@ final ramp = RampFlutter(
   Configuration(
     hostApiKey: 'YOUR_API_KEY',
     hostAppName: 'My App',
-    hostLogoUrl: 'https://example.com/logo.png',
     enabledFlows: ['ONRAMP', 'OFFRAMP'],
+    outAsset: 'BTC_BTC',
   ),
 )
   ..onWidgetEvent = (event) {

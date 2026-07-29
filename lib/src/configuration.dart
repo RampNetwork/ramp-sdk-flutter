@@ -1,22 +1,18 @@
 class Configuration {
   const Configuration({
     this.url,
-    this.containerNode,
-    this.deepLinkScheme,
-    this.defaultAsset,
     this.defaultFlow,
     this.enabledFlows,
-    this.fiatCurrency,
-    this.fiatValue,
+    this.enabledCryptoAssets,
+    this.inAsset,
+    this.inAssetValue,
+    this.outAsset,
+    this.outAssetValue,
     this.finalUrl,
     this.hostApiKey,
     this.hostAppName,
-    this.hostLogoUrl,
-    this.offrampAsset,
     this.offrampWebhookV3Url,
     this.selectedCountryCode,
-    this.swapAmount,
-    this.swapAsset,
     this.userAddress,
     this.userEmailAddress,
     this.useSendCryptoCallback,
@@ -26,25 +22,20 @@ class Configuration {
   static const String defaultUrl = 'https://app.rampnetwork.com';
   static const String sdkType = 'FLUTTER';
   static const String sdkVersion = '5.0.0';
-  static const String mobileSdkVariant = 'sdk-mobile';
 
   final String? url;
-  final String? containerNode;
-  final String? deepLinkScheme;
-  final String? defaultAsset;
   final String? defaultFlow;
   final List<String>? enabledFlows;
-  final String? fiatCurrency;
-  final String? fiatValue;
+  final List<String>? enabledCryptoAssets;
+  final String? inAsset;
+  final String? inAssetValue;
+  final String? outAsset;
+  final String? outAssetValue;
   final String? finalUrl;
   final String? hostApiKey;
   final String? hostAppName;
-  final String? hostLogoUrl;
-  final String? offrampAsset;
   final String? offrampWebhookV3Url;
   final String? selectedCountryCode;
-  final String? swapAmount;
-  final String? swapAsset;
   final String? userAddress;
   final String? userEmailAddress;
   final bool? useSendCryptoCallback;
@@ -61,28 +52,24 @@ class Configuration {
 
     final queryParameters = <String, String>{
       ...base.queryParameters,
-      if (_nonEmpty(containerNode)) 'containerNode': containerNode!,
-      if (_nonEmpty(deepLinkScheme)) 'deepLinkScheme': deepLinkScheme!,
-      if (_nonEmpty(defaultAsset)) 'defaultAsset': defaultAsset!,
       if (_nonEmpty(defaultFlow)) 'defaultFlow': defaultFlow!,
       if (enabledFlows != null && enabledFlows!.isNotEmpty) 'enabledFlows': enabledFlows!.join(','),
-      if (_nonEmpty(fiatCurrency)) 'fiatCurrency': fiatCurrency!,
-      if (_nonEmpty(fiatValue)) 'fiatValue': fiatValue!,
+      if (enabledCryptoAssets != null && enabledCryptoAssets!.isNotEmpty)
+        'enabledCryptoAssets': enabledCryptoAssets!.join(','),
+      if (_nonEmpty(inAsset)) 'inAsset': inAsset!,
+      if (_nonEmpty(inAssetValue)) 'inAssetValue': inAssetValue!,
+      if (_nonEmpty(outAsset)) 'outAsset': outAsset!,
+      if (_nonEmpty(outAssetValue)) 'outAssetValue': outAssetValue!,
       if (_nonEmpty(finalUrl)) 'finalUrl': finalUrl!,
       if (_nonEmpty(hostApiKey)) 'hostApiKey': hostApiKey!,
       if (_nonEmpty(hostAppName)) 'hostAppName': hostAppName!,
-      if (_nonEmpty(hostLogoUrl)) 'hostLogoUrl': hostLogoUrl!,
-      if (_nonEmpty(offrampAsset)) 'offrampAsset': offrampAsset!,
       if (_nonEmpty(offrampWebhookV3Url)) 'offrampWebhookV3Url': offrampWebhookV3Url!,
       if (_nonEmpty(selectedCountryCode)) 'selectedCountryCode': selectedCountryCode!,
-      if (_nonEmpty(swapAmount)) 'swapAmount': swapAmount!,
-      if (_nonEmpty(swapAsset)) 'swapAsset': swapAsset!,
       if (_nonEmpty(userAddress)) 'userAddress': userAddress!,
       if (_nonEmpty(userEmailAddress)) 'userEmailAddress': userEmailAddress!,
       if (_nonEmpty(webhookStatusUrl)) 'webhookStatusUrl': webhookStatusUrl!,
       'sdkType': sdkType,
       'sdkVersion': sdkVersion,
-      'variant': mobileSdkVariant,
     };
 
     if (useSendCryptoCallback == true) {

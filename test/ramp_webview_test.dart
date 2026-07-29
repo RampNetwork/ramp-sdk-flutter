@@ -12,15 +12,18 @@ void main() {
       expect(url.host, 'app.rampnetwork.com');
       expect(url.queryParameters['sdkType'], 'FLUTTER');
       expect(url.queryParameters['sdkVersion'], '5.0.0');
-      expect(url.queryParameters['variant'], 'sdk-mobile');
+      expect(url.queryParameters.containsKey('variant'), isFalse);
     });
 
-    test('merges configuration fields and joins enabled flows', () {
+    test('merges configuration fields and joins list params', () {
       final url = const Configuration(
         url: 'https://app.dev.ramp-network.org/custom',
         hostApiKey: 'key',
         hostAppName: 'App',
-        offrampAsset: 'ETH',
+        enabledCryptoAssets: ['ETH_*', 'BTC_BTC'],
+        inAsset: 'EUR',
+        outAsset: 'ETH_ETH',
+        inAssetValue: '10000',
         offrampWebhookV3Url: 'https://example.com/hook',
         enabledFlows: ['ONRAMP', 'OFFRAMP'],
         defaultFlow: 'OFFRAMP',
@@ -31,15 +34,18 @@ void main() {
       expect(url.path, '/custom');
       expect(url.queryParameters['hostApiKey'], 'key');
       expect(url.queryParameters['enabledFlows'], 'ONRAMP,OFFRAMP');
+      expect(url.queryParameters['enabledCryptoAssets'], 'ETH_*,BTC_BTC');
+      expect(url.queryParameters['inAsset'], 'EUR');
+      expect(url.queryParameters['outAsset'], 'ETH_ETH');
+      expect(url.queryParameters['inAssetValue'], '10000');
       expect(url.queryParameters['useSendCryptoCallbackVersion'], '1');
-      expect(url.queryParameters['variant'], 'sdk-mobile');
     });
 
     test('omits null and empty optional fields', () {
-      final url = const Configuration(hostApiKey: '', fiatValue: null).buildWidgetUrl();
+      final url = const Configuration(hostApiKey: '', inAssetValue: null).buildWidgetUrl();
 
       expect(url.queryParameters.containsKey('hostApiKey'), isFalse);
-      expect(url.queryParameters.containsKey('fiatValue'), isFalse);
+      expect(url.queryParameters.containsKey('inAssetValue'), isFalse);
     });
   });
 
