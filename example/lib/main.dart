@@ -1,13 +1,16 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import 'package:ramp_flutter/ramp_flutter.dart';
+
+import 'configuration_form.dart';
+import 'signed_url_form.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const RampFlutterApp());
 }
+
+enum LaunchMode { configuration, signedUrl }
 
 class RampFlutterApp extends StatefulWidget {
   const RampFlutterApp({super.key});
@@ -17,159 +20,47 @@ class RampFlutterApp extends StatefulWidget {
 }
 
 class _RampFlutterAppState extends State<RampFlutterApp> {
-  final ValueNotifier<List<_DebugEvent>> _debugEvents = ValueNotifier<List<_DebugEvent>>(const []);
-  var _nextDebugEventId = 0;
+  final _signedUrlKey = GlobalKey<SignedUrlFormState>();
+  final _configurationKey = GlobalKey<ConfigurationFormState>();
+  var _launchMode = LaunchMode.signedUrl;
 
-  final List<String> _predefinedEnvironments = [
-    'https://app.dev.ramp-network.org',
-    'https://app.demo.ramp.network',
-    'https://app.rampnetwork.com',
-  ];
-
-  int _selectedEnvironment = 0;
-  String? _userEmailAddress;
-  String? _inAsset;
-  String? _inAssetValue;
-  String? _outAsset = 'BTC_BTC';
-  String? _outAssetValue;
-  String? _enabledCryptoAssets;
-  String? _userAddress;
-  String? _hostAppName = 'Ramp Network Flutter';
-  String? _hostApiKey;
-  TransactionFlow? _defaultFlow = TransactionFlow.ONRAMP;
-  List<TransactionFlow> _enabledFlows = [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP, TransactionFlow.SWAP];
-
-  @override
-  void initState() {
-    _applyEnvironment(_selectedEnvironment);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _debugEvents.dispose();
-    super.dispose();
-  }
-
-  void _selectEnvironment(int id) {
-    _applyEnvironment(id);
-    setState(() {});
-  }
-
-  void _applyEnvironment(int id) {
-    _selectedEnvironment = id;
-  }
-
-  Configuration _buildConfiguration() {
-    final enabledCryptoAssets = _enabledCryptoAssets
-        ?.split(',')
-        .map((asset) => asset.trim())
-        .where((asset) => asset.isNotEmpty)
-        .toList();
-    return Configuration(
-      url: _predefinedEnvironments[_selectedEnvironment],
-      hostAppName: _hostAppName,
-      defaultFlow: _defaultFlow,
-      enabledFlows: List<TransactionFlow>.from(_enabledFlows),
-      enabledCryptoAssets: enabledCryptoAssets,
-      inAsset: _inAsset,
-      inAssetValue: _inAssetValue,
-      outAsset: _outAsset,
-      outAssetValue: _outAssetValue,
-      useSendCryptoCallback: true,
-      hostApiKey: _hostApiKey,
-      userEmailAddress: _userEmailAddress,
-      userAddress: _userAddress,
-    );
-  }
-
-  void _addDebugEvent(String label, [Map<String, Object?> data = const {}]) {
-    final encoded = const JsonEncoder.withIndent('  ').convert({'event': label, ...data});
-    _debugEvents.value = [..._debugEvents.value, _DebugEvent(_nextDebugEventId++, encoded)];
-  }
-
-  void _removeDebugEvent(int id) {
-    _debugEvents.value = _debugEvents.value.where((e) => e.id != id).toList(growable: false);
-  }
-
-  Future<void> _showRamp(BuildContext context) async {
-    final ramp = RampFlutter(_buildConfiguration());
+  Future<void> _openRamp(BuildContext context) async {
+    final RampFlutter ramp;
+    try {
+      ramp = switch (_launchMode) {
+        LaunchMode.signedUrl => RampFlutter.signed(_signedUrlKey.currentState!.url),
+        LaunchMode.configuration => RampFlutter(_configurationKey.currentState!.configuration),
+      };
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$error')));
+      return;
+    }
 
     ramp.onWidgetEvent = (event) {
+      debugPrint('Ramp event: $event');
       switch (event) {
-        case WidgetConfigDone():
-          _addDebugEvent('WIDGET_CONFIG_DONE');
-        case WidgetConfigFailed():
-          _addDebugEvent('WIDGET_CONFIG_FAILED');
-        case PurchaseCreated(:final payload):
-          _addDebugEvent('PURCHASE_CREATED', {'id': payload.purchase?.id, 'asset': payload.purchase?.asset?.symbol});
-        case OfframpSaleCreated(:final payload):
-          _addDebugEvent('OFFRAMP_SALE_CREATED', {'id': payload.sale?.id});
-        case SendCryptoRequested(:final payload):
-          _addDebugEvent('SEND_CRYPTO', {
-            'address': payload.address,
-            'amount': payload.amount,
-            'asset': payload.assetInfo?.symbol,
-          });
-          ramp.postHostEvent(SendCryptoResult.txHash('123'));
+        case SendCryptoRequested():
+          ramp.postHostEvent(SendCryptoResult.txHash('demo-tx-hash'));
         case RequestCryptoAccount(:final payload):
-          _addDebugEvent('REQUEST_CRYPTO_ACCOUNT', {'type': payload.type, 'assetSymbol': payload.assetSymbol});
           ramp.postHostEvent(
-            RequestCryptoAccountResult.account(address: '0xabc', type: payload.type, assetSymbol: payload.assetSymbol),
+            RequestCryptoAccountResult.account(address: '0xabc', type: payload.type),
           );
-        case WidgetClose(:final payload):
-          _addDebugEvent('WIDGET_CLOSE', {'showAlert': payload.showAlert});
-        case WidgetCloseRequest():
-          _addDebugEvent('WIDGET_CLOSE_REQUEST');
+        case WidgetClose():
+          if (context.mounted) Navigator.of(context).maybePop();
+        default:
+          break;
       }
     };
 
     await showModalBottomSheet<void>(
       context: context,
-      useRootNavigator: true,
       isScrollControlled: true,
-      enableDrag: true,
-      isDismissible: true,
       useSafeArea: true,
-      builder: (sheetContext) {
-        return SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.92,
-          child: Material(
-            color: Colors.white,
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 28,
-                      child: Center(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: Colors.black26,
-                            borderRadius: BorderRadius.all(Radius.circular(2)),
-                          ),
-                          child: SizedBox(width: 36, height: 4),
-                        ),
-                      ),
-                    ),
-                    Expanded(child: ramp.view),
-                  ],
-                ),
-                Positioned(
-                  left: 8,
-                  right: 8,
-                  top: 36,
-                  child: _DebugEventList(
-                    eventsListenable: _debugEvents,
-                    maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.45,
-                    onDismiss: _removeDebugEvent,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (sheetContext) => SizedBox(
+        height: MediaQuery.sizeOf(sheetContext).height * 0.92,
+        child: ramp.view,
+      ),
     );
 
     ramp.dispose();
@@ -181,181 +72,51 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       home: Builder(
         builder: (context) => Scaffold(
           appBar: AppBar(title: const Text('Ramp Network Flutter')),
-          body: Stack(
+          body: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: ListView(children: _formFields(context)),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: SegmentedButton<LaunchMode>(
+                  expandedInsets: EdgeInsets.zero,
+                  showSelectedIcon: false,
+                  segments: const [
+                    ButtonSegment(value: LaunchMode.signedUrl, label: Text('Signed URL')),
+                    ButtonSegment(value: LaunchMode.configuration, label: Text('Configuration')),
+                  ],
+                  selected: {_launchMode},
+                  onSelectionChanged: (selection) {
+                    setState(() => _launchMode = selection.single);
+                  },
+                ),
               ),
-              Positioned(
-                left: 8,
-                right: 8,
-                top: 8,
-                child: _DebugEventList(
-                  eventsListenable: _debugEvents,
-                  maxHeight: MediaQuery.sizeOf(context).height * 0.5,
-                  onDismiss: _removeDebugEvent,
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: IndexedStack(
+                    index: _launchMode == LaunchMode.signedUrl ? 0 : 1,
+                    children: [
+                      SignedUrlForm(key: _signedUrlKey),
+                      ConfigurationForm(key: _configurationKey),
+                    ],
+                  ),
+                ),
+              ),
+              SafeArea(
+                top: false,
+                minimum: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: FilledButton(
+                    onPressed: () => _openRamp(context),
+                    child: const Text('Open Ramp', style: TextStyle(fontSize: 18)),
+                  ),
                 ),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  List<Widget> _formFields(BuildContext context) {
-    return [..._configurationForm(), _showRampButton(context), _appInfo()];
-  }
-
-  Widget _appInfo() {
-    return const Text('App version: Flutter WebView');
-  }
-
-  List<Widget> _configurationForm() {
-    return [
-      _segmentedControl('Env:', ['dev', 'demo', 'prod'], _selectEnvironment),
-      Text(
-        _predefinedEnvironments[_selectedEnvironment],
-        style: const TextStyle(color: Color.fromRGBO(46, 190, 117, 1)),
-      ),
-      _textField('User email address', (text) => _userEmailAddress = text, _userEmailAddress),
-      _textField('In asset', (text) => _inAsset = text, _inAsset),
-      _textField('In asset value', (text) => _inAssetValue = text, _inAssetValue),
-      _textField('Out asset', (text) => _outAsset = text, _outAsset),
-      _textField('Out asset value', (text) => _outAssetValue = text, _outAssetValue),
-      _textField('Enabled crypto assets', (text) => _enabledCryptoAssets = text, _enabledCryptoAssets),
-      _textField('User address', (text) => _userAddress = text, _userAddress),
-      _textField('Host app name', (text) => _hostAppName = text, _hostAppName),
-      _textField('Host API key', (text) => _hostApiKey = text, _hostApiKey),
-      _segmentedControl('Default flow:', ['ONRAMP', 'OFFRAMP'], (index) {
-        if (index == 0) {
-          _defaultFlow = TransactionFlow.ONRAMP;
-        }
-        if (index == 1) {
-          _defaultFlow = TransactionFlow.OFFRAMP;
-        }
-        setState(() {});
-      }),
-      _enabledFlowsSection(),
-    ];
-  }
-
-  Widget _enabledFlowsSection() {
-    Widget flowSwitch(TransactionFlow flow) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(flow.name),
-          Switch(
-            value: _enabledFlows.contains(flow),
-            onChanged: (enabled) {
-              setState(() {
-                if (enabled) {
-                  _enabledFlows = [..._enabledFlows, flow];
-                } else {
-                  _enabledFlows = _enabledFlows.where((value) => value != flow).toList();
-                }
-              });
-            },
-          ),
-        ],
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Enabled flows:'),
-        Row(
-          children: [
-            flowSwitch(TransactionFlow.ONRAMP),
-            flowSwitch(TransactionFlow.OFFRAMP),
-            flowSwitch(TransactionFlow.SWAP),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _showRampButton(BuildContext context) {
-    return TextButton(onPressed: () => _showRamp(context), child: const Text('Show Ramp'));
-  }
-
-  Row _segmentedControl(String title, List<String> options, void Function(int) itemSelected) {
-    final segments = options.asMap().entries.map((entry) {
-      return TextButton(onPressed: () => itemSelected(entry.key), child: Text(entry.value));
-    }).toList();
-    return Row(children: [Text(title), ...segments]);
-  }
-
-  TextField _textField(String placeholder, void Function(String) onChanged, String? defaultValue) {
-    return TextField(
-      decoration: InputDecoration(hintText: placeholder),
-      onChanged: onChanged,
-      controller: TextEditingController(text: defaultValue),
-    );
-  }
-}
-
-class _DebugEvent {
-  _DebugEvent(this.id, this.body);
-
-  final int id;
-  final String body;
-}
-
-class _DebugEventList extends StatelessWidget {
-  const _DebugEventList({required this.eventsListenable, required this.maxHeight, required this.onDismiss});
-
-  final ValueNotifier<List<_DebugEvent>> eventsListenable;
-  final double maxHeight;
-  final void Function(int id) onDismiss;
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<_DebugEvent>>(
-      valueListenable: eventsListenable,
-      builder: (context, events, _) {
-        if (events.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: maxHeight),
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: events.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 6),
-            itemBuilder: (context, index) {
-              final event = events[index];
-              return Material(
-                elevation: 3,
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xFF323232),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          event.body,
-                          style: const TextStyle(color: Colors.white, fontSize: 11, fontFamily: 'Courier'),
-                        ),
-                      ),
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(Icons.close, color: Colors.white70, size: 18),
-                        onPressed: () => onDismiss(event.id),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      },
     );
   }
 }
