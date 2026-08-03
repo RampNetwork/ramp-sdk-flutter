@@ -35,10 +35,7 @@ class SignedUrlFormState extends State<SignedUrlForm> {
     final checks = <(String, bool)>[
       ('https URL', parsed?.scheme == 'https'),
       ('hostApiKey', (params['hostApiKey'] ?? '').isNotEmpty),
-      (
-        timestampMs == null ? 'timestamp' : 'timestamp (${_formatLocal(timestampMs)})',
-        timestampMs != null,
-      ),
+      (timestampMs == null ? 'timestamp' : 'timestamp (${_formatLocal(timestampMs)})', timestampMs != null),
       ('signature', (params['signature'] ?? '').isNotEmpty),
     ];
 
@@ -63,11 +60,7 @@ class SignedUrlFormState extends State<SignedUrlForm> {
             padding: const EdgeInsets.symmetric(vertical: 2),
             child: Row(
               children: [
-                Icon(
-                  ok ? Icons.check_circle : Icons.cancel,
-                  color: ok ? Colors.green : Colors.red,
-                  size: 20,
-                ),
+                Icon(ok ? Icons.check_circle : Icons.cancel, color: ok ? Colors.green : Colors.red, size: 20),
                 const SizedBox(width: 8),
                 Expanded(child: Text(label)),
               ],

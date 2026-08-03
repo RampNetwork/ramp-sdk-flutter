@@ -56,8 +56,7 @@ class ConfigurationFormState extends State<ConfigurationForm> {
     _userAddress = TextEditingController(text: initial.userAddress ?? '');
     _defaultFlow = initial.defaultFlow ?? TransactionFlow.ONRAMP;
     _enabledFlows = List<TransactionFlow>.from(
-      initial.enabledFlows ??
-          const [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP, TransactionFlow.SWAP],
+      initial.enabledFlows ?? const [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP, TransactionFlow.SWAP],
     );
   }
 

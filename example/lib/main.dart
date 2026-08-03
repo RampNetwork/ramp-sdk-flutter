@@ -43,9 +43,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
         case SendCryptoRequested():
           ramp.postHostEvent(SendCryptoResult.txHash('demo-tx-hash'));
         case RequestCryptoAccount(:final payload):
-          ramp.postHostEvent(
-            RequestCryptoAccountResult.account(address: '0xabc', type: payload.type),
-          );
+          ramp.postHostEvent(RequestCryptoAccountResult.account(address: '0xabc', type: payload.type));
         case WidgetClose():
           if (context.mounted) Navigator.of(context).maybePop();
         default:
@@ -57,10 +55,7 @@ class _RampFlutterAppState extends State<RampFlutterApp> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (sheetContext) => SizedBox(
-        height: MediaQuery.sizeOf(sheetContext).height * 0.92,
-        child: ramp.view,
-      ),
+      builder: (sheetContext) => SizedBox(height: MediaQuery.sizeOf(sheetContext).height * 0.92, child: ramp.view),
     );
 
     ramp.dispose();

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:ramp_flutter/src/configuration.dart';
 import 'package:ramp_flutter/src/models/asset_info.dart';
 import 'package:ramp_flutter/src/models/json_map.dart';
 import 'package:ramp_flutter/src/models/purchase_details.dart';
@@ -46,7 +47,7 @@ sealed class WidgetEvent {
           return OfframpSaleCreated(OfframpSaleCreatedPayload.fromJson(payload), widgetInstanceId: widgetInstanceId);
         case 'SEND_CRYPTO':
           final version = json['eventVersion'];
-          if (version != null && version != 1) {
+          if (version != null && version != Configuration.sendCryptoProtocolVersion) {
             debugPrint('RampFlutter: drop SEND_CRYPTO — unsupported eventVersion=$version');
             return null;
           }

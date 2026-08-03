@@ -28,6 +28,7 @@ class Configuration {
   static const String defaultUrl = 'https://app.rampnetwork.com';
   static const String sdkType = 'FLUTTER';
   static const String sdkVersion = '5.0.0';
+  static const int sendCryptoProtocolVersion = 1;
 
   final String? url;
   final TransactionFlow? defaultFlow;
@@ -83,7 +84,7 @@ class Configuration {
         if (_nonEmpty(userAddress)) 'userAddress': userAddress!,
         if (_nonEmpty(userEmailAddress)) 'userEmailAddress': userEmailAddress!,
         if (_nonEmpty(webhookStatusUrl)) 'webhookStatusUrl': webhookStatusUrl!,
-        if (useSendCryptoCallback == true) 'useSendCryptoCallbackVersion': '1',
+        if (useSendCryptoCallback == true) 'useSendCryptoCallbackVersion': sendCryptoProtocolVersion.toString(),
         'sdkType': sdkType,
         'sdkVersion': sdkVersion,
       },
