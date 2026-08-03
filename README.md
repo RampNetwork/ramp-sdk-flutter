@@ -43,6 +43,8 @@ final ramp = RampFlutter(
 )
   ..onWidgetEvent = (event) {
     switch (event) {
+      case AppVersion():
+        break;
       case PurchaseCreated(:final payload):
         break;
       case OfframpSaleCreated(:final payload):
