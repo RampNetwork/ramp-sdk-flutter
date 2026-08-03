@@ -100,6 +100,13 @@ void main() {
       final ramp = RampFlutter.uri(widgetUrl)..onWidgetEvent = events.add;
 
       ramp.handleJavaScriptMessage(
+        jsonEncode({
+          'type': 'APP_VERSION',
+          'payload': {'version': '2.0'},
+          'widgetInstanceId': 'w0',
+        }),
+      );
+      ramp.handleJavaScriptMessage(
         jsonEncode({'type': 'WIDGET_CONFIG_DONE', 'payload': null, 'widgetInstanceId': 'w1'}),
       );
       ramp.handleJavaScriptMessage(jsonEncode({'type': 'WIDGET_CONFIG_FAILED', 'payload': null}));
@@ -173,6 +180,7 @@ void main() {
       ramp.handleJavaScriptMessage(jsonEncode({'type': 'WIDGET_CLOSE_REQUEST', 'payload': null}));
 
       expect(events, [
+        isA<AppVersion>(),
         isA<WidgetConfigDone>(),
         isA<WidgetConfigFailed>(),
         isA<PurchaseCreated>(),
@@ -184,29 +192,32 @@ void main() {
         isA<WidgetCloseRequest>(),
       ]);
 
-      expect(events[0].widgetInstanceId, 'w1');
+      final appVersion = events[0] as AppVersion;
+      expect(appVersion.widgetInstanceId, 'w0');
+      expect(appVersion.payload.version, '2.0');
+      expect(events[1].widgetInstanceId, 'w1');
 
-      final purchase = events[2] as PurchaseCreated;
+      final purchase = events[3] as PurchaseCreated;
       expect(purchase.payload.purchase?.id, 'p1');
       expect(purchase.payload.purchase?.asset?.symbol, 'ETH');
       expect(purchase.payload.purchase?.fiatValue, 50.5);
       expect(purchase.payload.purchaseViewToken, 'token');
 
-      final sale = events[3] as OfframpSaleCreated;
+      final sale = events[4] as OfframpSaleCreated;
       expect(sale.payload.sale?.id, 's1');
       expect(sale.payload.sale?.fees?.currencySymbol, '978');
       expect(sale.payload.saleViewToken, 'sale-token');
 
-      final send = events[4] as SendCryptoRequested;
+      final send = events[5] as SendCryptoRequested;
       expect(send.payload.address, '0xabc');
       expect(send.payload.assetInfo?.uai, 'eip155:1/slip44:60');
       expect(send.payload.assetInfo?.symbol, 'ETH');
 
-      final account = events[5] as RequestCryptoAccount;
+      final account = events[6] as RequestCryptoAccount;
       expect(account.payload.type, 'ETH');
       expect(account.payload.assetSymbol, 'ETH');
 
-      final close = events[6] as WidgetClose;
+      final close = events[7] as WidgetClose;
       expect(close.payload.showAlert, isTrue);
       expect(close.payload.descriptionText, 'Leave?');
     });

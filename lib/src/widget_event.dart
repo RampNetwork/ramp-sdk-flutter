@@ -8,6 +8,7 @@ export 'package:ramp_flutter/src/models/asset_info.dart';
 export 'package:ramp_flutter/src/models/purchase_details.dart';
 export 'package:ramp_flutter/src/models/sale_details.dart';
 
+part 'widget_events/app_version.dart';
 part 'widget_events/offramp_sale_created.dart';
 part 'widget_events/purchase_created.dart';
 part 'widget_events/request_crypto_account.dart';
@@ -33,6 +34,8 @@ sealed class WidgetEvent {
 
     try {
       switch (type) {
+        case 'APP_VERSION':
+          return AppVersion(AppVersionPayload.fromJson(payload), widgetInstanceId: widgetInstanceId);
         case 'WIDGET_CONFIG_DONE':
           return WidgetConfigDone(widgetInstanceId: widgetInstanceId);
         case 'WIDGET_CONFIG_FAILED':
