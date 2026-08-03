@@ -9,10 +9,10 @@ analyze:
 format:
 	dart format --line-length 120 lib test example/lib
 
-test:
+test: get analyze format
 	flutter test
 
-build:
+build: get
 	cd example && flutter build ios --debug --no-codesign
 	cd example && flutter build apk --debug
 
