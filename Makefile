@@ -12,8 +12,10 @@ format:
 test:
 	flutter test
 
-ios:
+build:
 	cd example && flutter build ios --debug --no-codesign
-
-android:
 	cd example && flutter build apk --debug
+
+ios:
+	flutter emulators --launch apple_ios_simulator
+	cd example && flutter run -d "iPhone"
