@@ -1,7 +1,8 @@
 # Ramp Network Flutter
 
-Official Flutter package for Ramp Network. Loads the Ramp widget in a Flutter
-WebView on iOS and Android (no native Ramp SDK or Flutter plugin shells).
+Official Flutter package for Ramp Network. \
+Loads the Ramp widget in a Flutter
+WebView on iOS and Android.
 
 ## Getting Started
 
@@ -12,15 +13,14 @@ dependencies:
   ramp_flutter: ^5.0.0
 ```
 
+Upgrading from 4.x? See [MIGRATION.md](MIGRATION.md).
+
 ### Host setup
 
-- **Android:** `minSdkVersion` 24+. Declare `android.permission.CAMERA` if you
-  need KYC camera capture.
-- **iOS:** deployment target 13+. Add `NSCameraUsageDescription` (and photo
-  library usage if you rely on document upload).
-- Native Ramp iOS/Android SDKs and empty Flutter plugin shells are **not**
-  required (no CocoaPods `Ramp` pod, no JitPack `ramp-sdk-android`).
-  Platform WebView support comes from `webview_flutter` / `url_launcher`.
+- **Android:** `minSdkVersion` 24+. Declare `android.permission.CAMERA` for
+  identity verification camera capture.
+- **iOS:** deployment target 13+. Add `NSCameraUsageDescription` and photo
+  library usage descriptions for identity verification and document upload.
 - Requires Flutter 3.44+ / Dart 3.12+.
 
 ### Usage
@@ -44,7 +44,6 @@ final ramp = RampFlutter(
   ..onWidgetEvent = (event) {
     switch (event) {
       case PurchaseCreated(:final payload):
-        // payload.purchase, purchaseViewToken, apiUrl
         break;
       case OfframpSaleCreated(:final payload):
         break;
@@ -57,7 +56,6 @@ final ramp = RampFlutter(
       case WidgetClose():
         Navigator.of(context).pop();
       case WidgetCloseRequest():
-        // User tried to dismiss while widget is not closeable — confirm or ignore.
         break;
       case WidgetConfigDone():
       case WidgetConfigFailed():
@@ -100,6 +98,5 @@ For more configuration parameters see
   pick it up transitively (no host `dependency_overrides` required unless
   another package pins pub.dev `webview_flutter`).
 - Android WebView `<input type="file">` uses `file_picker` (and the camera via
-  `image_picker` when capture is requested). Host apps need camera / photo
-  library usage descriptions (see Getting Started). iOS WKWebView handles file
-  inputs natively.
+  `image_picker` for capture). Host apps must declare camera / photo library
+  usage (see Getting Started). iOS WKWebView handles file inputs natively.

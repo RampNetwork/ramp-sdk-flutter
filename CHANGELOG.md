@@ -5,39 +5,13 @@
 * Rewrite the SDK to load the Ramp widget in a Flutter WebView instead of the
   native iOS/Android Ramp SDKs. Published as a Dart Flutter package (no
   Android/iOS plugin shells).
-* Breaking: SDK no longer presents UI. Create `RampFlutter(Configuration)` or
-  `RampFlutter.signed(url)`, embed `ramp.view` in your own route/sheet, and
-  call `dispose` when done. `Configuration` is an immutable helper used only
-  for the config-built entry point.
-* Widget → host: sealed `WidgetEvent` via `onWidgetEvent` (includes
-  `WidgetCloseRequest`). Host → widget: sealed `HostEvent`
-  (`SendCryptoResult`, `RequestCryptoAccountResult`) via `postHostEvent`.
-* `Configuration` builds widget URLs with widget-2 params (`inAsset` /
-  `outAsset` / `inAssetValue` / `outAssetValue` / `enabledCryptoAssets` /
-  `paymentMethodType`, plus `sdkType` / `sdkVersion`). `defaultFlow` /
-  `enabledFlows` use `TransactionFlow`; `paymentMethodType` uses
-  `PaymentMethodType`.
-  Legacy params (`defaultAsset`, `fiatCurrency`, `fiatValue`, `swapAsset`,
-  `offrampAsset`, `swapAmount`, `hostLogoUrl`, `containerNode`,
-  `deepLinkScheme`, `variant`) are removed.
-* `Configuration.buildWidgetUrl()` and `RampFlutter.signed` both require an
-  `https` Ramp Network host (`*.ramp.network`, `*.rampnetwork.com`,
-  `*.ramp-network.org`).
+* Breaking: host owns presentation (`ramp.view`); use sealed `WidgetEvent` /
+  `HostEvent` instead of the old callbacks; `Configuration` is immutable and
+  uses widget-2 params. See [MIGRATION.md](MIGRATION.md).
 * Default base URL is now `https://app.rampnetwork.com`.
-* Raise minimum platforms to Android 7.0 (API 24) and iOS 13.
-* Raise minimum Flutter to 3.44 / Dart 3.12; update `webview_flutter`,
-  `url_launcher`, and `flutter_lints`.
-* Open off-widget navigations and `target=_blank` / `window.open` in the system
-  browser (same-host stays in the WebView). Depends on a forked
-  `webview_flutter` (`flutter_packages` / `webview-target-blank`) as a direct
-  git dependency so hosts pick it up transitively.
-* Android WebView file inputs use `file_picker`; capture requests use
-  `image_picker` (camera).
-* Queue `postHostEvent` until the widget page has finished loading.
-* Public API is `package:ramp_flutter/ramp_flutter.dart` only (implementation under `lib/src/`).
-* Add `RampFlutter.signed` for server-signed widget URLs (loaded verbatim).
-  Config URL building rejects bases that already include a `signature` query
-  parameter.
+* Raise minimums: Flutter 3.44 / Dart 3.12, Android API 24, iOS 13.
+* Off-widget / `target=_blank` navigations open in the system browser; Android
+  file inputs use `file_picker` / `image_picker`.
 
 ## 4.0.1
 
