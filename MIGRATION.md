@@ -88,7 +88,7 @@ point. It builds widget URLs with widget-2 params and always appends
 | `defaultAsset` / `fiatCurrency` / `fiatValue` / `swapAsset` / `offrampAsset` / `swapAmount` | `inAsset` / `outAsset` / `inAssetValue` / `outAssetValue` / `enabledCryptoAssets` |
 | `enabledFlows` / `defaultFlow` as strings | `TransactionFlow` enum |
 | — | `paymentMethodType` (`PaymentMethodType` enum) |
-| `hostLogoUrl`, `containerNode`, `deepLinkScheme`, `variant` | removed |
+| `hostLogoUrl`, `hostAppName`, `containerNode`, `deepLinkScheme`, `variant` | removed — partner name and logo are set by Ramp Network on the integration (`PARTNER_NAME` / `PARTNER_LOGO_URL`) |
 
 Default base URL is `https://app.rampnetwork.com`.
 

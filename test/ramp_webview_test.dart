@@ -19,7 +19,6 @@ void main() {
       final url = const Configuration(
         url: 'https://app.dev.ramp-network.org/custom',
         hostApiKey: 'key',
-        hostAppName: 'App',
         enabledCryptoAssets: ['ETH_*', 'BTC_BTC'],
         inAsset: 'EUR',
         outAsset: 'ETH_ETH',
@@ -40,7 +39,6 @@ void main() {
       expect(url.host, 'app.dev.ramp-network.org');
       expect(url.path, '/custom');
       expect(url.queryParameters['hostApiKey'], 'key');
-      expect(url.queryParameters['hostAppName'], 'App');
       expect(url.queryParameters['enabledFlows'], 'ONRAMP,OFFRAMP');
       expect(url.queryParameters['enabledCryptoAssets'], 'ETH_*,BTC_BTC');
       expect(url.queryParameters['inAsset'], 'EUR');

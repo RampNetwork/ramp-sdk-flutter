@@ -9,7 +9,6 @@ class ConfigurationForm extends StatefulWidget {
 
   static Configuration defaults() => const Configuration(
     url: 'https://app.dev.ramp-network.org',
-    hostAppName: 'Ramp Network Flutter',
     enabledFlows: [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP, TransactionFlow.SWAP],
     defaultFlow: TransactionFlow.ONRAMP,
     outAsset: 'BTC_BTC',
@@ -28,7 +27,6 @@ class ConfigurationFormState extends State<ConfigurationForm> {
   ];
 
   late final TextEditingController _hostApiKey;
-  late final TextEditingController _hostAppName;
   late final TextEditingController _inAsset;
   late final TextEditingController _inAssetValue;
   late final TextEditingController _outAsset;
@@ -47,7 +45,6 @@ class ConfigurationFormState extends State<ConfigurationForm> {
     final initial = widget.initialConfiguration ?? ConfigurationForm.defaults();
     _url = initial.url ?? _environments.first;
     _hostApiKey = TextEditingController(text: initial.hostApiKey ?? '');
-    _hostAppName = TextEditingController(text: initial.hostAppName ?? '');
     _inAsset = TextEditingController(text: initial.inAsset ?? '');
     _inAssetValue = TextEditingController(text: initial.inAssetValue ?? '');
     _outAsset = TextEditingController(text: initial.outAsset ?? '');
@@ -62,7 +59,6 @@ class ConfigurationFormState extends State<ConfigurationForm> {
 
   List<TextEditingController> get _textControllers => [
     _hostApiKey,
-    _hostAppName,
     _inAsset,
     _inAssetValue,
     _outAsset,
@@ -87,7 +83,6 @@ class ConfigurationFormState extends State<ConfigurationForm> {
   Configuration _build() => Configuration(
     url: _url,
     hostApiKey: _trimmed(_hostApiKey),
-    hostAppName: _trimmed(_hostAppName),
     defaultFlow: _defaultFlow,
     enabledFlows: List<TransactionFlow>.from(_enabledFlows),
     inAsset: _trimmed(_inAsset),
@@ -127,7 +122,6 @@ class ConfigurationFormState extends State<ConfigurationForm> {
         ),
         const SizedBox(height: 12),
         _field(_hostApiKey, 'Host API key'),
-        _field(_hostAppName, 'Host app name'),
         const Text('Enabled flows'),
         Row(
           children: [

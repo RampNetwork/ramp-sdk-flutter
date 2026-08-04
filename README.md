@@ -36,7 +36,6 @@ import 'package:ramp_flutter/ramp_flutter.dart';
 final ramp = RampFlutter(
   Configuration(
     hostApiKey: 'YOUR_API_KEY',
-    hostAppName: 'My App',
     enabledFlows: [TransactionFlow.ONRAMP, TransactionFlow.OFFRAMP],
     outAsset: 'BTC_BTC',
   ),
@@ -86,6 +85,10 @@ final ramp = RampFlutter.signed(signedWidgetUrlFromYourBackend)
 
 Generate the signed URL on your backend (`hostApiKey`, `timestamp`, `signature`).
 Keep signing keys out of the app.
+
+Partner **name** and **logo** are not SDK configuration fields. Ask Ramp
+Network to set host features `PARTNER_NAME` / `PARTNER_LOGO_URL` for your
+integration (for example via integrations@rampnetwork.com).
 
 For more configuration parameters see
 [Ramp Network Flutter documentation](https://docs.ramp.network/mobile/flutter-sdk/).

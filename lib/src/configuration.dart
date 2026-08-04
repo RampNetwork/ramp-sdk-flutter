@@ -15,7 +15,6 @@ class Configuration {
     this.outAssetValue,
     this.finalUrl,
     this.hostApiKey,
-    this.hostAppName,
     this.offrampWebhookV3Url,
     this.paymentMethodType,
     this.selectedCountryCode,
@@ -40,7 +39,6 @@ class Configuration {
   final String? outAssetValue;
   final String? finalUrl;
   final String? hostApiKey;
-  final String? hostAppName;
   final String? offrampWebhookV3Url;
   final PaymentMethodType? paymentMethodType;
   final String? selectedCountryCode;
@@ -77,7 +75,6 @@ class Configuration {
         if (_nonEmpty(outAssetValue)) 'outAssetValue': outAssetValue!,
         if (_nonEmpty(finalUrl)) 'finalUrl': finalUrl!,
         if (_nonEmpty(hostApiKey)) 'hostApiKey': hostApiKey!,
-        if (_nonEmpty(hostAppName)) 'hostAppName': hostAppName!,
         if (_nonEmpty(offrampWebhookV3Url)) 'offrampWebhookV3Url': offrampWebhookV3Url!,
         if (paymentMethodType != null) 'paymentMethodType': paymentMethodType!.name,
         if (_nonEmpty(selectedCountryCode)) 'selectedCountryCode': selectedCountryCode!,
