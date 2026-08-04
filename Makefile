@@ -1,15 +1,16 @@
-.PHONY: get analyze format test ios android
+.PHONY: get format analyze test ios
+.DEFAULT_GOAL := test
 
 get:
 	flutter pub get
 
+format:
+	dart format lib test example/lib
+
 analyze:
 	dart analyze
 
-format:
-	dart format --line-length 120 lib test example/lib
-
-test: get analyze format
+test: get format analyze
 	flutter test
 
 build: get
@@ -17,5 +18,7 @@ build: get
 	cd example && flutter build apk --debug
 
 ios:
-	flutter emulators --launch apple_ios_simulator
-	cd example && flutter run -d "iPhone"
+	@id=$$(flutter devices --device-connection attached | grep SimRuntime.iOS \
+	| head -n1 | cut -d'•' -f2 | xargs); \
+	[ -n "$$id" ] || (echo "No iOS device found" && exit 1); \
+	cd example && flutter run -d $$id
