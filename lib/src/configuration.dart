@@ -13,7 +13,6 @@ class Configuration {
     this.inAssetValue,
     this.outAsset,
     this.outAssetValue,
-    this.finalUrl,
     this.hostApiKey,
     this.offrampWebhookV3Url,
     this.paymentMethodType,
@@ -37,7 +36,6 @@ class Configuration {
   final String? inAssetValue;
   final String? outAsset;
   final String? outAssetValue;
-  final String? finalUrl;
   final String? hostApiKey;
   final String? offrampWebhookV3Url;
   final PaymentMethodType? paymentMethodType;
@@ -73,7 +71,6 @@ class Configuration {
         if (_nonEmpty(inAssetValue)) 'inAssetValue': inAssetValue!,
         if (_nonEmpty(outAsset)) 'outAsset': outAsset!,
         if (_nonEmpty(outAssetValue)) 'outAssetValue': outAssetValue!,
-        if (_nonEmpty(finalUrl)) 'finalUrl': finalUrl!,
         if (_nonEmpty(hostApiKey)) 'hostApiKey': hostApiKey!,
         if (_nonEmpty(offrampWebhookV3Url)) 'offrampWebhookV3Url': offrampWebhookV3Url!,
         if (paymentMethodType != null) 'paymentMethodType': paymentMethodType!.name,

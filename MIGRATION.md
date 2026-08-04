@@ -89,6 +89,7 @@ point. It builds widget URLs with widget-2 params and always appends
 | `enabledFlows` / `defaultFlow` as strings | `TransactionFlow` enum |
 | — | `paymentMethodType` (`PaymentMethodType` enum) |
 | `hostLogoUrl`, `hostAppName`, `containerNode`, `deepLinkScheme`, `variant` | removed — partner name and logo are set by Ramp Network on the integration (`PARTNER_NAME` / `PARTNER_LOGO_URL`) |
+| `finalUrl` | removed — hosted-mode redirect only; not used by the Flutter WebView SDK |
 
 Default base URL is `https://app.rampnetwork.com`.
 

@@ -24,7 +24,6 @@ void main() {
         outAsset: 'ETH_ETH',
         inAssetValue: '10000',
         outAssetValue: '500000',
-        finalUrl: 'https://example.com/done',
         webhookStatusUrl: 'https://example.com/purchase-hook',
         offrampWebhookV3Url: 'https://example.com/hook',
         selectedCountryCode: 'PL',
@@ -45,7 +44,6 @@ void main() {
       expect(url.queryParameters['outAsset'], 'ETH_ETH');
       expect(url.queryParameters['inAssetValue'], '10000');
       expect(url.queryParameters['outAssetValue'], '500000');
-      expect(url.queryParameters['finalUrl'], 'https://example.com/done');
       expect(url.queryParameters['webhookStatusUrl'], 'https://example.com/purchase-hook');
       expect(url.queryParameters['offrampWebhookV3Url'], 'https://example.com/hook');
       expect(url.queryParameters['selectedCountryCode'], 'PL');
