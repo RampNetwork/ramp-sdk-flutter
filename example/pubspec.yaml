@@ -1,22 +1,19 @@
 name: ramp_flutter_example
-description: "Demonstrates how to use the ramp_flutter plugin."
-version: 1.0.0+1
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+description: "Demonstrates how to use the ramp_flutter package."
+publish_to: 'none'
+version: 0.1.0+1
 
 environment:
-  sdk: '>=3.2.3 <4.0.0'
+  sdk: ^3.12.2
 
 dependencies:
   flutter:
     sdk: flutter
   ramp_flutter:
     path: ../
-  cupertino_icons: ^1.0.2
-  flutter_platform_widgets: ^6.0.2
-  flutter_local_notifications: ^16.3.0
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true

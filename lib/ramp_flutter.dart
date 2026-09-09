@@ -1,72 +1,38 @@
-import 'dart:async';
+import 'package:flutter/widgets.dart';
+import 'package:ramp_flutter/src/configuration.dart';
+import 'package:ramp_flutter/src/host_event.dart';
+import 'package:ramp_flutter/src/ramp_webview.dart';
+import 'package:ramp_flutter/src/signed_url.dart';
+import 'package:ramp_flutter/src/widget_event.dart';
 
-import 'package:flutter/services.dart';
-import 'package:ramp_flutter/offramp_sale.dart';
-import 'package:ramp_flutter/onramp_purchase.dart';
-import 'package:ramp_flutter/send_crypto_payload.dart';
+export 'package:ramp_flutter/src/configuration.dart';
+export 'package:ramp_flutter/src/host_event.dart';
+export 'package:ramp_flutter/src/widget_event.dart';
 
-import 'configuration.dart';
-
-/// Wrapper class for Ramp Network Flutter widget
 class RampFlutter {
-  final MethodChannel _channel = const MethodChannel('ramp_flutter');
+  RampFlutter(Configuration configuration) : this._(configuration.buildWidgetUrl());
 
-  Function(OnrampPurchase, String, String)? onOnrampPurchaseCreated;
-  Function(SendCryptoPayload payload)? onSendCryptoRequested;
-  Function(OfframpSale, String, String)? onOfframpSaleCreated;
-  Function()? onRampClosed;
+  factory RampFlutter.signed(String url) => RampFlutter._(validateRampSignedUrl(url));
 
-  void _handleOnOnrampPurchaseCreated(dynamic arguments) {
-    dynamic payload = arguments[0];
-    String purchaseViewToken = arguments[1];
-    String apiUrl = arguments[2];
-    OnrampPurchase purchase = OnrampPurchase.fromArguments(payload);
-    onOnrampPurchaseCreated!(purchase, purchaseViewToken, apiUrl);
+  @visibleForTesting
+  factory RampFlutter.uri(Uri widgetUrl) => RampFlutter._(widgetUrl);
+
+  RampFlutter._(Uri widgetUrl) : _webView = RampWebView(widgetUrl);
+
+  final RampWebView _webView;
+
+  void Function(WidgetEvent event)? get onWidgetEvent => _webView.onWidgetEvent;
+
+  set onWidgetEvent(void Function(WidgetEvent event)? callback) {
+    _webView.onWidgetEvent = callback;
   }
 
-  void _handleOnSendCryptoRequested(dynamic arguments) {
-    dynamic payload = arguments[0];
-    SendCryptoPayload sendCrypto = SendCryptoPayload.fromArguments(payload);
-    onSendCryptoRequested!(sendCrypto);
-  }
+  Widget get view => _webView.view;
 
-  void _handleOnOfframpSaleCreated(dynamic arguments) {
-    dynamic payload = arguments[0];
-    String saleViewToken = arguments[1];
-    String apiUrl = arguments[2];
-    OfframpSale sale = OfframpSale.fromArguments(payload);
-    onOfframpSaleCreated!(sale, saleViewToken, apiUrl);
-  }
+  Future<void> postHostEvent(HostEvent event) => _webView.postHostEvent(event);
 
-  void _handleOnRampClosed() {
-    onRampClosed!();
-  }
+  void dispose() => _webView.dispose();
 
-  Future<void> _didRecieveMethodCall(MethodCall call) async {
-    switch (call.method) {
-      case "onOnrampPurchaseCreated":
-        _handleOnOnrampPurchaseCreated(call.arguments);
-        break;
-      case "onSendCryptoRequested":
-        _handleOnSendCryptoRequested(call.arguments);
-        break;
-      case "onOfframpSaleCreated":
-        _handleOnOfframpSaleCreated(call.arguments);
-        break;
-      case "onRampClosed":
-        _handleOnRampClosed();
-        break;
-    }
-  }
-
-  Future<void> showRamp(
-    Configuration configuration,
-  ) async {
-    _channel.setMethodCallHandler(_didRecieveMethodCall);
-    await _channel.invokeMethod('showRamp', configuration.toMap());
-  }
-
-  Future<void> sendCrypto(String? transactionHash) async {
-    await _channel.invokeMethod('sendCrypto', transactionHash);
-  }
+  @visibleForTesting
+  void handleJavaScriptMessage(String message) => _webView.handleJavaScriptMessage(message);
 }

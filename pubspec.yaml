@@ -1,25 +1,38 @@
 name: ramp_flutter
-description: Ramp Network for Flutter is a simple wrapper for native iOS and Android Ramp Network SDKs. Unified API lets you write code once and use on any of the platforms. Ramp Network Flutter SDK supports iOS and Android platforms.
-version: 4.0.1
+description: "Ramp Network for Flutter loads the Ramp widget in a Flutter WebView with a unified Dart API for iOS and Android."
+version: 5.0.0
 homepage: https://ramp.network/
 
 environment:
-  sdk: '>=3.2.3 <4.0.0'
-  flutter: '>=3.3.0'
+  sdk: ^3.12.2
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.0.2
+  file_picker: ^10.1.2
+  image_picker: ^1.1.2
+  url_launcher: ^6.3.2
+  # Fork with NavigationDelegate.onCreateWindow (target=_blank / window.open).
+  # Android / wkwebview are listed because we import them; same commit as webview_flutter.
+  # https://github.com/mateusz-ramp/flutter_packages/tree/webview-target-blank
+  webview_flutter:
+    git:
+      url: https://github.com/mateusz-ramp/flutter_packages.git
+      ref: a37d157a9160fbd509484e9bb176be038c4d153c
+      path: packages/webview_flutter/webview_flutter
+  webview_flutter_android:
+    git:
+      url: https://github.com/mateusz-ramp/flutter_packages.git
+      ref: a37d157a9160fbd509484e9bb176be038c4d153c
+      path: packages/webview_flutter/webview_flutter_android
+  webview_flutter_wkwebview:
+    git:
+      url: https://github.com/mateusz-ramp/flutter_packages.git
+      ref: a37d157a9160fbd509484e9bb176be038c4d153c
+      path: packages/webview_flutter/webview_flutter_wkwebview
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
-
-flutter:
-  plugin:
-    platforms:
-      android:
-        package: network.ramp.ramp_flutter
-        pluginClass: RampFlutterPlugin
-      ios:
-        pluginClass: RampFlutterPlugin
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
